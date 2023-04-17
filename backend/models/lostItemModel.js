@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize, DataTypes, BOOLEAN } = require('sequelize');
 
 const { sequelize } = require('../db/connect');
 const UserModel = require('./userModel');
@@ -58,6 +58,11 @@ const LostItemModel = sequelize.define('lost_items', {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
+  is_approved: {
+    type: DataTypes.BOOLEAN,
+    default: false,
+    allowNull: false,
+  }
 });
 
 (async () => {
