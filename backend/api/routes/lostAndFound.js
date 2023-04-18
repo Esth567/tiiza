@@ -26,10 +26,10 @@ router.post(
 );
 
 router.post(
-  '/register/customer/lost-item',
+  '/customer/register/lost-item',
   VerifyUser.ensureAuthenticated,
   (req, res, next) => {
-    initiateMediaTransfer(req, res, next, 'req.user', 'lost');
+    initiateMediaTransfer(req, res, next, 'lost_and_found', 'lost');
   },
   lostItemCtrl
 );

@@ -5,6 +5,7 @@ const register = require('./routes/register');
 const dashboard = require('./routes/dashboard');
 const resetPassword = require('./routes/resetPassword');
 const otpAction = require('./routes/otpAction');
+const conversation = require('./routes/conversation');
 
 const lostAndFound = require('./routes/lostAndFound');
 
@@ -21,5 +22,6 @@ router.use(dashboard);
 router.use(register);
 router.use(profile);
 router.use(login);
+router.use(conversation);
 
 module.exports = router;

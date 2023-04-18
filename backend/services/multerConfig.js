@@ -4,14 +4,15 @@ const path = require('path');
 const initiateMediaTransfer = (req, res, next, _path, dest) => {
   if (_path === 'lost_and_found') {
   }
-
-  dest = dest === '' ? req.user.username : dest;
+  console.log(req.user.email)
+  const customerEmail = req.user.email;
+  dest = dest === '' ? req.user.email : dest;
   // if
   const storage = multer.diskStorage({
     destination: `./uploads/${_path}/${dest}`,
     filename: function (req, file, cb) {
       // console.log(file);
-      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+      cb(null, customerEmail + "_Img" + '-' + Date.now() + path.extname(file.originalname));
     },
   });
 
