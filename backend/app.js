@@ -11,8 +11,14 @@ const { sequelize } = require('./db/connect');
 const PORT = process.env.PORT || 4000;
 const errorHandler = require('./middleware/errorHandler');
 const cors = require('cors');
-// require('./service/flutterwaveConfig');
+const path = require('path');
 
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const httpServer = createServer(app);
+const io = new Server(httpServer, { /* options */ });
+// require('./service/flutterwaveConfig');
+require("./services/socketConfig")(io)
 // store config
 
 const sessionStore = new SequelizeStore({
@@ -25,7 +31,7 @@ const sessionStore = new SequelizeStore({
     secure: true,
   },
 });
-
+app.use(express.static(path.join(__dirname, 'public')));
 // middle wares
 
 app.use(function (err, req, res, next) {
@@ -66,7 +72,7 @@ app.use(errorHandler);
 const startApp = async () => {
   try {
     await connectDb();
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       console.log(`App is running on port ${PORT}`);
     });
   } catch (error) {

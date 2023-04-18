@@ -6,68 +6,67 @@ const asyncWrapper = require('../../middleware/asyncWrapper');
 const FoundItemModel = require('../../models/foundItemModel');
 
 const lostItemCtrl = asyncWrapper(async (req, res) => {
-  const { item_name, item_worth, date_lost, location_lost, phone_number } = req.body;
-
-  if (!item_name || !item_worth || !date_lost || !location_lost || !phone_number)
+  const { item_name, item_worth, lost_date, lost_location, phone_number, description, report_type, item_color, item_type } = req.body;
+  const { email } = req.user
+  if (!item_name || !item_worth || !lost_date || !lost_location || !phone_number || !description || !report_type || !item_color || !item_type)
     return res.status(400).send({ success: false, payload: 'Input fields cannot be empty' });
   //check for invalid date
-  const date = new Date(date_lost);
+  const date = new Date(lost_date);
   if (isNaN(date.getTime()))
     return res.status(400).send({ success: false, payload: 'Please Enter a valid date' });
   if (!req.file)
     return res.status(400).send({ success: false, payload: 'Please select an image file' });
+  if (description.length < 6 || description.length > 200)
+    return res.status(400).send({ success: false, payload: 'Please enter a valid description for your item' });
   let { destination } = req.file;
-  const { username } = req.user;
+
   destination = destination.slice(1);
   console.log({
     image_url: destination,
+    item_type,
     item_name,
     item_worth,
-    date_lost,
-    location_lost,
+    lost_date,
+    lost_location,
     phone_number,
+    report_type,
+    item_color,
+    description
   });
 
   const storeLostInfo = await LostItemModel.create({
     image_url: destination,
     item_name,
     item_worth,
-    date_lost: date,
-    location_lost,
-    username,
+    item_type,
+    lost_date: date,
+    lost_location,
     phone_number,
+    description,
+    report_type,
+    item_color,
+    customer_email: email,
+    is_approved: false,
+
   });
   //   TODO:
   if (!storeLostInfo)
     return res.status(500).send({ success: false, payload: 'something went wrong' });
-  return res.status(200).send({ success: true, payload: 'Your complaint has been received' });
+  return res.status(200).send({ success: true, payload: 'Thank you for submitting your report. We have received it and will publish it once it has been approved' });
 });
 
 const fetchLostItemsCtrl = asyncWrapper(async (req, res) => {
-  //   const dirPath = path.join('uploads/lost_and_found/lost');
-  //   fs.readdir(dirPath, (err, files) => {
-  //     if (err) {
-  //       return res.status(500).send('Error reading uploads folder: ' + err.message);
-  //     } else {
-  //       // Filter out non-image files
-  //       const imageFiles = files.filter((file) => {
-  //         return file.endsWith('.jpeg') || file.endsWith('.jpg') || file.endsWith('.png');
-  //       });
-  //       // Send back the remaining image files as a response
-  //       return res.status(200).send({ success: true, payload: imageFiles });
-  //     }
-  //   });
 
-  const getLostItems = await LostItemModel.findAll();
+  const getLostItems = await LostItemModel.findAll({ where: { is_approved: true } });
   if (getLostItems.length == 0)
     return res.status(404).send({ success: false, payload: 'No item found' });
   return res.status(200).send({ success: true, payload: getLostItems });
 });
 
 const fetchCustomerLostItems = asyncWrapper(async (req, res) => {
-  const { username } = req.user;
+  const { email } = req.user;
 
-  const customersItems = await LostItemModel.findAll({ where: { username: username } });
+  const customersItems = await LostItemModel.findAll({ where: { customer_email: email, is_approved: true } });
   if (customersItems.length == 0)
     return res.status(404).send({ success: false, payload: 'No item found' });
   return res.status(200).send({ success: true, payload: customersItems });
@@ -76,49 +75,55 @@ const fetchCustomerLostItems = asyncWrapper(async (req, res) => {
 // ----------------------------------------------FOUND SECTION--------------------------------
 
 const foundLostItemCtrl = asyncWrapper(async (req, res) => {
-  const { item_name, discovery_location, date_found, pickup_location, phone_number } = req.body;
+  const { item_name, discovery_location, date_found, pickup_location, phone_number, item_type, item_color, description } = req.body;
   console.log(item_name, discovery_location, date_found, pickup_location, phone_number);
-  if (!item_name || !discovery_location || !date_found || !pickup_location || !phone_number)
+  if (!item_name || !discovery_location || !date_found || !pickup_location || !phone_number || !item_type || !item_color || !description)
     return res.status(400).send({ success: false, payload: 'Input fields cannot be empty' });
   //check for invalid date
   const date = new Date(date_found);
   if (isNaN(date.getTime()))
     return res.status(400).send({ success: false, payload: 'Please Enter a valid date' });
+  if (description.length < 6 || description.length > 200)
+    return res.status(400).send({ success: false, payload: 'Please enter a valid description for your item' })
   if (!req.file)
     return res.status(400).send({ success: false, payload: 'Please select an image file' });
-  console.log(req.file);
-  let { destination } = req.file;
-  destination = destination.slice(1);
-  //   console.log(req.file);
+  let { destination, path, filename } = req.file;
+  destination = destination.slice(2);
+  const fullPath = `${destination}${filename} `
+  console.log(fullPath);
   //   return;
-  const { username } = req.user;
+  const { email } = req.user;
 
   const storeFoundInfo = await FoundItemModel.create({
-    image_url: destination,
+    image_url: fullPath,
+    item_type,
     item_name,
     discovery_location,
     date_found: date,
     pickup_location,
-    username,
+    customer_email: email,
     phone_number,
+    item_color,
+    description,
+    is_approved: false
   });
 
   if (!storeFoundInfo)
     return res.status(500).send({ success: false, payload: 'something went wrong' });
-  return res.status(200).send({ success: true, payload: 'Information uploaded successfully' });
+  return res.status(200).send({ success: true, payload: 'Thank you for submitting your report. We have received it and will publish it once it has been approved' });
 });
 
 const fetchFoundItemsCtrl = asyncWrapper(async (req, res) => {
-  const getFoundItems = await FoundItemModel.findAll();
+  const getFoundItems = await FoundItemModel.findAll({ where: { is_approved: true } });
   if (getFoundItems.length == 0)
     return res.status(404).send({ success: false, payload: 'No item found' });
   return res.status(200).send({ success: true, payload: getFoundItems });
 });
 
 const fetchCustomerFoundItems = asyncWrapper(async (req, res) => {
-  const { username } = req.user;
+  const { email } = req.user;
 
-  const customersItems = await FoundItemModel.findAll({ where: { username: username } });
+  const customersItems = await FoundItemModel.findAll({ where: { customer_email: email, is_approved: true } });
   if (customersItems.length == 0)
     return res.status(404).send({ success: false, payload: 'No item found' });
   return res.status(200).send({ success: true, payload: customersItems });

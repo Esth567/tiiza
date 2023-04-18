@@ -40,6 +40,11 @@ const FoundItemModel = sequelize.define('found_items', {
     type: DataTypes.STRING(45),
     allowNull: false,
   },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+
   customer_email: {
     type: DataTypes.STRING(45),
     allowNull: false,
@@ -52,6 +57,11 @@ const FoundItemModel = sequelize.define('found_items', {
     type: DataTypes.STRING(45),
     allowNull: false,
   },
+  is_approved: {
+    type: DataTypes.BOOLEAN,
+    default: false,
+    allowNull: false,
+  }
 });
 
 (async () => {

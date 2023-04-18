@@ -2,6 +2,7 @@
 const { otpValidation, requestOtp } = require('./OTPController');
 
 const { registerController } = require('./registerController');
+const { conversationCtrl, getConversationCtrl, sendMessageCtrl, fetchMessageCtrl } = require('./conversationController');
 const {
   lostItemCtrl,
   fetchLostItemsCtrl,
@@ -28,5 +29,8 @@ module.exports = {
   fetchLostItemsCtrl,
   lostItemCtrl,
   fetchCustomerLostItems,
-
+  conversationCtrl,
+  getConversationCtrl,
+  sendMessageCtrl,
+  fetchMessageCtrl
 };
