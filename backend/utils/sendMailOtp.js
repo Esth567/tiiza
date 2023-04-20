@@ -63,6 +63,7 @@ async function sendMailOTP(email, req) {
   // console.log(mailOptions)
 
   const isSent = await transporter.sendMail(mailOptions);
+  return isSent
 }
 
 module.exports = { sendMailOTP };
