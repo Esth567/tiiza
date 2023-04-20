@@ -6,8 +6,9 @@ const asyncWrapper = require('../../middleware/asyncWrapper');
 const FoundItemModel = require('../../models/foundItemModel');
 
 const lostItemCtrl = asyncWrapper(async (req, res) => {
+
   const { item_name, item_worth, lost_date, lost_location, phone_number, description, report_type, item_color, item_type } = req.body;
-  const { email } = req.user
+  const { email } = req.user;
   if (!item_name || !item_worth || !lost_date || !lost_location || !phone_number || !description || !report_type || !item_color || !item_type)
     return res.status(400).send({ success: false, payload: 'Input fields cannot be empty' });
   //check for invalid date
@@ -21,18 +22,6 @@ const lostItemCtrl = asyncWrapper(async (req, res) => {
   let { destination } = req.file;
 
   destination = destination.slice(1);
-  console.log({
-    image_url: destination,
-    item_type,
-    item_name,
-    item_worth,
-    lost_date,
-    lost_location,
-    phone_number,
-    report_type,
-    item_color,
-    description
-  });
 
   const storeLostInfo = await LostItemModel.create({
     image_url: destination,
@@ -72,7 +61,7 @@ const fetchCustomerLostItems = asyncWrapper(async (req, res) => {
   return res.status(200).send({ success: true, payload: customersItems });
 });
 
-// ----------------------------------------------FOUND SECTION--------------------------------
+//====================================================FOUND SECTION===================================================================
 
 const foundLostItemCtrl = asyncWrapper(async (req, res) => {
   const { item_name, discovery_location, date_found, pickup_location, phone_number, item_type, item_color, description } = req.body;
@@ -89,8 +78,7 @@ const foundLostItemCtrl = asyncWrapper(async (req, res) => {
     return res.status(400).send({ success: false, payload: 'Please select an image file' });
   let { destination, path, filename } = req.file;
   destination = destination.slice(2);
-  const fullPath = `${destination}${filename} `
-  console.log(fullPath);
+  const fullPath = `${destination}${filename}`
   //   return;
   const { email } = req.user;
 
@@ -113,8 +101,9 @@ const foundLostItemCtrl = asyncWrapper(async (req, res) => {
   return res.status(200).send({ success: true, payload: 'Thank you for submitting your report. We have received it and will publish it once it has been approved' });
 });
 
+
 const fetchFoundItemsCtrl = asyncWrapper(async (req, res) => {
-  const getFoundItems = await FoundItemModel.findAll({ where: { is_approved: true } });
+  const getFoundItems = await FoundItemModel.findAll({ where: { is_approved: true, is_resolved: false } });
   if (getFoundItems.length == 0)
     return res.status(404).send({ success: false, payload: 'No item found' });
   return res.status(200).send({ success: true, payload: getFoundItems });
@@ -123,11 +112,13 @@ const fetchFoundItemsCtrl = asyncWrapper(async (req, res) => {
 const fetchCustomerFoundItems = asyncWrapper(async (req, res) => {
   const { email } = req.user;
 
-  const customersItems = await FoundItemModel.findAll({ where: { customer_email: email, is_approved: true } });
+  const customersItems = await FoundItemModel.findAll({ where: { customer_email: email, is_approved: true, is_resolved: false } });
   if (customersItems.length == 0)
     return res.status(404).send({ success: false, payload: 'No item found' });
   return res.status(200).send({ success: true, payload: customersItems });
 });
+
+
 module.exports = {
   lostItemCtrl,
   fetchLostItemsCtrl,

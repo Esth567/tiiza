@@ -15,7 +15,7 @@ const ConversationModel = sequelize.define('Conversation', {
   }
 });
 
-const ConversationMemberModel = sequelize.define('ConversationMember', {
+const ConversationMemberModel = sequelize.define('Conversation_Member', {
   record_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -25,6 +25,49 @@ const ConversationMemberModel = sequelize.define('ConversationMember', {
   member_id: {
     type: DataTypes.INTEGER,
     allowNull: false
+  }
+});
+
+const UserConversationModel = sequelize.define('User_conversation', {
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: UserModel,
+      key: 'user_id',
+    },
+    onDelete: 'CASCADE',
+  },
+  conversation_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: ConversationModel,
+      key: 'conversation_id',
+    },
+    onDelete: 'CASCADE',
+  },
+});
+
+
+
+
+const Connection = sequelize.define('Connection', {
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  socketId: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  lastActive: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
 });
 
@@ -52,8 +95,8 @@ MessageModel.belongsTo(ConversationModel, { foreignKey: 'conversation_id' });
 UserModel.hasMany(MessageModel, { foreignKey: 'user_id' });
 MessageModel.belongsTo(UserModel, { foreignKey: 'user_id' });
 
-UserModel.belongsToMany(ConversationModel, { through: 'UserConversation', foreignKey: 'conversation_id' });
-ConversationModel.belongsToMany(UserModel, { through: 'UserConversation', foreignKey: 'user_id' });
+UserModel.belongsToMany(ConversationModel, { through: UserConversationModel, foreignKey: 'user_id' });
+ConversationModel.belongsToMany(UserModel, { through: UserConversationModel, foreignKey: 'conversation_id' });
 
 (async () => {
   try {
@@ -64,4 +107,4 @@ ConversationModel.belongsToMany(UserModel, { through: 'UserConversation', foreig
   }
 })();
 
-module.exports = { ConversationModel, MessageModel, ConversationMemberModel };
+module.exports = { ConversationModel, MessageModel, ConversationMemberModel, UserConversationModel, Connection };
