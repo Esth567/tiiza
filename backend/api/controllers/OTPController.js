@@ -44,7 +44,8 @@ const otpValidation = asyncWrapper(async (req, res, next) => {
 
 const requestOtp = asyncWrapper(async (req, res, next) => {
     const { email } = req.body;
-    sendMailOTP(email, req);
+    const response = await sendMailOTP(email, req);
+    console.log(response)
     return res.status(200).json({
         success: true,
         payload: { message: `OTP has been sent to ${email}`, authUrl: '/customer/validate-otp' },

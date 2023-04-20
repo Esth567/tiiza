@@ -62,6 +62,11 @@ const LostItemModel = sequelize.define('lost_items', {
     type: DataTypes.BOOLEAN,
     default: false,
     allowNull: false,
+  },
+  is_resolved: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 });
 

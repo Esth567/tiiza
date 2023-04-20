@@ -5,6 +5,7 @@ const { HashPassword } = require('../../authentication/password');
 const { RegisterValidation } = require('../../validation/validation');
 const { createCustomError } = require('../../middleware/customError');
 const { sendMailOTP } = require('../../utils/sendMailOtp');
+
 require('dotenv').config();
 
 const registerController = asyncWrapper(async (req, res, next) => {
@@ -49,8 +50,8 @@ const registerController = asyncWrapper(async (req, res, next) => {
   req.session.customer_details.email = email;
   req.session.customer_details.phone = phone;
   req.session.customer_details.full_name = full_name;
-  sendMailOTP(email, req);
-
+  const reponse = await sendMailOTP(email, req);
+  console.log(response)
   return res.status(200).json({
     success: true,
     payload: { message: `OTP has been sent to ${email}`, authUrl: '/customer/validate-otp' },

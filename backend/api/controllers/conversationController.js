@@ -1,22 +1,11 @@
 const { sequelize } = require("../../db/connect");
 const asyncWrapper = require("../../middleware/asyncWrapper");
 const { createCustomError } = require("../../middleware/customError");
-const { ConversationModel, ConversationMemberModel, MessageModel } = require("../../models/chatModels");
+const { ConversationModel, ConversationMemberModel, MessageModel, UserConversationModel } = require("../../models/chatModels");
 const UserModel = require("../../models/userModel");
 
-const conversationCtrl = asyncWrapper(async (req, res) => {
+const InitiateConversationCtrl = asyncWrapper(async (req, res) => {
     const { senderId, receiverId } = req.body;
-    // const createConversation = await ConversationModel.create({ title: "default" });
-
-    // const createMember1 = await ConversationMember.create({
-    //     member_id: senderId,
-    //     conversation_id: createConversation.id,
-    // })
-    // const createMember2 = await ConversationMember.create({
-    //     member_id: reciverId,
-    //     conversation_id: createConversation.id,
-    // })
-
 
     const conversation = await sequelize.transaction(async (t) => {
         const createdConversation = await ConversationModel.create(
@@ -26,19 +15,32 @@ const conversationCtrl = asyncWrapper(async (req, res) => {
 
         const members = [
             { member_id: senderId, conversation_id: createdConversation.conversation_id },
-            { member_id: receiverId, conversation_id: createdConversation.conversation_id }
+            { member_id: receiverId, conversation_id: createdConversation.conversation_id },
         ];
+
+        console.log(members)
         await ConversationMemberModel.bulkCreate(members, { transaction: t });
+
+        const userConversations = [
+            { user_id: senderId, conversation_id: createdConversation.conversation_id },
+            { user_id: receiverId, conversation_id: createdConversation.conversation_id },
+        ];
+        await UserConversationModel.bulkCreate(userConversations, { transaction: t });
 
         return createdConversation;
     });
-    res.send(conversation);
+    return res.status(200).send({ success: true, payload: conversation });
 })
 
 
 const sendMessageCtrl = asyncWrapper(async (req, res, next) => {
     const { user_id } = req.user;
+
     const { conversationId, sender, text } = req.body;
+
+    if (!text) return next(createCustomError("Message field cannot be empty", 400));
+    if (!conversationId || !sender) return next(createCustomError("Please provide all necessary information", 400));
+
     const createMessage = await MessageModel.create({
         user_id: sender,
         text,
@@ -82,4 +84,4 @@ const getConversationCtrl = asyncWrapper(async (req, res, next) => {
 })
 
 
-module.exports = { conversationCtrl, getConversationCtrl, sendMessageCtrl, fetchMessageCtrl }
+module.exports = { InitiateConversationCtrl, getConversationCtrl, sendMessageCtrl, fetchMessageCtrl }
