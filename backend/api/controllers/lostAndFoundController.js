@@ -4,13 +4,21 @@ const { upload } = require('../../services/multerConfig');
 const LostItemModel = require('../../models/lostItemModel');
 const asyncWrapper = require('../../middleware/asyncWrapper');
 const FoundItemModel = require('../../models/foundItemModel');
-
+const { createCustomError } = require('../../middleware/customError');
+const { formatCurrency } = require('../../utils/formatters');
+const { checkSubscription } = require('../../utils/validateSubscription');
+require("dotenv").config()
 const lostItemCtrl = asyncWrapper(async (req, res) => {
 
-  const { item_name, item_worth, lost_date, lost_location, phone_number, description, report_type, item_color, item_type } = req.body;
+  let { item_name, item_worth, lost_date, lost_location, phone_number, description, report_type, item_color, item_type } = req.body;
   const { email } = req.user;
   if (!item_name || !item_worth || !lost_date || !lost_location || !phone_number || !description || !report_type || !item_color || !item_type)
     return res.status(400).send({ success: false, payload: 'Input fields cannot be empty' });
+
+  if (isNaN(item_worth)) return next(createCustomError("Please enter a  vaid  amount for your item worth", 400));
+  item_worth = parseFloat(item_worth)
+  console.log(item_worth)
+  if (item_worth >= process.env.TIIZA_REAL_CHARGE) return res.status(307).send({ success: false, payload: { message: `Sorry, Our free package Only allows registration of items NOT up to the value of ${formatCurrency(10000)}. However, if you wish to register an item worth more than this amount, we kindly request that you upgrade to our premium package for a registration fee of ${formatCurrency(2500)}`, redirectUrl: "/customer/subscriptions" } })
   //check for invalid date
   const date = new Date(lost_date);
   if (isNaN(date.getTime()))
@@ -19,12 +27,16 @@ const lostItemCtrl = asyncWrapper(async (req, res) => {
     return res.status(400).send({ success: false, payload: 'Please select an image file' });
   if (description.length < 6 || description.length > 200)
     return res.status(400).send({ success: false, payload: 'Please enter a valid description for your item' });
-  let { destination } = req.file;
 
-  destination = destination.slice(1);
+  let { destination, path, filename } = req.file;
+  destination = destination.slice(2);
+  const fullPath = `${destination}${filename}`
+  //   return;
+  // const { email } = req.user;
+
 
   const storeLostInfo = await LostItemModel.create({
-    image_url: destination,
+    image_url: fullPath,
     item_name,
     item_worth,
     item_type,
@@ -45,11 +57,36 @@ const lostItemCtrl = asyncWrapper(async (req, res) => {
 });
 
 const fetchLostItemsCtrl = asyncWrapper(async (req, res) => {
+  const { user_id, location } = req.user
 
-  const getLostItems = await LostItemModel.findAll({ where: { is_approved: true } });
-  if (getLostItems.length == 0)
-    return res.status(404).send({ success: false, payload: 'No item found' });
-  return res.status(200).send({ success: true, payload: getLostItems });
+
+  async function fetchItems(_location) {
+    if (_location) {
+
+      const getLostItems = await LostItemModel.findAll({ where: { is_approved: true, is_resolved: false, lost_location: _location } });
+      return getLostItems
+
+    } else {
+      const getLostItems = await LostItemModel.findAll({ where: { is_approved: true, is_resolved: false } });
+      return getLostItems
+    }
+
+  }
+  const isSubscribed = checkSubscription(req);
+
+  if (!isSubscribed) {
+    const lostItems = await fetchItems(null);
+    if (lostItems.length == 0)
+      return res.status(404).send({ success: false, payload: 'No item found' });
+    return res.status(200).send({ success: true, payload: lostItems });
+  } else {
+    const lostItems = await fetchItems(location);
+    if (lostItems.length == 0)
+      return res.status(404).send({ success: false, payload: 'No item found' });
+    return res.status(200).send({ success: true, payload: { message: `Please renew your subscription to access items found in other states.`, data: lostItems } });
+  }
+
+
 });
 
 const fetchCustomerLostItems = asyncWrapper(async (req, res) => {
@@ -103,15 +140,40 @@ const foundLostItemCtrl = asyncWrapper(async (req, res) => {
 
 
 const fetchFoundItemsCtrl = asyncWrapper(async (req, res) => {
-  const getFoundItems = await FoundItemModel.findAll({ where: { is_approved: true, is_resolved: false } });
-  if (getFoundItems.length == 0)
-    return res.status(404).send({ success: false, payload: 'No item found' });
-  return res.status(200).send({ success: true, payload: getFoundItems });
+  const { user_id, location } = req.user
+  async function fetchItems(_location) {
+    if (_location) {
+      console.log("logged");
+      const getFoundItems = await FoundItemModel.findAll({ where: { is_approved: true, is_resolved: false, discovery_location: _location } });
+      return getFoundItems
+
+    } else {
+      const getFoundItems = await FoundItemModel.findAll({ where: { is_approved: true, is_resolved: false } });
+      return getFoundItems
+    }
+
+  }
+
+  const isSubscribed = checkSubscription(req);
+  if (!isSubscribed) {
+    const foundItems = await fetchItems(null);
+    if (foundItems.length == 0)
+      return res.status(404).send({ success: false, payload: 'No item found' });
+    return res.status(200).send({ success: true, payload: foundItems });
+  } else {
+    const foundItems = await fetchItems(location);
+    if (foundItems.length == 0)
+      return res.status(404).send({ success: false, payload: 'No item found' });
+    return res.status(200).send({ success: true, payload: { message: `Please renew your subscription to access items found in other states.`, data: foundItems } });
+  }
+
+
 });
 
 const fetchCustomerFoundItems = asyncWrapper(async (req, res) => {
   const { email } = req.user;
 
+  checkSubscription(req)
   const customersItems = await FoundItemModel.findAll({ where: { customer_email: email, is_approved: true, is_resolved: false } });
   if (customersItems.length == 0)
     return res.status(404).send({ success: false, payload: 'No item found' });
@@ -127,3 +189,4 @@ module.exports = {
   fetchFoundItemsCtrl,
   fetchCustomerFoundItems,
 };
+
