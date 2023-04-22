@@ -6,6 +6,7 @@ const dashboard = require('./routes/dashboard');
 const resetPassword = require('./routes/resetPassword');
 const otpAction = require('./routes/otpAction');
 const conversation = require('./routes/conversation');
+const cardPayment = require('./routes/cardPayment');
 
 const lostAndFound = require('./routes/lostAndFound');
 
@@ -16,6 +17,7 @@ const lostAndFound = require('./routes/lostAndFound');
 router.use(lostAndFound);
 router.use(resetPassword);
 
+router.use(cardPayment);
 router.use(otpAction);
 console.log(register);
 router.use(dashboard);
