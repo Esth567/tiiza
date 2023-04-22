@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes, Model } = require('sequelize');
 const { sequelize } = require('../db/connect');
-class UserModel extends Model {}
+class UserModel extends Model { }
 UserModel.init(
   {
     user_id: {
@@ -29,7 +29,16 @@ UserModel.init(
       type: DataTypes.STRING(200),
       allowNull: false,
     },
+    is_verified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    location: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
 
+    }
   },
   { sequelize, modelName: 'user' }
 );
