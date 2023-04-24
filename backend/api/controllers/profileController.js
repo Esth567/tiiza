@@ -1,8 +1,11 @@
 const { Op } = require('sequelize');
 const UserModel = require('../../models/userModel');
 const asyncWrapper = require('../../middleware/asyncWrapper');
-const { ProfileValidator } = require('../../validation/validation');
+const { ProfileValidator, PhoneValidator } = require('../../validation/validation');
 const { createCustomError } = require('../../middleware/customError');
+const { sendSMSOtp } = require('../../utils/sendSMSOtp');
+require("dotenv").config()
+
 const getCustomersProfile = asyncWrapper(async (req, res) => {
   const { user_id } = req.user;
 
@@ -43,4 +46,34 @@ const updateCustomersProfile = asyncWrapper(async (req, res, next) => {
   return res.status(200).send({ success: true, payload: 'Profile update, successful!' });
 });
 
-module.exports = { getCustomersProfile, updateCustomersProfile };
+const updateNumberCtrl = asyncWrapper(async (req, res, next) => {
+  console.log("first")
+  console.log(!req.session.customer_details)
+  if (!req.session.customer_details) return next(createCustomError("Sorry,you don't have access to this resource ", 403))
+  const { email } = req.session.customer_details;
+  const { phone } = req.body;
+  const getUser = await UserModel.findOne({ where: { email } });
+  if (!getUser) return next(createCustomError("Sorry, Systeme is unable to find account. please try again", 404))
+  const { error } = new PhoneValidator({ phone }).validate();
+  if (error) return next(createCustomError(error.message, 400));
+
+  const updatePhone = await UserModel.update({ phone }, { where: { email } })
+  if (!updatePhone[0])
+    return next(createCustomError('Sorry, something went wrong.Please try again later', 500));
+
+  sendSMSOtp(process.env.TWILIO_FROM_NUMBER, phone, req).then(response => {
+    res.status(200).json({
+      success: true,
+      payload: { message: `OTP has been sent to ${phone}`, authUrl: '/customer/validate-otp' },
+    });
+  }).catch(error => {
+    next(
+      createCustomError('System is unable to connect to your phone.please try again later', 500)
+    );
+  })
+  // return res.status(200).send({ success: true, payload: {message:'Profile update, successful!',redirectUrl:"" }});
+
+
+})
+
+module.exports = { getCustomersProfile, updateCustomersProfile, updateNumberCtrl };

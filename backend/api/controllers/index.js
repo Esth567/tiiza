@@ -1,6 +1,6 @@
 
-const { otpValidation, requestOtp } = require('./OTPController');
-
+const { otpValidation, requestOtp, smsOtpValidationCtrl } = require('./OTPController');
+const { cardPaymentCtrl, cardAuthorizationCtrl, validateCardTransactionCtrl } = require("./cardPaymentController")
 const { registerController } = require('./registerController');
 const { InitiateConversationCtrl, getConversationCtrl, sendMessageCtrl, fetchMessageCtrl } = require('./conversationController');
 const {
@@ -11,7 +11,7 @@ const {
   fetchFoundItemsCtrl,
   fetchCustomerFoundItems,
 } = require('./lostAndFoundController');
-const { getCustomersProfile, updateCustomersProfile } = require('./profileController');
+const { getCustomersProfile, updateCustomersProfile, updateNumberCtrl } = require('./profileController');
 
 const { resetPassword, confirmResetPassword } = require('./resetPasswordController');
 
@@ -32,5 +32,10 @@ module.exports = {
   InitiateConversationCtrl,
   getConversationCtrl,
   sendMessageCtrl,
-  fetchMessageCtrl
+  fetchMessageCtrl,
+  smsOtpValidationCtrl,
+  updateNumberCtrl,
+  cardPaymentCtrl,
+  cardAuthorizationCtrl,
+  validateCardTransactionCtrl
 };

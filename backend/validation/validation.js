@@ -183,6 +183,95 @@ class PasswordValidation extends Validation {
     return validateSchema.validate(this.data);
   }
 }
+
+class PhoneValidator extends Validation {
+  constructor(validationInfo) {
+    super(validationInfo);
+  }
+
+  schema() {
+    return joi.object({
+      phone: joi
+        .string()
+        .pattern(/^(\+?\d{1,3}[- ]?)?\d{11}$/) // Phone number regular expression pattern
+        .messages({
+          'string.pattern.base': `phone number must have  11 digits.`,
+        }),
+
+    });
+  }
+
+  validate() {
+    let validateSchema = this.schema();
+    // console.log(validateSchema);
+    return validateSchema.validate(this.data);
+  }
+}
+
+class CardPaymentValidator extends Validation {
+  constructor(validationInfo) {
+    super(validationInfo);
+  }
+
+  schema() {
+    return joi.object({
+      email: joi
+        .string()
+        .email({
+          minDomainSegments: 2,
+          tlds: { allow: ['com', 'net', 'org', 'it'] },
+        })
+        .required(),
+
+      card_number: joi
+        .string()
+
+        .pattern(/^[0-9]+$/)
+        .messages({
+          'string.pattern.base': `Card number must have  15 digits.`, //TODO: change to 15 in production mode
+        })
+        .min(16)
+        .max(20)
+        .required(),
+      cvv: joi
+        .string()
+        .pattern(/^\d{3}$/)
+        .messages({
+          'string.pattern.base': `CVV number must have  3 digits.`,
+        })
+        .required(),
+      amount: joi.number().required(),
+      fullname: joi.string().required(),
+      phone_number: joi
+        .string()
+        .pattern(/^(\+?\d{1,3}[- ]?)?\d{11}$/) // Phone number regular expression pattern
+        .messages({
+          'string.pattern.base': `phone number must have  11 digits.`,
+        })
+        .required(),
+      expiry_month: joi
+        .string()
+        .pattern(/^\d{2}$/)
+        .messages({
+          'string.pattern.base': `Expiry month  must have  2 digits.`,
+        })
+        .required(),
+      expiry_year: joi
+        .string()
+        .pattern(/^\d{2}$/)
+        .messages({
+          'string.pattern.base': `Expiry  month must have  2 digits.`,
+        })
+        .required(),
+    });
+  }
+
+  validate() {
+    let validateSchema = this.schema();
+    // console.log(validateSchema);
+    return validateSchema.validate(this.data);
+  }
+}
 module.exports = {
 
   RegisterValidation,
@@ -190,5 +279,7 @@ module.exports = {
   ProfileValidator,
   LoginValidation,
   EmailValidation,
+  PhoneValidator,
+  CardPaymentValidator,
 };
 // return next(createCustomError(response, 400));

@@ -50,7 +50,7 @@ const registerController = asyncWrapper(async (req, res, next) => {
   req.session.customer_details.email = email;
   req.session.customer_details.phone = phone;
   req.session.customer_details.full_name = full_name;
-  const reponse = await sendMailOTP(email, req);
+  const response = await sendMailOTP(email, req);
   console.log(response)
   return res.status(200).json({
     success: true,
