@@ -1,0 +1,2 @@
+2023-04-24 10:09:45, | Exception:DB Error  | Customer ID: 32  |   Source: Transaction Table  | Message: Unable to create  transaction record .... Amount sent: $2300.  Transaction code 23443
+"level":"error","message":"invalid credentials for email: callistus06@gmail.com password:Qqwerty12!","service":"tiiza-app","timestamp":"2023-04-24 01:48:22"
