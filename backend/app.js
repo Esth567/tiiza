@@ -3,22 +3,28 @@ require('dotenv').config();
 const app = express();
 const cookiePasser = require('cookie-parser');
 const routes = require('./api');
-const { connectDb } = require('./db/connect');
+const {connectDb} = require('./db/connect');
 const session = require('express-session');
 const passport = require('passport');
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const { sequelize } = require('./db/connect');
+const SequelizeStore = require('connect-session-sequelize')(
+  session.Store,
+);
+const {sequelize} = require('./db/connect');
+const requestIp = require('request-ip');
+
 const PORT = process.env.PORT || 4000;
 const errorHandler = require('./middleware/errorHandler');
 const cors = require('cors');
 const path = require('path');
 
-const { createServer } = require("http");
-const { Server } = require("socket.io");
+const {createServer} = require('http');
+const {Server} = require('socket.io');
 const httpServer = createServer(app);
-const io = new Server(httpServer, { /* options */ });
+const io = new Server(httpServer, {
+  /* options */
+});
 // require('./service/flutterwaveConfig');
-require("./services/socketConfig")(io)
+require('./services/socketConfig')(io);
 // store config
 
 const sessionStore = new SequelizeStore({
@@ -33,6 +39,7 @@ const sessionStore = new SequelizeStore({
 });
 app.use(express.static(path.join(__dirname, 'public')));
 // middle wares
+app.use(requestIp.mw());
 
 app.use(function (err, req, res, next) {
   if (err instanceof multer.MulterError) {
@@ -54,14 +61,14 @@ app.use(function (err, req, res, next) {
 app.use(cors());
 app.use(cookiePasser());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 app.use(
   session({
     secret: process.env.SESSION_SECRETE,
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
-  })
+  }),
 );
 app.use(passport.initialize());
 app.use(passport.session());
