@@ -1,34 +1,53 @@
-
-const { otpValidation, requestOtp, smsOtpValidationCtrl } = require('./OTPController');
-const { cardPaymentCtrl, cardAuthorizationCtrl, validateCardTransactionCtrl } = require("./cardPaymentController")
-const { registerController } = require('./registerController');
-const { InitiateConversationCtrl, getConversationCtrl, sendMessageCtrl, fetchMessageCtrl } = require('./conversationController');
+const {
+  emailOtpValidationCtrl,
+  requestOtpCtrl,
+  smsOtpValidationCtrl,
+} = require('./OTPController');
+const {
+  cardPaymentCtrl,
+  cardAuthorizationCtrl,
+  validateCardTransactionCtrl,
+} = require('./cardPaymentController');
+const {registerController} = require('./registerController');
+const {
+  InitiateConversationCtrl,
+  getConversationCtrl,
+  sendMessageCtrl,
+  fetchMessageCtrl,
+} = require('./conversationController');
 const {
   lostItemCtrl,
   fetchLostItemsCtrl,
-  fetchCustomerLostItems,
+  fetchCustomerLostItemsCtrl,
   foundLostItemCtrl,
   fetchFoundItemsCtrl,
-  fetchCustomerFoundItems,
+  fetchCustomerFoundItemsCtrl,
 } = require('./lostAndFoundController');
-const { getCustomersProfile, updateCustomersProfile, updateNumberCtrl } = require('./profileController');
+const {
+  getCustomersProfileCtrl,
+  updateCustomersProfileCtrl,
+  updateNumberCtrl,
+} = require('./profileController');
 
-const { resetPassword, confirmResetPassword } = require('./resetPasswordController');
+const {
+  resetPasswordCtrl,
+  confirmResetPasswordCtrl,
+} = require('./resetPasswordController');
 
 module.exports = {
-  updateCustomersProfile,
-  getCustomersProfile,
-  resetPassword,
-  confirmResetPassword,
+  updateCustomersProfileCtrl,
+  getCustomersProfileCtrl,
+  resetPasswordCtrl,
+  confirmResetPasswordCtrl,
   foundLostItemCtrl,
   fetchFoundItemsCtrl,
-  otpValidation,
+  emailOtpValidationCtrl,
   registerController,
-  requestOtp,
-  fetchCustomerFoundItems,
+  requestOtpCtrl,
+  fetchCustomerFoundItemsCtrl,
   fetchLostItemsCtrl,
   lostItemCtrl,
-  fetchCustomerLostItems,
+  fetchCustomerLostItemsCtrl,
   InitiateConversationCtrl,
   getConversationCtrl,
   sendMessageCtrl,
@@ -37,5 +56,5 @@ module.exports = {
   updateNumberCtrl,
   cardPaymentCtrl,
   cardAuthorizationCtrl,
-  validateCardTransactionCtrl
+  validateCardTransactionCtrl,
 };
