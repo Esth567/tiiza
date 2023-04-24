@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-const BottomTab = () => {
+const CategoryScreen = () => {
   return (
     <View>
       <Text>Category</Text>
     </View>
   );
-};
+}
 
-export default BottomTab;
+export default CategoryScreen;

@@ -6,13 +6,14 @@
  */
 
 import React from 'react';
-import {View, Text} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { HomeNavigator } from './src/navigation';
 
 const App = () => {
   return (
-    <View>
-      <Text>Hello</Text>
-    </View>
+    <NavigationContainer>
+      <HomeNavigator />
+    </NavigationContainer>
   )
 };
 
