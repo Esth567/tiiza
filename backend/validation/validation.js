@@ -6,7 +6,7 @@ class Validation {
   }
 }
 
-class RegisterValidation extends Validation {
+class RegisterValidator extends Validation {
   constructor(validationInfo) {
     super(validationInfo);
   }
@@ -47,12 +47,9 @@ class RegisterValidation extends Validation {
         .messages({
           'string.pattern.base': `phone number must have  11 digits.`,
         }),
-      bvn: joi
-        .string()
-        .pattern(/^\d{10}$/)
-        .messages({
-          'string.pattern.base': `BNV number must have  10 digits.`,
-        }),
+        location: joi
+        .string().required()
+       ,
     });
   }
 
@@ -62,7 +59,7 @@ class RegisterValidation extends Validation {
   }
 }
 
-class LoginValidation extends Validation {
+class LoginValidator extends Validation {
   constructor(validationInfo) {
     super(validationInfo);
   }
@@ -73,7 +70,7 @@ class LoginValidation extends Validation {
         .string()
         .email({
           minDomainSegments: 2,
-          tlds: { allow: ['com', 'net', 'org', 'net'] },
+          tlds: { allow: ['com', 'net', 'org', 'net',"it"] },
         })
         .required()
         .messages({
@@ -126,7 +123,7 @@ class ProfileValidator extends Validation {
     return validateSchema.validate(this.data);
   }
 }
-class EmailValidation extends Validation {
+class EmailValidator extends Validation {
   constructor(validationInfo) {
     super(validationInfo);
   }
@@ -137,7 +134,7 @@ class EmailValidation extends Validation {
         .string()
         .email({
           minDomainSegments: 2,
-          tlds: { allow: ['com', 'net', 'org', 'ng'] },
+          tlds: { allow: ['com', 'net', 'org', 'ng',"it"] },
         })
         .required()
         .messages({
@@ -155,7 +152,7 @@ class EmailValidation extends Validation {
   }
 }
 
-class PasswordValidation extends Validation {
+class PasswordValidator extends Validation {
   constructor(validationInfo) {
     super(validationInfo);
   }
@@ -268,18 +265,16 @@ class CardPaymentValidator extends Validation {
 
   validate() {
     let validateSchema = this.schema();
-    // console.log(validateSchema);
     return validateSchema.validate(this.data);
   }
 }
 module.exports = {
 
-  RegisterValidation,
-  PasswordValidation,
-  ProfileValidator,
-  LoginValidation,
-  EmailValidation,
-  PhoneValidator,
   CardPaymentValidator,
+  PasswordValidator,
+  RegisterValidator,
+  ProfileValidator,
+  LoginValidator,
+  EmailValidator,
+  PhoneValidator,
 };
-// return next(createCustomError(response, 400));

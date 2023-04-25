@@ -28,7 +28,7 @@ async function sendSMSOtp(fromNumber, toNumber, req) {
     const isSent = sendSMS(
         fromNumber,
         toNumber,
-        `Your One Time Verification Code (OTP) is: ${token}.Do not share with any one `
+        `Your One Time Verification Code (OTP) is: ${token}.Do not share with any one.Donot share this code with others `
     );
     return isSent;
 }

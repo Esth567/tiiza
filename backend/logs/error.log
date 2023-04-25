@@ -1,0 +1,13 @@
+
+{"level":"error","message":"invalid credentials for callistus56@gmail.com","service":"tiiza-app","timestamp":"2023-04-24 01:37:08"}
+{"level":"error","message":"invalid credentials for callistus56@gmail.com","service":"tiiza-app","timestamp":"2023-04-24 01:38:48"}
+{"level":"error","message":"invalid credentials for email: callistus56@gmail.com password:Qqwerty12!","service":"tiiza-app","timestamp":"2023-04-24 01:40:15"}
+error: invalid credentials for email: callistus56@gmail.com password:Qqwerty12! {"service":"tiiza-app","timestamp":"2023-04-24 01:41:58"}
+{"level":"error","message":"invalid credentials for email: callistus56@gmail.com password:Qqwerty12!","service":"tiiza-app","timestamp":"2023-04-24 01:42:50"}
+{"level":"\u001b[31merror\u001b[39m","message":"invalid credentials for email: callistus56@gmail.com password:Qqwerty12!","service":"tiiza-app","timestamp":"2023-04-24 01:43:25"}
+{"level":"error","message":"invalid credentials for email: callistus06@gmail.com password:Qqwerty12!","service":"tiiza-app","timestamp":"2023-04-24 01:46:22"}
+{"level":"error","message":"invalid credentials for email: callistus06@gmail.com password:Qqwerty12!","service":"tiiza-app","timestamp":"2023-04-24 01:47:29"}
+{"level":"error","message":"invalid credentials for email: callistus06@gmail.com password:Qqwerty12!","service":"tiiza-app","timestamp":"2023-04-24 01:48:22"}
+{"action":"register lost item","errorSource":"lostitem DB","errorType":"DB Error","level":"error","message":"Unable to register Lost Item in Database","service":"tiiza-app","timestamp":"2023-04-24 03:33:15","userId":4}
+{"action":"register lost item","errorSource":"lostitem DB","errorType":"DB Error","level":"error","message":"Unable to register Lost Item in Database","service":"tiiza-app","timestamp":"2023-04-24 03:37:54","userId":4}
+{"action":"register lost item","errorSource":"lostitem DB","errorType":"DB Error","ip":"::1","level":"error","message":"Unable to register Lost Item in Database","service":"tiiza-app","timestamp":"2023-04-24 03:40:32","userId":4}

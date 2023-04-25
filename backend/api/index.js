@@ -3,27 +3,21 @@ const login = require('./routes/login');
 const profile = require('./routes/profile');
 const register = require('./routes/register');
 const dashboard = require('./routes/dashboard');
-const resetPassword = require('./routes/resetPassword');
 const otpAction = require('./routes/otpAction');
-const conversation = require('./routes/conversation');
 const cardPayment = require('./routes/cardPayment');
-
+const conversation = require('./routes/conversation');
+const resetPasswordCtrl = require('./routes/resetPassword');
 const lostAndFound = require('./routes/lostAndFound');
 
-
-// const failedTransaction = require('./routes/flwRoutes/failedTransaction');
-
-
+router.use(resetPasswordCtrl);
+router.use(conversation);
 router.use(lostAndFound);
-router.use(resetPassword);
-
 router.use(cardPayment);
 router.use(otpAction);
-console.log(register);
 router.use(dashboard);
+console.log(register);
 router.use(register);
 router.use(profile);
 router.use(login);
-router.use(conversation);
 
 module.exports = router;

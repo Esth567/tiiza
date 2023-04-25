@@ -1,8 +1,14 @@
 const router = require('express').Router();
 const VerifyUser = require('../../middleware/auth');
-const { resetPassword, confirmResetPassword } = require('../controllers');
+const {
+  resetPasswordCtrl,
+  confirmResetPasswordCtrl,
+} = require('../controllers');
 
-router.post('/customer/reset-password', resetPassword);
-router.post('/customer/confirm-password/:token', confirmResetPassword);
+router.post('/customer/reset-password', resetPasswordCtrl);
+router.post(
+  '/customer/confirm-password/:token',
+  confirmResetPasswordCtrl,
+);
 
 module.exports = router;
