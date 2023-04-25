@@ -23,7 +23,7 @@ async function sendMailOTP(email, req) {
   var token = speakeasy.totp({
     secret: secret.base32,
     encoding: 'base32',
-    time: 120,
+    time: 600,
   });
 
   let transporter = nodemailer.createTransport({
@@ -63,6 +63,7 @@ async function sendMailOTP(email, req) {
   // console.log(mailOptions)
 
   const isSent = await transporter.sendMail(mailOptions);
+  // console.log(isSent)
   return isSent
 }
 
