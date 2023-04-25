@@ -324,7 +324,7 @@ paths:
                           application/json:
                             example:
                               success:
-                                true
+                                false
                               payload:
                                   Invalid OTP
                 '500':
