@@ -168,7 +168,11 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
         '/flw/payment/card-payment/validation';
       return res
         .status(200)
-        .send({success: true, payload: req.session.charge_payload});
+        .send({
+          success: true,
+          payload:
+            'Pin Authorization complete.OTP has been sent to your phone number.Please use it to authenticate your payment.',
+        });
     // return res.redirect('/api/v1/payment/card_payment/validation');
     case 'redirect':
       const authUrl = response.meta.authorization.redirect;
@@ -263,7 +267,11 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
         req.session.custom_payload = {};
         return res
           .status(200)
-          .send({success: true, payload: transaction.data});
+          .send({
+            success: true,
+            payload:
+              'Pin Authorization complete.OTP has been sent to your phone number.Please use it to authenticate your payment.',
+          });
       } else if (transaction.data.status == 'pending') {
         // LOG TO FILE
         logger.info(
