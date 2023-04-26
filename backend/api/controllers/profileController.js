@@ -20,7 +20,7 @@ const getCustomersProfileCtrl = asyncWrapper(async (req, res) => {
   if (!userProfile)
     return res
       .status(500)
-      .send({success: false, payload: 'Sorry something went wrong'});
+      .send({success: false, payload: ' An unexpected error occurred while getting the customer profile'});
 
   return res.status(200).send({success: true, payload: userProfile});
 });

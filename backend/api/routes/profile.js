@@ -11,7 +11,7 @@ router.get(
   VerifyUser.ensureAuthenticated,
   getCustomersProfileCtrl,
 );
-router.post('/customer/update/phone', updateNumberCtrl);
+router.patch('/customer/update/phone', updateNumberCtrl);
 router.patch(
   '/customer/update/profile',
   VerifyUser.ensureAuthenticated,

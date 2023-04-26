@@ -1,0 +1,1000 @@
+openapi: 3.0.0
+
+info:
+  title: Tiiza  API Docs
+  description: Documentation of tiiza API
+  version: "1.0"
+  contact:
+    name: Ukaobasi Callistus
+    email: callistus406@gmail.com
+
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Development server
+
+paths:
+  /login:
+    post:
+      summary: Logs a user into the application
+      description: Use this endpoint to log in to the application.
+      requestBody:
+        description: User credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Returns an object with success message
+        '400':
+          description: Bad request - Invalid or missing request parameters
+        '401':
+          description: Unauthorized - Invalid credentials provided
+        '500':
+          description: Internal server error
+
+  # ==========================REGISTER ROUTE================================
+  /register:
+    post:
+      summary: Register a customer in the application
+      description: Use this endpoint to register a customer in the application
+      requestBody:
+        description: User credentials for registration
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email address of the customer to be registered
+                fullName:
+                  type: string
+                  description: Full name of the customer to be registered
+                phone:
+                  type: string
+                  description: Phone number of the customer to be registered
+                password:
+                  type: string
+                  description: Password of the customer to be registered
+                location:
+                  type: string
+                  description: Location of the customer to be registered
+            examples:
+              example-1:
+                value:
+                  email: johndoe@example.com
+                  fullName: John Doe
+                  phone: "+2348137439434"
+                  password: password123
+                  location: Lagos    
+      responses:
+        '200':
+          description: An OTP has been sent to the customer's email address along with the authUrl
+        '400':
+          description: Bad request - Invalid or missing request parameters
+        '500':
+          description: Internal server error 
+
+  # ==========================RESET PASSWORD ROUTE================================
+
+  /customer/reset-password:
+    post:
+      summary: Reset customer password
+      description: Use this endpoint to reset a customer's password.
+      requestBody:
+        description: Email address of the customer to reset the password for.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: johndoe@example.com
+      responses:
+        '200':
+          description: A password reset email has been sent to the provided email address.
+        '400':
+          description: The request is malformed or missing required parameters.
+        '500':
+          description: Internal server error
+
+# ====================== REQUEST EMAIL OTP==============================================
+  /customer/request-mail-otp:
+    post:
+      summary: Resend email OTP  to customer 
+      description: Use this endpoint to resend   email OTP when customer requests for it during registration.
+      requestBody:
+        description: Email address of the customer .
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: johndoe@example.com
+      responses:
+        '200':
+          description: OTP has been sent to "exampl@gmail.com" .
+        '400':
+          description: The request is malformed or missing required parameters.
+        '500':
+          description: An unexpected error occurred on the server
+ 
+# ====================== REQUEST SMS OTP ROUTE==============================================
+
+  /customer/request-sms-otp:
+    post:
+      summary: Resend SMS OTP  to customer 
+      description: Use this endpoint to resend   email OTP when customer requests for it during Login verification.
+      requestBody:
+        description: Phone address of the customer .
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                  example: "+234983443292"
+      responses:
+        '200':
+          description: Returns an object with success message .
+        '400':
+          description: The request is malformed or missing required parameters.
+        '500':
+          description: Server Error
+ 
+
+# ====================== CONFIRM PASSWORD RESET ROUTE==============================================
+
+  /customer/confirm-password/{token}:
+    post:
+      summary: Confirm customer password reset
+      description: Use this endpoint to confirm a customer's password reset.
+      parameters:
+        - in: path
+          name: token
+          required: true
+          description: Token received from password reset email.
+          schema:
+            type: string
+      requestBody:
+        description: New password for the customer account.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  minLength: 8
+                  example: Password123#
+      responses:
+        '200':
+          description: Returns an object with success message
+        '400':
+          description: The request is malformed or missing required parameters.
+        '401':
+          description: Authentication error.
+        '500':
+          description: Server error
+
+
+# ====================== UPDATE PROFILE ROUTE==============================================
+       
+  /customer/update/profile:
+    patch:
+      summary: Update customer profile
+      description: Updates the profile information of a customer in the application.
+      requestBody:
+        description: Customer profile information to update
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  description: Full name of the customer
+                phone:
+                  type: string
+                  description: Phone number of the customer
+                  example: "+2348137439434"
+      responses:
+        '200':
+          description: The customer profile has been updated successfully.
+        '400':
+          description:  Returns an object with error message
+          content:
+           application/json:
+            example:
+              success:
+                 false
+              payload:
+                The request is invalid or missing required parameters.
+        '500':
+          description: returns  an object with server error message
+          
+
+
+  # ======================UPDATE CUSTOMER PHONE NUMBER ROUTE===========================================
+
+  /customer/update/phone:
+    patch:
+      summary: Update customer phone number
+      description: Updates the  customer phone number.
+      requestBody:
+        description: Update Phone number
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                  description: Phone number of the customer
+                  example: "+2348137439434"
+      responses:
+        '200':
+          description: Returns an object with a success message
+          content:
+           application/json:
+            example:
+              success:
+                 true
+              payload:
+                OTP has been sent to "+2348137439434", authUrl:'/customer/validate-otp'              
+        '400':
+          description: The request is invalid or missing required parameters.
+        '500':
+            description: Unexpected error occured on the server
+            
+  # ======================VALIDATE OTP ROUTE===========================================
+
+  /customer/validate-otp:
+    post:
+      summary: Customer registration Email OTP verification
+      description: Use this endpoint to validate customer email one time password before completing registration
+      requestBody:
+        description: Customer Email
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Customer One Time Password
+                  example: 342204
+      responses:
+                '200':
+                  description: Customer profile information was successfully retrieved.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          user_id:
+                            type: integer
+                            description: The unique identifier of the customer.
+                          email:
+                            type: string
+                            description: The email address associated with the customer account.
+                          fullName:
+                            type: string
+                            description: The full name of the customer.
+                          phone:
+                            type: string
+                            description: The phone number associated with the customer account.
+                          location:
+                            type: string
+                            description: The location associated with the customer account.
+                      examples:
+                        example-1:
+                          summary: Example customer profile response
+                          value:
+                            user_id: 2,
+                            email: johndoe@example.com
+                            fullName: John Doe
+                            phone: "+2348137439434"
+                            location: Lagos
+                '400':
+                    description: Returns an object with error message
+                    content:
+                          application/json:
+                            example:
+                              success:
+                                false
+                              payload:
+                                  Invalid OTP
+                '500':
+                  description: System is unable to create user . 
+
+
+
+
+
+  # ======================GET CUSTOMER PROFILE ROUTE DOC===========================================
+  /customer/profile:
+      get:
+        summary: Get customer profile
+        description: Retrieve the profile information for a specific customer in the application.
+        responses:
+          '200':
+            description: Customer profile information was successfully retrieved.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    user_id:
+                      type: integer
+                      description: The unique identifier of the customer.
+                    email:
+                      type: string
+                      description: The email address associated with the customer account.
+                    fullName:
+                      type: string
+                      description: The full name of the customer.
+                    phone:
+                      type: string
+                      description: The phone number associated with the customer account.
+                    location:
+                      type: string
+                      description: The location associated with the customer account.
+                examples:
+                  example-1:
+                    summary: Example customer profile response
+                    value:
+                      user_id: 2,
+                      email: johndoe@example.com
+                      fullName: John Doe
+                      phone: "+2348137439434"
+                      location: Lagos
+          '500':
+            description: An unexpected error occurred while retrieving lost items            
+                        
+                                     
+# ====================== FETCH LOST ITEM ROUTE==============================================
+  
+  /fetch/lost-items:
+    get:
+      summary: Retrieve lost items for a customer's subscription
+      description: Returns all lost items that match a customer's subscription criteria.
+      responses:
+        '200':
+          description: A list of lost items was successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    item_id:
+                      type: integer
+                      description: The unique identifier of the lost item.
+                    item_name:
+                      type: string
+                      description: The name of the lost item.
+                    item_type:
+                      type: string
+                      description: The type of item lost.
+                    image_url:
+                      type: string
+                      description: The URL of the item image.
+                    item_color:
+                      type: string
+                      description: The color of the lost item.
+                    report_type:
+                      type: string
+                      description: The report type of the lost item.
+                    item_worth:
+                      type: number
+                      description: The value of the lost item in NGN.
+                    lost_date:
+                      type: string
+                      description: The date the item was lost.
+                      example: 2021-12-31T00:00:00.000Z
+                    lost_location:
+                      type: string
+                      description: The location where the item was lost.
+                    description:
+                      type: string
+                      description: A short description of the lost item.
+                    customer_email:
+                      type: string
+                      description: The email of the customer who lost the item.
+                    phone_number:
+                      type: string
+                      description: The phone number of the customer who lost the item.
+                    createdAt:
+                      type: string
+                      description: The date and time the item was reported lost.
+                      example: 2023-04-17T14:49:50.000Z
+                    message: 
+                      type: string
+                      description: A message reminding the customer to renew their subscription.
+                      example: Please renew your subscription to access items found in other states.
+              examples:
+                example-1:
+                  summary: Example of a lost item response
+                  value:
+                    item_id: 2
+                    image_url: uploads/lost_and_found/lostcallistus506@gmail.com_Img-1682083301914.jpg
+                    item_name: battery
+                    item_color: red
+                    report_type: missing
+                    item_worth: 2000.00
+                    lost_date: 2021-12-31T00:00:00.000Z
+                    lost_location: lekki
+                    description: this was lost at oshodi
+                    customer_email: callistus406@gmail.com
+                    phone_number: 08032344321
+                    createdAt: 2023-04-17T14:49:50.000Z
+        '404':
+          description: No lost items were found that match the customer's subscription criteria.
+        '500':
+          description: Server Error.
+
+
+
+# ====================== FETCH FOUND ITEM ROUTE==============================================
+
+  /fetch/found-items:
+    get:
+      summary: Retrieve found items for a customer's subscription
+      description: Returns all found items that match a customer's subscription criteria.
+      responses:
+        '200':
+          description: A list of found items was successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    item_id:
+                      type: integer
+                      description: The unique identifier of the lost item.
+                    item_name:
+                      type: string
+                      description: The name of the lost item.
+                    item_type:
+                      type: string
+                      description: The type of item found.
+                    image_url:
+                      type: string
+                      description: The URL of the item image.
+                    item_color:
+                      type: string
+                      description: The color of the found item.
+                    report_type:
+                      type: string
+                      description: The report type of the found item.
+                    date_found:
+                      type: string
+                      description: The date the item was found.
+                      example: 2021-12-31T00:00:00.000Z
+                    discovery_location:
+                      type: string
+                      description: The location where the item was found.
+                    description:
+                      type: string
+                      description: A short description of the found item.
+                    customer_email:
+                      type: string
+                      description: The email of the customer who found the item.
+                    pickup_location:
+                      type: string
+                      description: The location where the item can be retrived
+                    phone_number:
+                      type: string
+                      description: The phone number of the customer who found the item.
+                    createdAt:
+                      type: string
+                      description: The date and time the item was reported found.
+                      example: 2023-04-17T14:49:50.000Z
+                    message: 
+                      type: string
+                      description: A message reminding the customer to renew their subscription.
+                      example: Please renew your subscription to access items found in other states.
+              examples:
+                example-1:
+                  summary: Example of a found item response
+                  value:
+                    item_id: 2
+                    image_url: uploads/lost_and_found/lostcallistus506@gmail.com_Img-1682083301914.jpg
+                    item_name: battery
+                    item_color: red
+                    report_type: missing
+                    date_found: 2021-12-31T00:00:00.000Z
+                    discovery_location: lekki
+                    pickup_location: lekki
+                    description: this was lost at oshodi
+                    customer_email: callistus406@gmail.com
+                    phone_number: 08032344321
+                    createdAt: 2023-04-17T14:49:50.000Z
+        '404':
+          description: No lost items were found that match the customer's subscription criteria.
+        '500':
+          description: Server Error.
+
+
+# ====================== REGISTER FOUND ITEM ROUTE==============================================
+
+  /customer/register/found-items:
+    post:
+      summary: Register a  found item
+      description: Use this endpoint to register found items
+      requestBody:
+        description: Item credentials for registration
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                    item_id:
+                      type: integer
+                      description: The unique identifier of the lost item.
+                    item_name:
+                      type: string
+                      description: The name of the lost item.
+                    item_type:
+                      type: string
+                      description: The type of item found.
+                    image_url:
+                      type: string
+                      description: The URL of the item image.
+                    item_color:
+                      type: string
+                      description: The color of the found item.
+                    report_type:
+                      type: string
+                      description: The report type of the found item.
+                    date_found:
+                      type: string
+                      description: The date the item was found.
+                      example: 2021-12-31T00:00:00.000Z
+                    discovery_location:
+                      type: string
+                      description: The location where the item was found.
+                    description:
+                      type: string
+                      description: A short description of the found item.
+                    customer_email:
+                      type: string
+                      description: The email of the customer who found the item.
+                    pickup_location:
+                      type: string
+                      description: The location where the item can be retrived
+                    phone_number:
+                      type: string
+                      description: The phone number of the customer who found the item.
+            examples:
+              example-1:
+                value:
+                  item_id: 1
+                  image_url: uploads/lost_and_found/foundcallistus406@gmail.com_Img-1681741418688.jpg 
+                  item_type: phone
+                  item_name: battery
+                  item_color: blue
+                  discovery_location: lekki
+                  date_found: 2021-12-31T00:00:00.000Z
+                  pickup_location:  lekki phase one
+                  description: this item was found in a bus
+                  customer_email: callistus406@gmail.com
+                  phone_number: 08032344321
+                  is_approved: true
+                  is_resolved: false
+                  createdAt: 2023-04-17T14:23:38.000Z
+                  updatedAt: 2023-04-17T14:23:38.000Z
+      responses:
+        '201':
+          description: Returns an object with success message
+          content:
+                application/json:
+                  example:
+                    success:
+                      true
+                    payload:
+                      Thank you for submitting your report. We have received it and will publish it once it has been approved
+        '400':
+          description: Bad request - Invalid or missing request parameters
+        '500':
+          description: Internal server error 
+
+
+# ====================== REGISTER LOST ITEM ROUTE==============================================
+
+
+  /customer/register/lost-items:
+    post:
+      summary: Register a  lost item
+      description: Use this endpoint to register lost items
+      requestBody:
+        description: Item credentials for registration
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                    item_id:
+                      type: integer
+                      description: The unique identifier of the lost item.
+                    item_name:
+                      type: string
+                      description: The name of the lost item.
+                    item_type:
+                      type: string
+                      description: The type of item lost.
+                    image_url:
+                      type: string
+                      description: The URL of the item image.
+                    item_color:
+                      type: string
+                      description: The color of the lost item.
+                    report_type:
+                      type: string
+                      description: The report type of the lost item.
+                    item_worth:
+                      type: number
+                      description: The value of the lost item in NGN.
+                    lost_date:
+                      type: string
+                      description: The date the item was lost.
+                      example: 2021-12-31T00:00:00.000Z
+                    lost_location:
+                      type: string
+                      description: The location where the item was lost.
+                    description:
+                      type: string
+                      description: A short description of the lost item.
+                    customer_email:
+                      type: string
+                      description: The email of the customer who lost the item.
+                    phone_number:
+                      type: string
+                      description: The phone number of the customer who lost the item.
+                  
+            examples:
+              example-1:
+                value:
+                  item_id: 1
+                  image_url: uploads/lost_and_found/foundcallistus406@gmail.com_Img-1681741418688.jpg 
+                  item_type: phone
+                  item_name: battery
+                  item_color: blue
+                  item_worth: 5000
+                  discovery_location: lekki
+                  lost_date: 2021-12-31T00:00:00.000Z
+                  lost_location:  lekki phase one
+                  description: this item was found in a bus
+                  customer_email: callistus406@gmail.com
+                  phone_number: 08032344321
+                  is_approved: true
+                  is_resolved: false
+                  createdAt: 2023-04-17T14:23:38.000Z
+                  updatedAt: 2023-04-17T14:23:38.000Z
+      responses:
+        '201':
+          description: Returns an object with success messageg
+          content:
+                application/json:
+                  example:
+                    success:
+                      true
+                    payload:
+                      Thank you for submitting your report. We have received it and will publish it once it has been approved
+        '400':
+          description: Bad request - Invalid or missing request parameters
+        '500':
+          description: Internal server error 
+
+
+
+
+# ====================== CARD PAYMENT DOCS================================================
+
+  /flw/payment/card-payment:
+      post:
+        summary: Card payment
+        description: Use this endpoint to accept card payment
+        requestBody:
+          description: Card details
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  card_number:
+                    type: string
+                    description: Customers Card number
+                    example: 553188665214295
+                  cvv:
+                    type: string
+                    description: Card CVV Number
+                    example: 234
+                  expiry_month:
+                    type: string
+                    description: Card expiry Month
+                    example: 01
+                  expiry_year:
+                    type: string
+                    description: Card expiry Year
+                    example: 23
+                  amount:
+                    type: string
+                    description: The amount to be charged
+                    example: 4000
+                  currency:
+                    type: string
+                    description: Currency to charge. this should be read only
+                    example: NGN
+                  email:
+                    type: string
+                    description: The customer's email address.
+                    example: exampl@gmail.com
+                  phone_number:
+                    type: string
+                    description: Customers phone
+                  fullname:
+                    type: string
+                    description: Location of the customer to be registered
+                  subscription_name:
+                    type: string
+                    description: package the customer is subscribing to
+              examples:
+                example-1:
+                  value:
+                    card_number: 5531886652142950
+                    cvv: 564
+                    expiry_month: 09
+                    expiry_year: 32
+                    currency: NGN
+                    amount: 18000
+                    fullname: Julius Benz
+                    email: callistus406@gmail.com
+                    phone_number: 08137127355
+                    subscription_name: tiiza_real   
+        responses:
+          '200':
+              description: Returns payload of transactiondetails
+              content:
+                application/json:
+                  example:
+                    success:
+                      true
+                    payload:
+                      card_number: 5531886652142950
+                      cvv: 564
+                      email: callistus406@gmail.com
+                      expiry_month: 09
+                      expiry_year: 32
+                      amount: 18000
+                      currency: NGN
+                      phone_number: 08137127355
+                      fullname: Julius Benz
+                      enckey: FLWSECK_TEST2b0af9e3cd26
+                      tx_ref: TX-84abe94e-3638-4183-a82c-0ef9a6014519
+                      authUrl: /api/v1/flw/payment/card-payment/authorization'
+                      totalDebit: 18302
+                      commission: 302
+                      subscription_name: tiiza     
+
+          '400':
+            description: Bad request - Invalid or missing request parameters or un supported card type
+            
+          '500':
+            description: Internal server error 
+
+            
+# =============== PIN AUTHORIZATION ROUTE DOC========================= 
+
+  /flw/payment/card-payment/authorization:
+      post:
+        summary: payment Authorization with pin
+        description: Use this endpoint to  authorize payment with pin
+        requestBody:
+          description: Enter card pin
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    description: Card pin
+                
+              examples:
+                example-1:
+                  value:
+                    email: 1245
+            
+        responses:
+          '200':
+              description: Returns an object with success message
+              content:
+                application/json:
+                  example:
+                    success:
+                      true
+                    payload:
+                      Pin Authorization complete.An OTP has been sent to your phone number.Please use it to authenticate your payment.
+
+          '400':
+            description: Bad request - Invalid or missing request parameters
+          '500':
+            description: Internal server error - 
+
+
+# =============== OTP AUTHORIZATION ROUTE DOC========================= 
+  /flw/payment/card-payment/validation:
+      post:
+        summary: payment Authentication  with OTP
+        description: Use this endpoint to  Authenticate payment with OTP
+        requestBody:
+          description: Enter OTP
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: number
+                    description: Transaction OTP
+              example:
+                value:
+                  email: 12345
+            
+        responses:
+          '200':
+              description: Pin Authorization complete.An OTP has been sent to your phone number.Please use it to authenticate your payment.
+              content:
+                application/json:
+                  example:
+                    success:
+                      true
+                    payload:
+                      transaction_type: Card Payment
+                      amount: 18000
+                      tx_ref: TX-21e3f710-1c76-4860-a92c-81977b66c3bb
+                      receiver_account: successful
+                      description: 2023-04-25T11:59:39.584Z
+                      status: successful
+          '400':
+            description: Bad request - Invalid or missing request parameters
+          '500':
+            description: Internal server error 
+
+
+  /customer/create/conversation:
+      post:
+        summary: conversation route
+        description: Use this endpoint to initiate  conversation
+        requestBody:
+          description: Start conversation
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  senderId:
+                    type: number
+                    description: id of the initiator
+                  receiverId:
+                    type: number
+                    description: id of the receiver
+              example:
+                  senderId: 2
+                  receiverId: 4
+        responses:
+          '200':
+              description: Returns an object payload of the conversation.
+          '400':
+            description: Bad request - Invalid or missing request parameters
+          '500':
+            description: Internal server error 
+
+
+  /customer/fetch/conversations:
+      get:
+        summary: Fetch  conversation messages
+        description: Use this endpoint fetch conversations
+     
+        responses:
+          '200':
+              description: Returns an  payload of  customer conversations.
+          '400':
+            description: Bad request - Invalid or missing request parameters
+          '404':
+            description: No conversation found
+          '500':
+            description: Internal server error 
+
+
+
+
+  /customer/fetch/messages/{conversationId}:
+      get:
+        summary: Fetch  conversation messages
+        description: Use this endpoint fetch messages of a sepecified conversation
+        parameters:
+          - in: path
+            name: conversationId
+            required: true
+            description: ID gotten from a selected conversation
+            schema:
+              type: string
+         
+        responses:
+          '200':
+              description: Returns an object payload of  the messages in the specified conversation.
+          '400':
+            description: Bad request - Invalid or missing request parameters
+          '404':
+            description:  No message found
+          '500':
+            description: Internal server error 
+
+
+  /customer/send/message:
+      post:
+        summary: Creates  conversation messages
+        description: Use this endpoint to create messages for a specified conversation
+        requestBody:
+          description: Start conversation
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sender:
+                    type: number
+                    description: id of the sender
+                  text:
+                    type: string
+                    description: message
+                  conversationId:
+                    type: number
+                    description: id of the selected conversation
+              example:
+                  sender: 1
+                  text: Hello there !
+                  conversationId: 1
+         
+        responses:
+          '200':
+              description: Returns an object payload of  the sent message in the specified conversation id.
+          '400':
+            description: Bad request - Invalid or missing request parameters
+          '500':
+            description: Internal server error 
