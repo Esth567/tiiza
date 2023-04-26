@@ -26,12 +26,12 @@ router.get(
   fetchFoundItemsCtrl,
 );
 router.get(
-  '/fetch/customer/lost-items',
+  '/customer/fetch/lost-items',
   VerifyUser.ensureAuthenticated,
   fetchCustomerLostItemsCtrl,
 );
 router.get(
-  '/fetch/customer/found-items',
+  '/customer/fetch/found-items',
   VerifyUser.ensureAuthenticated,
   fetchCustomerFoundItemsCtrl,
 );

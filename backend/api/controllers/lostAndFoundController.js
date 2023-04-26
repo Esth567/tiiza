@@ -263,7 +263,7 @@ const foundLostItemCtrl = asyncWrapper(async (req, res) => {
       .status(500)
       .send({success: false, payload: 'Sorry,something went wrong'});
   }
-  return res.status(200).send({
+  return res.status(201).send({
     success: true,
     payload:
       'Thank you for submitting your report. We have received it and will publish it once it has been approved',

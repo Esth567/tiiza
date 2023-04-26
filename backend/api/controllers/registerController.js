@@ -69,7 +69,7 @@ const registerController = asyncWrapper(async (req, res, next) => {
     return next(
       createCustomError(
         'Sorry!, Something went wrong,please try again later',
-        400,
+        500,
       ),
     );
   }

@@ -123,7 +123,7 @@ const requestOtpCtrl = asyncWrapper((req, res, next) => {
     })
     .catch(error => {
       logger.error(`${error.message}`, {
-        errorSource: 'Twilio',
+        errorSource: 'Email server',
         userId: null,
         errorType: 'connection error',
         action: 'send mail',
@@ -132,7 +132,7 @@ const requestOtpCtrl = asyncWrapper((req, res, next) => {
       });
       return next(
         createCustomError(
-          'System is unable to sent Otp to your Mail. please try again later',
+          `System is unable to send Otp to ${email}. please try again later`,
           500,
         ),
       );

@@ -6,6 +6,9 @@ const routes = require('./api');
 const {connectDb} = require('./db/connect');
 const session = require('express-session');
 const passport = require('passport');
+const swaggerUI = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerJSDocs = YAML.load('./apiDocs.yaml');
 const SequelizeStore = require('connect-session-sequelize')(
   session.Store,
 );
@@ -37,6 +40,7 @@ const sessionStore = new SequelizeStore({
     secure: true,
   },
 });
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 app.use(express.static(path.join(__dirname, 'public')));
 // middle wares
 app.use(requestIp.mw());

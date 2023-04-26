@@ -49,3 +49,4 @@
 {"action":"login","errorSource":"Login","errorType":"authentication error","ip":"::1","level":"warn","message":"undefined","service":"tiiza-app","timestamp":"2023-04-24 07:47:44","userId":null}
 {"action":"login","errorSource":"Login","errorType":"authentication error","ip":"::1","level":"warn","message":"Failed login attempt for email: callistus06@gmail.com. Reason: Incorrect password entered.","service":"tiiza-app","statusCode":404,"timestamp":"2023-04-24 07:48:04","userId":null}
 {"action":"login","errorSource":"Login","errorType":"authentication error","ip":"::1","level":"warn","message":"Failed login attempt for email: callistus506@gmail.com. Reason: Incorrect password entered.","service":"tiiza-app","statusCode":401,"timestamp":"2023-04-24 07:48:15","userId":null}
+{"action":"login","errorSource":"Login","errorType":"authentication error","ip":"::1","level":"warn","message":"undefined","service":"tiiza-app","timestamp":"2023-04-25 07:36:19","userId":null}
