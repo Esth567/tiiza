@@ -13,7 +13,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Input from '../component/Input';
 import CustomButton from '../component/CustomBottom';
 
-const CreateReport = ({navigation}) => {
+const CreateReport = ({navigation} : any) => {
 
   const [selectCategory, setSelectCategory] = React.useState(1);
   return (

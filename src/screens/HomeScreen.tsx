@@ -2,11 +2,13 @@ import React from 'react';
 import { View, Text, StatusBar, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import CarouselComponent from '../component/carousel';
+import CustomButton from '../component/CustomBottom';
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({navigation}:any) => {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white, paddingTop: 10 }}>
-      <StatusBar backgroundColor={COLORS.white} barStyle="ddark-content" />
+      <StatusBar backgroundColor={COLORS.white} barStyle="dark-content" />
       <ScrollView
         contentContainerStyle={{
           paddingTop: 10,
@@ -111,12 +113,23 @@ const HomeScreen = ({navigation}) => {
           >
             Missing item
           </Text>
-          <Text style={{ marginHorizontal: 10, color: COLORS.black, fontSize: 12 }}>See all</Text>
+          <Text>
+          <View style={style.seeAll}>
+          <TouchableOpacity
+                  style={style.seeAll}
+                  onPress={() => {
+                    navigation.navigate('All items');
+                  }}>
+                </TouchableOpacity> 
+          </View>
+            See all</Text>
         </View>
         <View style={{flexDirection: 'row'}}>
-          <View style={style.adContainer}></View>
-          <View style={style.adContainer2}></View>
-        </View>        
+          <CarouselComponent />
+        </View>    
+        <View>
+          <CustomButton/>
+          </View>    
       </ScrollView>
     </View>
   );
@@ -144,6 +157,14 @@ const style = StyleSheet.create({
     backgroundColor: COLORS.primary,
     marginBottom: 10,
   },
+ seeAll: {
+  marginHorizontal: 10, 
+  color: COLORS.black, 
+  fontSize: 12 ,
+  height: 30,
+  // justifyContent: 'center',
+ },
+    
   reportIcon: {
     width: 40,
     height: 40,
