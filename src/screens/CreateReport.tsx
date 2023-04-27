@@ -12,6 +12,7 @@ import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Input from '../component/Input';
 import CustomButton from '../component/CustomBottom';
+import ItemPicker from '../component/ItemPicker';
 
 const CreateReport = ({navigation} : any) => {
 
@@ -53,7 +54,7 @@ const CreateReport = ({navigation} : any) => {
         </Text>
         <View style={style.inputContainer}>
           <TextInput placeholder="Item type" style={{ flex: 1 }} />
-          <TouchableOpacity>
+          <TouchableOpacity onPress={ItemPicker}>
             <FontAwesome name="caret-down" size={18} />
           </TouchableOpacity>
         </View>
@@ -137,7 +138,7 @@ const CreateReport = ({navigation} : any) => {
               marginBottom: 2,
               marginRight: 30,
             }}
-          >
+          > 
             Report type
           </Text>
         </View>

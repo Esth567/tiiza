@@ -1,22 +1,23 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
 import { COLORS } from '../constant/theme';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Input = ({ label, iconName, error, password, onFocus = () => {}, ...props }) => {
   const [isFocused, setIsFocused] = React.useState(false);
   const [hidePassword, setHidePassword] = React.useState(password);
   return (
-    <View style={{ marginBottom: 20 }}>
+    <View style={{ marginBottom: 15 }}>
       <View
         style={[
           style.inputContainer,
           { borderColor: error ? COLORS.red : isFocused ? COLORS.primary : COLORS.gray },
         ]}
       >
-        <Icon name={iconName} style={{ fontSize: 20, color: COLORS.primary }} />
+        <Icon name={iconName} style={{ fontSize: 15, color: COLORS.primary }} />
         <TextInput
           secureTextEntry={hidePassword}
+          isPassword={true}
           autoCorrect={false}
           onFocus={() => {
             onFocus();
@@ -25,14 +26,14 @@ const Input = ({ label, iconName, error, password, onFocus = () => {}, ...props 
           onBlur={() => {
             setIsFocused(false);
           }}
-          style={{ color: COLORS.black, flex: 1, fontSize: 16 }}
+          style={{ color: COLORS.black, flex: 1, fontSize: 15 }}
           {...props}
         />
         {password && (
           <Icon
             onPress={() => setHidePassword(!hidePassword)}
             style={{ fontSize: 21, color: COLORS.primary }}
-            name={hidePassword ? 'visibility' : 'visibility-off'}
+            name={hidePassword ? 'eye' : 'eye-slash'}
           />
         )}
       </View>

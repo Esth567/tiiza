@@ -9,13 +9,12 @@ const CustomButton = ({ title, onPress = () => {} } : any) => {
       activeOpacity={0.7}
       onPress={onPress}
       style={{
-        height: 70,
+        height: 50,
         width: '100%',
         backgroundColor: COLORS.primary,
         justifyContent: 'center',
         borderRadius: 12,
         alignItems: 'center',
-        marginVertical: 60,
       }}
     >
       <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: 'bold' }}>{title}</Text>

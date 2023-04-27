@@ -1,5 +1,5 @@
 import AuthNavigator from './AuthNavigator';
 import HomeNavigator from './HomeNavigator';
-import BottomTab from './BottomTab';
+import BottomTabNavigator from './BottomTabNavigator';
 
-export {AuthNavigator, HomeNavigator, BottomTab};
+export {AuthNavigator, HomeNavigator, BottomTabNavigator};

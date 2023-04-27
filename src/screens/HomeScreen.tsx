@@ -25,7 +25,7 @@ const HomeScreen = ({navigation}:any) => {
                   color: COLORS.black,
                   fontSize: 16,
                   fontWeight: 'bold',
-                  marginRight: 70
+                  marginRight: 70,
                 }}
               >
                 Create Advert for Lost items
@@ -47,7 +47,7 @@ const HomeScreen = ({navigation}:any) => {
                 color: COLORS.black,
                 fontSize: 16,
                 fontWeight: 'bold',
-                marginBottom: 10
+                marginBottom: 10,
               }}
             >
               and items found
@@ -108,28 +108,24 @@ const HomeScreen = ({navigation}:any) => {
               fontSize: 14,
               fontWeight: '600',
               flex: 1,
-              marginBottom: 20
+              marginBottom: 20,
             }}
           >
             Missing item
           </Text>
-          <Text>
-          <View style={style.seeAll}>
           <TouchableOpacity
-                  style={style.seeAll}
-                  onPress={() => {
-                    navigation.navigate('All items');
-                  }}>
-                </TouchableOpacity> 
-          </View>
-            See all</Text>
+            onPress={() => {
+              navigation.navigate('All items');
+            }}>
+            <Text style={{color: COLORS.primary}}>See all</Text>
+          </TouchableOpacity>
         </View>
-        <View style={{flexDirection: 'row'}}>
+        <View style={{ flexDirection: 'row' }}>
           <CarouselComponent />
-        </View>    
+        </View>
         <View>
-          <CustomButton/>
-          </View>    
+          <CustomButton />
+        </View>
       </ScrollView>
     </View>
   );
