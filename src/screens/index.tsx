@@ -1,12 +1,26 @@
 import RegisterScreen from './RegisterScreen';
 import LoginScreen from './LoginScreen';
-import HomeScreen from './HomeScreen';
-import CreateReport from './CreateReport';
+import Dashboard from './Dashboard';
+import CreateReport from './Report';
 import FoundDetails from './FoundDetails';
 import CategoryScreen from './CategoryScreen';
 import DetailsScreen from './DetailsScreen';
 import ForgotPassword from './ForgotPassword';
 import SplashScreen from './SplashScreen';
-import IntroScreen from './IntroScreen';
+import HelpScreen from './HelpScreen';
+import ItemDetails from './ItemDetails';
+import Verification from './Verification';
 
-export { RegisterScreen, LoginScreen, HomeScreen, CategoryScreen , CreateReport, DetailsScreen, ForgotPassword, SplashScreen, IntroScreen};
+export {
+  RegisterScreen,
+  LoginScreen,
+  Dashboard,
+  CategoryScreen,
+  CreateReport,
+  DetailsScreen,
+  ForgotPassword,
+  SplashScreen,
+  HelpScreen,
+  ItemDetails,
+  Verification,
+};

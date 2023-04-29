@@ -7,7 +7,7 @@ const Input = ({ label, iconName, error, password, onFocus = () => {}, ...props 
   const [isFocused, setIsFocused] = React.useState(false);
   const [hidePassword, setHidePassword] = React.useState(password);
   return (
-    <View style={{ marginBottom: 15 }}>
+    <View style={{ marginBottom: 10 }}>
       <View
         style={[
           style.inputContainer,
@@ -17,7 +17,6 @@ const Input = ({ label, iconName, error, password, onFocus = () => {}, ...props 
         <Icon name={iconName} style={{ fontSize: 15, color: COLORS.primary }} />
         <TextInput
           secureTextEntry={hidePassword}
-          isPassword={true}
           autoCorrect={false}
           onFocus={() => {
             onFocus();
@@ -26,7 +25,7 @@ const Input = ({ label, iconName, error, password, onFocus = () => {}, ...props 
           onBlur={() => {
             setIsFocused(false);
           }}
-          style={{ color: COLORS.black, flex: 1, fontSize: 15 }}
+          style={{ color: COLORS.black, flex: 1, fontSize: 14 }}
           {...props}
         />
         {password && (

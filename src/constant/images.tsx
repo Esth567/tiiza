@@ -3,7 +3,7 @@ const lostIcon = require('../assets/images/lostIcon.jpg');
 const lost15 = require('../assets/images/lost15.jpg');
 const success = require('../assets/images/success.jpg');
 const lost12 = require('../assets/images/lost12.jpg');
-const tizaLogo = require('../assets/images/TizaLogo.jpg');
+const tiizLogo = require('../assets/images/tiizLogo.jpg');
 
 export default {
   foundIcon,
@@ -11,5 +11,5 @@ export default {
   lost15,
   success,
   lost12,
-  tizaLogo,
+  tiizLogo,
 };

@@ -9,7 +9,7 @@ const CustomButton = ({ title, onPress = () => {} } : any) => {
       activeOpacity={0.7}
       onPress={onPress}
       style={{
-        height: 50,
+        height: 45,
         width: '100%',
         backgroundColor: COLORS.primary,
         justifyContent: 'center',
@@ -17,7 +17,7 @@ const CustomButton = ({ title, onPress = () => {} } : any) => {
         alignItems: 'center',
       }}
     >
-      <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: 'bold' }}>{title}</Text>
+      <Text style={{ color: COLORS.white, fontSize: 16, fontWeight: 'bold' }}>{title}</Text>
     </TouchableOpacity>
   );
 };

@@ -5,7 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CarouselComponent from '../component/carousel';
 import CustomButton from '../component/CustomBottom';
 
-const HomeScreen = ({navigation}:any) => {
+const Dashboard = ({navigation}:any) => {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white, paddingTop: 10 }}>
       <StatusBar backgroundColor={COLORS.white} barStyle="dark-content" />
@@ -37,7 +37,7 @@ const HomeScreen = ({navigation}:any) => {
                     navigation.navigate('Create Ad');
                   }}
                 >
-                  <FontAwesome name="plus" size={28} color={COLORS.white} />
+                  <FontAwesome name="rectangle-ad" size={28} color={COLORS.white} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -106,7 +106,7 @@ const HomeScreen = ({navigation}:any) => {
               marginHorizontal: 10,
               color: COLORS.black,
               fontSize: 14,
-              fontWeight: '600',
+              fontWeight: '700',
               flex: 1,
               marginBottom: 20,
             }}
@@ -116,15 +116,13 @@ const HomeScreen = ({navigation}:any) => {
           <TouchableOpacity
             onPress={() => {
               navigation.navigate('All items');
-            }}>
-            <Text style={{color: COLORS.primary}}>See all</Text>
+            }}
+          >
+            <Text style={{ color: COLORS.primary }}>See all</Text>
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row' }}>
           <CarouselComponent />
-        </View>
-        <View>
-          <CustomButton />
         </View>
       </ScrollView>
     </View>
@@ -159,8 +157,7 @@ const style = StyleSheet.create({
   fontSize: 12 ,
   height: 30,
   // justifyContent: 'center',
- },
-    
+ },   
   reportIcon: {
     width: 40,
     height: 40,
@@ -195,4 +192,4 @@ const style = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default Dashboard;

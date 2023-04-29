@@ -6,8 +6,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS } from '../constant/theme';
 import SubscriptionScreen from '../screens/SubscriptionScreen';
 import HomeNavigator from './HomeNavigator';
-import { CreateReport } from '../screens';
-
+import { CreateReport, HelpScreen } from '../screens';
+import Report from '../screens/Report';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,24 +33,24 @@ const BottomTabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Lost item"
-        component={CreateReport}
+        name="Report"
+        component={Report}
         options={{
-          tabBarIcon: ({ color }) => <Icon name="qr-code-scanner" color={color} size={25} />,
+          tabBarIcon: ({ color }) => <Icon name="person-circle" color={color} size={20} />,
         }}
       />
       <Tab.Screen
-        name="Found item"
-        component={CreateReport}
+        name="Help"
+        component={HelpScreen}
         options={{
-          tabBarIcon: ({ color }) => <Icon name="person" color={color} size={25} />,
+          tabBarIcon: ({ color }) => <Icon name="handshake-angle" color={color} size={25} />,
         }}
       />
       <Tab.Screen
         name="Subscription"
         component={SubscriptionScreen}
         options={{
-          tabBarIcon: ({ color }) => <Icon name="person" color={color} size={25} />,
+          tabBarIcon: ({ color }) => <Icon name="rectangle-list" color={color} size={25} />,
         }}
       />
     </Tab.Navigator>

@@ -13,8 +13,9 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Input from '../component/Input';
 import CustomButton from '../component/CustomBottom';
 import ItemPicker from '../component/ItemPicker';
+import SwitchButton from '../component/SwitchButton';
 
-const CreateReport = ({navigation} : any) => {
+const Report = ({navigation} : any) => {
 
   const [selectCategory, setSelectCategory] = React.useState(1);
   return (
@@ -26,26 +27,7 @@ const CreateReport = ({navigation} : any) => {
           marginHorizontal: 15,
         }}
       >
-        <View style={style.reportContainer}>
-          <View style={{ flexDirection: 'row' }}>
-            <Text
-              style={{
-                marginHorizontal: 20,
-                color: COLORS.white,
-                fontSize: 15,
-                fontWeight: '700',
-                flex: 1,
-              }}
-            >
-              Lost item
-            </Text>
-            <Text
-              style={{ marginHorizontal: 20, color: COLORS.white, fontSize: 15, fontWeight: '500' }}
-            >
-              Found item
-            </Text>
-          </View>
-        </View>
+      <SwitchButton />
         <Text style={{ color: COLORS.black, fontSize: 12, marginBottom: 10 }}>
           Kindly provide details of the missing items
         </Text>
@@ -167,7 +149,7 @@ const CreateReport = ({navigation} : any) => {
             </TouchableOpacity>
           </View>
         </View>
-        <CustomButton title="Continue"   onPress={() => {navigation.navigate('Details')}} />
+        <CustomButton title="Continue" onPress={() => {navigation.navigate('Details')}} />
       </ScrollView>
     </View>
   );
@@ -214,4 +196,4 @@ const style = StyleSheet.create({
   },
 });
 
-export default CreateReport;
+export default Report;

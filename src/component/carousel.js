@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef} from 'react';
-import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { COLORS } from '../constant/theme';
 
@@ -54,21 +54,43 @@ const data = [
       
      
     const renderItem = ({ item, index }) => (
-          <View style={[styles.card, { backgroundColor: index === 0 ? '#012454' : '#A8C2FB'}]}>
+      <View style={[styles.card, { backgroundColor: index === 0 ? '#012454' : '#A8C2FB' }]}>
         <View style={styles.imagecontainer}>
           <Image source={item.image} style={styles.cardImage} />
           <View style={styles.separator} />
-          <View style={[styles.subscriptionContainer2, { backgroundColor: index === 0 ? '#A8C2FB' : '#012454'},{color: index === 0 ? '#000000' : '#0000b3'}]}>
-          <Text style={styles.textContainer2}>{item.status}</Text>
+          <View
+            style={[
+              styles.subscriptionContainer2,
+              { backgroundColor: index === 0 ? '#A8C2FB' : '#012454' },
+              { color: index === 0 ? '#000000' : '#0000b3' },
+            ]}
+          >
+            <Text style={styles.textContainer2}>{item.status}</Text>
           </View>
         </View>
-        <Text style={[styles.cardTitle, { color: index === 0 ? '#ffffff' : '#000000'}]}>{item.title}</Text>
-        <Text style={[styles.cardDescription, { color: index === 0 ? '#ffffff' : '#000000'}]}>{item.description}</Text>
-        <Text style={[styles.lastseen,, { color: index === 0 ? '#ffffff' : '#000000'}]}>{item.lastseen}</Text>
-        <Text style={[styles.location, { color: index === 0 ? '#ffffff' : '#000000'}]}>{item.location}</Text>
-        <View style={styles.detailsCont}>
-        <Text style={[styles.subscriptionContainer, { backgroundColor: index === 0 ? '#A8C2FB' : '#012454'}]}>View Details</Text>
-        </View>
+        <Text style={[styles.cardTitle, { color: index === 0 ? '#ffffff' : '#000000' }]}>
+          {item.title}
+        </Text>
+        <Text style={[styles.cardDescription, { color: index === 0 ? '#ffffff' : '#000000' }]}>
+          {item.description}
+        </Text>
+        <Text style={[styles.lastseen, , { color: index === 0 ? '#ffffff' : '#000000' }]}>
+          {item.lastseen}
+        </Text>
+        <Text style={[styles.location, { color: index === 0 ? '#ffffff' : '#000000' }]}>
+          {item.location}
+        </Text>
+        <TouchableOpacity
+          style={styles.detailsCont}>
+          <Text
+            style={[
+              styles.subscriptionContainer,
+              { backgroundColor: index === 0 ? '#A8C2FB' : '#012454' },
+            ]}
+          >
+            View Details
+          </Text>
+        </TouchableOpacity>
       </View>
     );
     return (
@@ -98,74 +120,73 @@ const data = [
   const itemWidth = sliderWidth * 0.8;
   
   const styles = StyleSheet.create({
-    imagecontainer:{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        // paddingVertical: 10,
+    imagecontainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+      // paddingVertical: 10,
     },
     container: {
-      flex: 1,
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: 20,
       paddingVertical: 10,
     },
-    subscriptionContainer2:{
-        height: 48,
-        width: '38%',
-        borderRadius: 40,
-        backgroundColor: COLORS.primary,
-        marginBottom: 10,
-  },
-    textContainer2:{
+    subscriptionContainer2: {
+      height: 35,
+      width: '30%',
+      borderRadius: 50,
+      backgroundColor: COLORS.primary,
+      marginBottom: 10,
+    },
+    textContainer2: {
       color: COLORS.white,
       textAlign: 'center',
       paddingTop: 10,
-      fontSize: 18,
-      fontWeight: 600,
+      fontSize: 15,
+      fontWeight: '600',
     },
     separator: {
-        width: 30,
-      },
+      width: 30,
+    },
     card: {
       backgroundColor: '#A8C2FB',
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
-      height: 300,
+      height: 280,
       width: '100%',
     },
     cardImage: {
-    flexDirection: 'row',
+      flexDirection: 'row',
       width: 100,
-      height: 150,
+      height: 100,
       resizeMode: 'contain',
       alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+      paddingVertical: 10,
     },
     cardTitle: {
-      fontSize: 24,
+      fontSize: 15,
       fontWeight: 'bold',
+      marginTop: 10,
     },
     cardDescription: {
-      fontSize: 18,
+      fontSize: 12,
       fontWeight: 400,
       marginBottom: 8,
-      textAlign: 'left',
+      textAlign: 'center',
     },
     lastseen: {
-        fontSize: 18,
-        fontWeight: 400,
+      fontSize: 12,
+      fontWeight: 400,
     },
     location: {
-        fontSize: 18,
-        fontWeight: 500,
-        marginBottom: 5,
-        marginTop: 8,
+      fontSize: 12,
+      fontWeight: 500,
+      marginTop: 8,
     },
     paginationContainer: {
       paddingVertical: 8,
@@ -176,25 +197,26 @@ const data = [
       borderRadius: 8,
       marginHorizontal: 5,
       backgroundColor: 'rgba(0, 0, 0, 0.92)',
+      marginTop: 10
     },
     subscriptionContainer: {
-        height: 43, 
-        backgroundColor: COLORS.primary,
-        marginBottom: 25,
-        color: COLORS.white,
-        textAlign: 'center',
-        paddingTop: 5,
-        fontSize: 24,
-        fontStyle: 'normal',
-        fontWeight: 500,
-      },
-      detailsCont:{
-        height: 43,
-        width: '99%',
-        marginBottom: 13,
-        borderRadius: 50,
-      },
- });
+      height: 48,
+      backgroundColor: COLORS.primary,
+      color: COLORS.white,
+      textAlign: 'center',
+      paddingTop: 5,
+      fontSize: 15,
+      fontStyle: 'normal',
+      fontWeight: 500,
+    },
+    detailsCont: {
+      height: 30,
+      width: '99%',
+      marginTop: 15,
+      borderBottomRightRadius: 20,
+      textAlign: 'center'
+    },
+  });
   
 export default CarouselComponent;
   
