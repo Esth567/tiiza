@@ -20,17 +20,22 @@ class RegisterValidator extends Validation {
         .string()
         .email({
           minDomainSegments: 2,
-          tlds: { allow: ['com', 'net', 'org', 'net'] },
+          tlds: {allow: ['com', 'net', 'org', 'net']},
         })
         .required()
         .messages({
           'string.empty': ` Email field cannot be empty `,
           'object.regex': 'Email Must Be A Valid Email',
-          'string.pattern.base': 'Email Must Be A Valid Email Address',
+          'string.pattern.base':
+            'Email Must Be A Valid Email Address',
         }),
       password: joi
         .string()
-        .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$'))
+        .pattern(
+          new RegExp(
+            '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+          ),
+        )
         .min(8)
         .max(30)
         .required()
@@ -47,9 +52,7 @@ class RegisterValidator extends Validation {
         .messages({
           'string.pattern.base': `phone number must have  11 digits.`,
         }),
-        location: joi
-        .string().required()
-       ,
+      location: joi.string().required(),
     });
   }
 
@@ -70,17 +73,22 @@ class LoginValidator extends Validation {
         .string()
         .email({
           minDomainSegments: 2,
-          tlds: { allow: ['com', 'net', 'org', 'net',"it"] },
+          tlds: {allow: ['com', 'net', 'org', 'net', 'it']},
         })
         .required()
         .messages({
           'string.empty': ` Email field cannot be empty `,
           'object.regex': 'Email Must Be A Valid Email',
-          'string.pattern.base': 'Email Must Be A Valid Email Address',
+          'string.pattern.base':
+            'Email Must Be A Valid Email Address',
         }),
       password: joi
         .string()
-        .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$'))
+        .pattern(
+          new RegExp(
+            '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+          ),
+        )
         .min(8)
         .max(30)
         .required()
@@ -98,7 +106,6 @@ class LoginValidator extends Validation {
     return validateSchema.validate(this.data);
   }
 }
-
 
 class ProfileValidator extends Validation {
   constructor(validationInfo) {
@@ -119,7 +126,6 @@ class ProfileValidator extends Validation {
 
   validate() {
     let validateSchema = this.schema();
-    // console.log(validateSchema);
     return validateSchema.validate(this.data);
   }
 }
@@ -134,20 +140,20 @@ class EmailValidator extends Validation {
         .string()
         .email({
           minDomainSegments: 2,
-          tlds: { allow: ['com', 'net', 'org', 'ng',"it"] },
+          tlds: {allow: ['com', 'net', 'org', 'ng', 'it']},
         })
         .required()
         .messages({
           'string.empty': ` Email field cannot be empty `,
           'object.regex': 'Email Must Be A Valid Email',
-          'string.pattern.base': 'Email Must Be A Valid Email Address',
+          'string.pattern.base':
+            'Email Must Be A Valid Email Address',
         }),
     });
   }
 
   validate() {
     let validateSchema = this.schema();
-    // console.log(validateSchema);
     return validateSchema.validate(this.data);
   }
 }
@@ -161,7 +167,11 @@ class PasswordValidator extends Validation {
     return joi.object({
       password: joi
         .string()
-        .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$'))
+        .pattern(
+          new RegExp(
+            '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+          ),
+        )
         .min(8)
         .max(30)
         .required()
@@ -176,7 +186,6 @@ class PasswordValidator extends Validation {
   }
   validate() {
     let validateSchema = this.schema();
-    // console.log(validateSchema);
     return validateSchema.validate(this.data);
   }
 }
@@ -194,13 +203,11 @@ class PhoneValidator extends Validation {
         .messages({
           'string.pattern.base': `phone number must have  11 digits.`,
         }),
-
     });
   }
 
   validate() {
     let validateSchema = this.schema();
-    // console.log(validateSchema);
     return validateSchema.validate(this.data);
   }
 }
@@ -216,7 +223,7 @@ class CardPaymentValidator extends Validation {
         .string()
         .email({
           minDomainSegments: 2,
-          tlds: { allow: ['com', 'net', 'org', 'it'] },
+          tlds: {allow: ['com', 'net', 'org', 'it']},
         })
         .required(),
 
@@ -269,7 +276,6 @@ class CardPaymentValidator extends Validation {
   }
 }
 module.exports = {
-
   CardPaymentValidator,
   PasswordValidator,
   RegisterValidator,
