@@ -13,8 +13,11 @@ cron.schedule('*/60 * * * * *', async () => {
     },
   });
   // console.log(expiredSubscriptions);
-  for (const subscription of expiredSubscriptions) {
-    await subscription.destroy();
+  if (expiredSubscriptions.length > 0) {
+    console.log('expiredSubscriptions');
+    for (const subscription of expiredSubscriptions) {
+      await subscription.destroy();
+    }
   }
 });
 

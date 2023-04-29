@@ -7,11 +7,11 @@ const otpAction = require('./routes/otpAction');
 const cardPayment = require('./routes/cardPayment');
 const conversation = require('./routes/conversation');
 const resetPasswordCtrl = require('./routes/resetPassword');
-const lostAndFound = require('./routes/lostAndFound');
+// const lostAndFound = require('./routes/lostAndFound');
 
 router.use(resetPasswordCtrl);
 router.use(conversation);
-router.use(lostAndFound);
+// router.use(lostAndFound);
 router.use(cardPayment);
 router.use(otpAction);
 router.use(dashboard);

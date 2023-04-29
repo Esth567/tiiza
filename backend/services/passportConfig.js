@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const {UnHashPassword} = require('../authentication/password');
 const passport = require('passport');
 const {logger} = require('../utils/winstonLogger');
+const {generateUniqueId} = require('../utils/uniqueIds');
+const requestId = generateUniqueId();
 
 const initializePassport = (
   passport,
@@ -12,7 +14,6 @@ const initializePassport = (
 ) => {
   async function authenticateUser(email, password, done) {
     const validateData = {email, password};
-    // console.log(req);
 
     const {error} = new LoginValidator(validateData).validate();
 
@@ -26,7 +27,7 @@ const initializePassport = (
         payload: {
           message: 'Invalid Credentials',
           statusCode: 404,
-          logMsg: `Failed login attempt for email: ${email}. Reason: Incorrect password entered.`,
+          logMsg: `Failed Authentication attempt for email: ${email}. Reason: Invalid Credentials.`,
         },
       });
 
@@ -45,18 +46,20 @@ const initializePassport = (
           payload: {
             message: 'Incorrect email or Password',
             statusCode: 401,
-            logMsg: `Failed login attempt for email: ${email}. Reason: Incorrect password entered.`,
+            logMsg: `Failed Authentication attempt for email: ${email}. Reason: Incorrect password entered.`,
           },
         });
       }
     } catch (e) {
       logger.warn(`${e.message}`, {
-        errorSource: 'Login DB',
+        module: 'passportConfig.js',
+        requestId: requestId,
         userId: null,
-        errorType: 'passport.js error',
-        action: 'authentication',
+        method: req.method,
+        path: req.path,
+        action: 'Authentication',
         statusCode: 500,
-        ip: req.clientIp,
+        clientIp: req.clientIp,
       });
       return done(e);
     }
