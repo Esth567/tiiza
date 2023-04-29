@@ -29,7 +29,6 @@ const InitiateConversationCtrl = asyncWrapper(async (req, res) => {
       },
     ];
 
-    console.log(members);
     await ConversationMemberModel.bulkCreate(members, {
       transaction: t,
     });

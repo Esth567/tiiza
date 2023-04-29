@@ -24,8 +24,7 @@ class VerifyUser {
     });
   }
   static forwardAuthenticated(req, res, next) {
-    if (req.isAuthenticated())
-      return res.redirect('/api/v1/dashboard');
+    if (req.isAuthenticated()) return res.redirect('/api/v1/');
     return next();
   }
 }

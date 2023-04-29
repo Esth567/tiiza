@@ -110,11 +110,8 @@ const startApp = async () => {
     httpServer.listen(PORT, () => {
       logger.info(`App is running on port${PORT}`, {
         module: 'app.js',
-        userId: null,
-        requestId: null,
         action: 'Lunch server',
         statusCode: 200,
-        clientIp: null,
         serverPort: PORT,
       });
       console.log(`App is running on port ${PORT}`);
@@ -122,11 +119,8 @@ const startApp = async () => {
   } catch (error) {
     logger.error(`${error.message}`, {
       module: 'app.js',
-      userId: null,
-      requestId: null,
       action: 'Lunch server',
       statusCode: 500,
-      clientIp: null,
       serverPort: PORT,
     });
   }
