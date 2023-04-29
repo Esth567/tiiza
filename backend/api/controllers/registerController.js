@@ -5,10 +5,12 @@ const {RegisterValidator} = require('../../validation/validation');
 const {createCustomError} = require('../../middleware/customError');
 const {sendMailOTP} = require('../../utils/sendMailOtp');
 const {logger} = require('../../utils/winstonLogger');
-
+const {generateUniqueId} = require('../../utils/uniqueIds');
 require('dotenv').config();
 
 const registerController = asyncWrapper(async (req, res, next) => {
+  const requestId = res.getHeader('X-request-Id');
+
   const {
     email,
     fullName,
@@ -26,7 +28,6 @@ const registerController = asyncWrapper(async (req, res, next) => {
     return res
       .status(200)
       .json({success: false, payload: error.message});
-  console.log(password, confirmPassword);
   if (password !== confirmPassword)
     return next(
       createCustomError('The passwords entered do not match. ', 400),
@@ -59,12 +60,14 @@ const registerController = asyncWrapper(async (req, res, next) => {
   const hashPassword = await new HashPassword(password).hash();
   if (!hashPassword) {
     logger.error(`Failed to hash password`, {
-      errorSource: 'Bcrypt',
-      userId: null,
-      errorType: 'hash Error',
-      action: 'hash password',
+      module: 'registerController.js',
+      userId: req.user ? req.user.user_id : null,
+      requestId: requestId,
+      method: req.method,
+      path: req.path,
+      action: 'Hash password',
       statusCode: 500,
-      ip: req.clientIp,
+      clientIp: req.clientIp,
     });
     return next(
       createCustomError(
@@ -92,12 +95,14 @@ const registerController = asyncWrapper(async (req, res, next) => {
     })
     .catch(error => {
       logger.error(`${error.message}`, {
-        errorSource: 'Twilio',
-        userId: null,
-        errorType: 'connection error',
-        action: 'send mail',
+        module: 'reisterController.js',
+        userId: req.user ? req.user.user_id : null,
+        requestId: requestId,
+        action: 'Send mail OTP',
+        method: req.method,
+        path: req.path,
         statusCode: 500,
-        ip: req.clientIp,
+        clientIp: req.clientIp,
       });
       return next(
         createCustomError(

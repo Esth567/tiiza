@@ -6,16 +6,20 @@ const {sendSMSOtp} = require('../../utils/sendSMSOtp');
 const {createCustomError} = require('../../middleware/customError');
 const {logger} = require('../../utils/winstonLogger');
 const {errorLogger} = require('../../utils/fileLogger');
+// const {generateUniqueId} = require('../../utils/uniqueIds');
 require('dotenv').config();
 initializePassport(
   passport,
   email => UserModel.findOne({where: {email: email}}),
   id => UserModel.findOne({where: {user_id: id}}),
 );
+
 router.post(
   '/login',
 
   (req, res, next) => {
+    const requestId = res.getHeader('X-request-Id');
+
     passport.authenticate('local', (error, user, info) => {
       if (error) {
         return res
@@ -25,13 +29,18 @@ router.post(
 
       if (!user) {
         console.log(info);
-        logger.warn(`${info.payload.logMsg}`, {
-          errorSource: 'Login',
-          userId: null,
-          errorType: 'authentication error',
-          action: 'login',
-          statusCode: info.payload.statusCode,
-          ip: req.clientIp,
+        const message = info.payload.logMsg;
+        logger.warn(`${message ? message : 'Validation Error '}`, {
+          module: 'login.js',
+          requestId: requestId,
+          userId: req.user ? req.user.user_id : null,
+          method: req.method,
+          path: req.path,
+          action: 'authentication',
+          statusCode: !info.payload.statusCode
+            ? 400
+            : info.payload.statusCode,
+          clientIp: req.clientIp,
         });
 
         return res
@@ -40,7 +49,6 @@ router.post(
       }
       if (user) {
         req.login(user, function (err) {
-          console.log('err');
           if (err) {
             return next(err);
           }
@@ -61,7 +69,15 @@ router.post(
                 });
               })
               .catch(error => {
-                console.log(error);
+                logger.error(`${error}`, {
+                  requestId: requestId,
+                  userId: null,
+                  method: req.method,
+                  path: req.path,
+                  action: 'Send SMS',
+                  statusCode: 500,
+                  clientIp: req.clientIp,
+                });
                 return next(
                   createCustomError(
                     'System is unable to connect to your phone.please try again later',
@@ -70,6 +86,16 @@ router.post(
                 );
               });
           } else {
+            logger.info('Authentication successful', {
+              module: 'login.js',
+              requestId: requestId,
+              userId: user.user_id,
+              method: req.method,
+              path: req.path,
+              action: 'authentication',
+              statusCode: 200,
+              clientIp: req.clientIp,
+            });
             return res
               .status(200)
               .send({success: true, payload: 'Login successful'});
