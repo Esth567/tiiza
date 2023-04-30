@@ -14,6 +14,8 @@ const {Op} = require('sequelize');
 require('dotenv').config();
 
 const lostItemCtrl = asyncWrapper(async (req, res) => {
+  const requestId = res.getHeader('X-request-Id');
+
   let {
     item_name,
     item_worth,
@@ -99,18 +101,19 @@ const lostItemCtrl = asyncWrapper(async (req, res) => {
   });
 
   if (!storeLostInfo) {
-    logger.error('Unable to register Lost Item in Database', {
-      errorSource: 'lostitem DB',
-      userId: req.user.user_id,
-      errorType: 'DB Error',
-      action: 'register lost item',
+    logger.error('Failed to register Lost Item in Database', {
+      module: 'lostAndFoundController.js',
+      userId: req.user ? req.user.user_id : null,
+      requestId: requestId,
+      method: req.method,
+      path: req.path,
+      action: 'Save Lost Item ',
       statusCode: 500,
-
-      ip: req.clientIp,
+      clientIp: req.clientIp,
     });
     return res
       .status(500)
-      .send({success: false, payload: 'something went wrong'});
+      .send({success: false, payload: 'Sorr,Something went wrong'});
   }
   return res.status(200).send({
     success: true,
@@ -168,7 +171,6 @@ const fetchLostItemsCtrl = asyncWrapper(async (req, res) => {
 
 const fetchCustomerLostItemsCtrl = asyncWrapper(async (req, res) => {
   const {email} = req.user;
-
   const customersItems = await LostItemModel.findAll({
     where: {customer_email: email, is_approved: true},
   });
@@ -251,14 +253,17 @@ const foundLostItemCtrl = asyncWrapper(async (req, res) => {
   });
 
   if (!storeFoundInfo) {
-    logger.error('Unable to register Found Item in Database', {
-      errorSource: 'foundIten DB',
-      userId: user_id,
-      errorType: 'DB Error',
-      action: 'register found item',
+    logger.error('Failed to register Found Item in Database', {
+      module: 'lostAndFoundController.js',
+      userId: req.user ? req.user.user_id : null,
+      requestId: requestId,
+      method: req.method,
+      path: req.path,
+      action: 'Save Found Item ',
       statusCode: 500,
-      ip: req.clientIp,
+      clientIp: req.clientIp,
     });
+
     return res
       .status(500)
       .send({success: false, payload: 'Sorry,something went wrong'});

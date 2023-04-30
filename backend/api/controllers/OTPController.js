@@ -7,6 +7,8 @@ const {logger} = require('../../utils/winstonLogger');
 require('dotenv').config();
 const emailOtpValidationCtrl = asyncWrapper(
   async (req, res, next) => {
+    const requestId = res.getHeader('X-request-Id');
+
     const {token} = req.body;
     if (!token)
       return next(createCustomError('Input cannot be empty', 400));
@@ -37,13 +39,24 @@ const emailOtpValidationCtrl = asyncWrapper(
       location,
     });
 
-    if (!Object.values(createdUser.dataValues).length > 0)
-      next(
+    if (!Object.values(createdUser.dataValues).length > 0) {
+      logger.error(`Failed to Create User`, {
+        module: 'OTPController.js',
+        userId: req.user ? req.user.user_id : null,
+        requestId: requestId,
+        method: req.method,
+        path: req.path,
+        action: 'Create user',
+        statusCode: 500,
+        clientIp: req.clientIp,
+      });
+      return next(
         createCustomError(
           'Sorry, Something went wrong,please try again',
           500,
         ),
       );
+    }
 
     req.session.customer_details = {};
     req.session.user_otp_auth = '';
@@ -54,6 +67,8 @@ const emailOtpValidationCtrl = asyncWrapper(
 );
 
 const smsOtpValidationCtrl = asyncWrapper(async (req, res, next) => {
+  const requestId = res.getHeader('X-request-Id');
+
   const {token} = req.body;
   if (!token)
     return next(createCustomError('Input cannot be empty', 400));
@@ -81,13 +96,15 @@ const smsOtpValidationCtrl = asyncWrapper(async (req, res, next) => {
     {where: {email}},
   );
   if (!updateUser[0]) {
-    logger.error(`Unable to Update phone number |`, {
-      errorSource: 'Users Table',
-      userId: null,
-      errorType: 'DB error',
-      action: 'update phone number',
+    logger.error(`Failed to Update phone number |`, {
+      module: 'OTPController.js',
+      userId: req.user ? req.user.user_id : null,
+      requestId: requestId,
+      action: 'Update phone number',
+      method: req.method,
+      path: req.path,
       statusCode: 500,
-      ip: req.clientIp,
+      clientIp: req.clientIp,
     });
     return next(
       createCustomError(
@@ -97,7 +114,6 @@ const smsOtpValidationCtrl = asyncWrapper(async (req, res, next) => {
     );
   }
   req.login(user, function (err) {
-    console.log('err');
     if (err) {
       return next(err);
     }
@@ -110,6 +126,7 @@ const smsOtpValidationCtrl = asyncWrapper(async (req, res, next) => {
 });
 
 const requestOtpCtrl = asyncWrapper((req, res, next) => {
+  const requestId = res.getHeader('X-request-Id');
   const {email} = req.body;
   sendMailOTP(email, req)
     .then(response => {
@@ -123,12 +140,14 @@ const requestOtpCtrl = asyncWrapper((req, res, next) => {
     })
     .catch(error => {
       logger.error(`${error.message}`, {
-        errorSource: 'Email server',
-        userId: null,
-        errorType: 'connection error',
-        action: 'send mail',
+        module: 'OTPController.js',
+        userId: req.user ? req.user.user_id : null,
+        requestId: requestId,
+        action: 'Send mail',
+        method: req.method,
+        path: req.path,
         statusCode: 500,
-        ip: req.clientIp,
+        clientIp: req.clientIp,
       });
       return next(
         createCustomError(

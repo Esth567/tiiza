@@ -1,6 +1,8 @@
-const { Sequelize, DataTypes, Model } = require('sequelize');
-const { sequelize } = require('../db/connect');
+const {Sequelize, DataTypes, Model} = require('sequelize');
+const {sequelize} = require('../db/connect');
 const UserModel = require('./userModel');
+const {logger} = require('../utils/winstonLogger');
+require('dotenv').config();
 
 const ConversationModel = sequelize.define('Conversation', {
   conversation_id: {
@@ -11,22 +13,25 @@ const ConversationModel = sequelize.define('Conversation', {
   },
   title: {
     type: DataTypes.STRING(200),
-    allowNull: false
-  }
+    allowNull: false,
+  },
 });
 
-const ConversationMemberModel = sequelize.define('Conversation_Member', {
-  record_id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    allowNull: false,
-    autoIncrement: true,
+const ConversationMemberModel = sequelize.define(
+  'Conversation_Member',
+  {
+    record_id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      allowNull: false,
+      autoIncrement: true,
+    },
+    member_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
-  member_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  }
-});
+);
 
 const UserConversationModel = sequelize.define('User_conversation', {
   user_id: {
@@ -49,31 +54,32 @@ const UserConversationModel = sequelize.define('User_conversation', {
   },
 });
 
-
-
-
 const Connection = sequelize.define('Connection', {
   userId: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
   },
   socketId: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
   },
   isActive: {
     type: DataTypes.BOOLEAN,
-    defaultValue: true
+    defaultValue: true,
   },
   lastActive: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
-  }
+    defaultValue: DataTypes.NOW,
+  },
 });
 
 // Add a foreign key to ConversationMember model
-ConversationMemberModel.belongsTo(ConversationModel, { foreignKey: 'conversation_id' });
-ConversationModel.hasMany(ConversationMemberModel, { foreignKey: 'conversation_id' });
+ConversationMemberModel.belongsTo(ConversationModel, {
+  foreignKey: 'conversation_id',
+});
+ConversationModel.hasMany(ConversationMemberModel, {
+  foreignKey: 'conversation_id',
+});
 
 const MessageModel = sequelize.define('Message', {
   message_id: {
@@ -85,26 +91,58 @@ const MessageModel = sequelize.define('Message', {
 
   text: {
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: false,
   },
 });
 
-ConversationModel.hasMany(MessageModel, { foreignKey: 'conversation_id' });
-MessageModel.belongsTo(ConversationModel, { foreignKey: 'conversation_id' });
+ConversationModel.hasMany(MessageModel, {
+  foreignKey: 'conversation_id',
+});
+MessageModel.belongsTo(ConversationModel, {
+  foreignKey: 'conversation_id',
+});
 
-UserModel.hasMany(MessageModel, { foreignKey: 'user_id' });
-MessageModel.belongsTo(UserModel, { foreignKey: 'user_id' });
+UserModel.hasMany(MessageModel, {foreignKey: 'user_id'});
+MessageModel.belongsTo(UserModel, {foreignKey: 'user_id'});
 
-UserModel.belongsToMany(ConversationModel, { through: UserConversationModel, foreignKey: 'user_id' });
-ConversationModel.belongsToMany(UserModel, { through: UserConversationModel, foreignKey: 'conversation_id' });
+UserModel.belongsToMany(ConversationModel, {
+  through: UserConversationModel,
+  foreignKey: 'user_id',
+});
+ConversationModel.belongsToMany(UserModel, {
+  through: UserConversationModel,
+  foreignKey: 'conversation_id',
+});
 
 (async () => {
   try {
-    await sequelize.sync({ force: false });
+    await sequelize.sync({force: false});
+    logger.info(`Successfully chat models users table`, {
+      module: 'chatModels.js',
+      status: 'Created',
+      action: 'Create Table',
+      statusCode: 200,
+      tableName: 'users',
+      DB_NAME: process.env.DB_NAME,
+    });
     console.log('Table created successfully.');
   } catch (error) {
+    logger.error(`${error.message}`, {
+      module: 'chatModels.js',
+      status: 'Failed',
+      action: 'Create Table',
+      statusCode: 500,
+      tableName: 'users',
+      DB_NAME: process.env.DB_NAME,
+    });
     console.error('Unable to create table:', error);
   }
 })();
 
-module.exports = { ConversationModel, MessageModel, ConversationMemberModel, UserConversationModel, Connection };
+module.exports = {
+  ConversationModel,
+  MessageModel,
+  ConversationMemberModel,
+  UserConversationModel,
+  Connection,
+};

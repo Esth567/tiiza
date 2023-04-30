@@ -18,9 +18,11 @@ const getCustomersProfileCtrl = asyncWrapper(async (req, res) => {
     attributes: {exclude: ['password', 'createdAt', 'updatedAt']},
   });
   if (!userProfile)
-    return res
-      .status(500)
-      .send({success: false, payload: ' An unexpected error occurred while getting the customer profile'});
+    return res.status(500).send({
+      success: false,
+      payload:
+        ' An unexpected error occurred while getting the customer profile',
+    });
 
   return res.status(200).send({success: true, payload: userProfile});
 });
@@ -29,8 +31,9 @@ const getCustomersProfileCtrl = asyncWrapper(async (req, res) => {
 
 const updateCustomersProfileCtrl = asyncWrapper(
   async (req, res, next) => {
+    const requestId = res.getHeader('X-request-Id');
+
     const {user_id, phone} = req.user;
-    console.log({user_id, phone});
     const {full_name, new_phone} = req.body;
     const {error} = new ProfileValidator({
       full_name,
@@ -52,13 +55,24 @@ const updateCustomersProfileCtrl = asyncWrapper(
       {phone: new_phone, full_name},
       {where: {user_id}},
     );
-    if (!userProfile[0])
+    if (!userProfile[0]) {
+      logger.error(`Failed to Update User Profile`, {
+        module: 'profileController.js',
+        userId: req.user ? req.user.user_id : null,
+        requestId: requestId,
+        method: req.method,
+        path: req.path,
+        action: 'Update user',
+        statusCode: 500,
+        clientIp: req.clientIp,
+      });
       return next(
         createCustomError(
           'Sorry, something went wrong.Please try again later',
           500,
         ),
       );
+    }
 
     return res
       .status(200)
@@ -69,6 +83,8 @@ const updateCustomersProfileCtrl = asyncWrapper(
 // ===============================CUSTOMER UPDATE NUMBER ===============================
 
 const updateNumberCtrl = asyncWrapper(async (req, res, next) => {
+  const requestId = res.getHeader('X-request-Id');
+
   if (!req.session.customer_details)
     return next(
       createCustomError(
@@ -93,13 +109,24 @@ const updateNumberCtrl = asyncWrapper(async (req, res, next) => {
     {phone},
     {where: {email}},
   );
-  if (!updatePhone[0])
+  if (!updatePhone[0]) {
+    logger.error(`Failed to Update User Phone Number`, {
+      module: 'profileController.js',
+      userId: req.user ? req.user.user_id : null,
+      requestId: requestId,
+      method: req.method,
+      path: req.path,
+      action: 'Update Phone Number',
+      statusCode: 500,
+      clientIp: req.clientIp,
+    });
     return next(
       createCustomError(
         'Sorry, something went wrong.Please try again later',
         500,
       ),
     );
+  }
 
   sendSMSOtp(process.env.TWILIO_FROM_NUMBER, phone, req)
     .then(response => {
@@ -112,6 +139,16 @@ const updateNumberCtrl = asyncWrapper(async (req, res, next) => {
       });
     })
     .catch(error => {
+      logger.error(`${error.message}`, {
+        module: 'profileController.js',
+        userId: req.user ? req.user.user_id : null,
+        requestId: requestId,
+        method: req.method,
+        path: req.path,
+        action: 'Send SMS ',
+        statusCode: 500,
+        clientIp: req.clientIp,
+      });
       next(
         createCustomError(
           'System is unable to connect to your phone.please try again later',

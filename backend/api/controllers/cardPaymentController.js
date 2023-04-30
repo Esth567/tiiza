@@ -31,6 +31,8 @@ const TIIZA_PREMIUM_DURATION = process.env.TIIZA_PREMIUM_DURATION;
 const TIIZA_MINOR_DURATION = process.env.TIIZA_MINOR_DURATION;
 // =======================================INITIALIZE CARD PAYMENT=====================================================
 const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
+  const requestId = res.getHeader('X-request-Id');
+
   const loggedInUser = req.user?.user_id;
   const envVar = process.env;
   let {
@@ -124,6 +126,19 @@ const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
         },
       });
     } else {
+      logger.error(
+        'Failed to Complete Transaction: Reason: Card type is not supported.',
+        {
+          module: 'cardPaymentController.js',
+          userId: req.user ? req.user.user_id : null,
+          requestId: requestId,
+          method: req.method,
+          path: req.path,
+          action: 'Card Payment',
+          statusCode: 400,
+          clientIp: req.clientIp,
+        },
+      );
       return res.status(400).send({
         success: 'false',
         payload:
@@ -131,9 +146,10 @@ const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
       });
     }
   } else {
-    return res
-      .status(400)
-      .send({success: false, payload: 'sorry something went wrong'});
+    return res.status(400).send({
+      success: false,
+      payload: 'Sorry, Something went wrong!',
+    });
   }
   // Authorizing transactions
 });
@@ -142,6 +158,8 @@ const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
  */
 
 const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
+  const requestId = res.getHeader('X-request-Id');
+
   const {user_id, phone} = req.user;
   const payload = req.session.charge_payload;
   const custom_payload = req.session.custom_payload;
@@ -166,13 +184,11 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
       req.session.charge_payload.flw_ref = response.data.flw_ref;
       req.session.custom_payload.validationUrl =
         '/flw/payment/card-payment/validation';
-      return res
-        .status(200)
-        .send({
-          success: true,
-          payload:
-            'Pin Authorization complete.OTP has been sent to your phone number.Please use it to authenticate your payment.',
-        });
+      return res.status(200).send({
+        success: true,
+        payload:
+          'Pin Authorization complete.OTP has been sent to your phone number.Please use it to authenticate your payment.',
+      });
     // return res.redirect('/api/v1/payment/card_payment/validation');
     case 'redirect':
       const authUrl = response.meta.authorization.redirect;
@@ -208,20 +224,23 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
 
         if (!isLogged) {
           logger.error(
-            `Unable to create Transaction record Amount ${formatCurrency(
+            `Failed to create Transaction record. | Amount ${formatCurrency(
               amount,
             )} | Transaction refrence: ${
               response.data.tx_ref
             } | Transaction code: ${response.data.id} `,
             {
-              errorSource: 'TransactionLog Table',
-              userId: user_id,
-              errorType: 'DB error',
-              action: 'Subscription',
+              module: 'cardPaymentController.js',
+              userId: req.user ? req.user.user_id : null,
+              requestId: requestId,
+              method: req.method,
+              path: req.path,
+              action: 'Save Subscription Record',
               statusCode: 500,
-              ip: req.clientIp,
+              clientIp: req.clientIp,
             },
           );
+
           return next(
             createCustomError(
               'System is unable to complete transaction, please wait for a few minutes, check your balance before you try again',
@@ -242,16 +261,18 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
 
         if (!isSubscribed) {
           logger.error(
-            `Unable to create Subscrition record Amount ${formatCurrency(
+            `Failed to create Subscrition record.| Amount ${formatCurrency(
               amount,
             )} | Subscription duration:${TIIZA_PREMIUM_DURATION} | Subscription Name ${subName} `,
             {
-              errorSource: 'Subscription Table',
-              userId: user_id,
-              errorType: 'DB error',
-              action: 'Subscription',
+              module: 'cardPaymentController.js',
+              userId: req.user ? req.user.user_id : null,
+              requestId: requestId,
+              method: req.method,
+              path: req.path,
+              action: 'Create Sunbscription',
               statusCode: 500,
-              ip: req.clientIp,
+              clientIp: req.clientIp,
             },
           );
 
@@ -265,17 +286,15 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
 
         req.session.charge_payload = {};
         req.session.custom_payload = {};
-        return res
-          .status(200)
-          .send({
-            success: true,
-            payload:
-              'Pin Authorization complete.OTP has been sent to your phone number.Please use it to authenticate your payment.',
-          });
+        return res.status(200).send({
+          success: true,
+          payload:
+            'Pin Authorization complete.OTP has been sent to your phone number.Please use it to authenticate your payment.',
+        });
       } else if (transaction.data.status == 'pending') {
         // LOG TO FILE
         logger.info(
-          `Pending Card Transaction ${formatCurrency(
+          `Pending Card Transaction. | Amount: ${formatCurrency(
             amount,
           )}  | Transaction ref ${
             req.session.charge_payload.tx_ref
@@ -283,12 +302,14 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
             req.session.charge_payload.amount
           }`,
           {
-            errorSource: 'Subscription Table',
-            userId: user_id,
-            errorType: 'Flutterwave Info',
-            action: 'Subscription',
-            statusCode: 500,
-            ip: req.clientIp,
+            module: 'cardPaymentController.js',
+            userId: req.user ? req.user.user_id : null,
+            requestId: requestId,
+            method: req.method,
+            path: req.path,
+            action: 'Card Payment',
+            statusCode: 400,
+            clientIp: req.clientIp,
           },
         );
 
@@ -298,7 +319,6 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
         }, 600000); //10 mins
         setTimeout(() => {
           clearInterval(intervalId);
-          console.log('Polling stopped.');
         }, 14400000); // Stop after 4 hours (4 * 60 * 60 * 1000 = 14400000 ms)
         return res
           .status(200)
@@ -314,12 +334,14 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
             req.session.charge_payload.amount
           }`,
           {
-            errorSource: 'Subscription Table',
-            userId: user_id,
-            errorType: 'Flutterwave error',
-            action: 'Subscription',
-            statusCode: 500,
-            ip: req.clientIp,
+            module: 'cardPaymentController.js',
+            userId: req.user ? req.user.user_id : null,
+            requestId: requestId,
+            method: req.method,
+            path: req.path,
+            action: 'Card Payment',
+            statusCode: 400,
+            clientIp: req.clientIp,
           },
         );
 
@@ -335,12 +357,13 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
 
 const validateCardTransactionCtrl = asyncWrapper(
   async (req, res, next) => {
+    const requestId = res.getHeader('X-request-Id');
+
     const {user_id, phone} = req.user;
 
     const requestPayload = req.session.charge_payload;
     const custom_payload = req.session.custom_payload;
 
-    console.log(custom_payload);
     if (
       Object.keys(requestPayload).length === 0 ||
       Object.keys(custom_payload).length === 0
@@ -374,12 +397,14 @@ const validateCardTransactionCtrl = asyncWrapper(
       });
       if (transaction.data.status === 'error') {
         logger.error(`${response.message}`, {
-          errorSource: 'Subscription Table',
-          userId: user_id,
-          errorType: 'Transaction error',
-          action: 'Subscription',
+          module: 'cardPaymentController.js',
+          userId: req.user ? req.user.user_id : null,
+          requestId: requestId,
+          method: req.method,
+          path: req.path,
+          action: 'Card Payment',
           statusCode: 400,
-          ip: req.clientIp,
+          clientIp: req.clientIp,
         });
 
         return res
@@ -410,18 +435,20 @@ const validateCardTransactionCtrl = asyncWrapper(
 
         if (!isLogged) {
           logger.error(
-            `Unable to create  transaction record .... Amount:  ${formatCurrency(
+            `Failed to create  transaction record |  Amount:  ${formatCurrency(
               txInfo.amount,
             )}. Transaction refrence:${
               txInfo.tx_ref
             }, Transaction code ${txInfo.id}`,
             {
-              errorSource: 'Transaction Table',
-              userId: user_id,
-              errorType: 'DB error',
-              action: 'Subscription',
+              module: 'cardPaymentController.js',
+              userId: req.user ? req.user.user_id : null,
+              requestId: requestId,
+              method: req.method,
+              path: req.path,
+              action: 'Card Payment',
               statusCode: 500,
-              ip: req.clientIp,
+              clientIp: req.clientIp,
             },
           );
 
@@ -439,23 +466,25 @@ const validateCardTransactionCtrl = asyncWrapper(
           duration: TIIZA_PREMIUM_DURATION, // in days
           startDate: new Date(),
           endDate: new Date(
-            Date.now() + 1440 * TIIZA_PREMIUM_DURATION * 60 * 1000,
+            Date.now() + 3 * 60 * 1000,
             // Date.now() + 8 * 60 * 1000,
           ),
         });
 
         if (!isSubscribed) {
           logger.error(
-            `Unable to create  Subscription record .... Amount :  ${formatCurrency(
+            `Failed to create  Subscription record |  Amount :  ${formatCurrency(
               txInfo.amount,
             )}. Subscription duration:${TIIZA_PREMIUM_DURATION}, Subscription Name ${subName}`,
             {
-              errorSource: 'Subscription Table',
-              userId: user_id,
-              errorType: 'DB error',
-              action: 'Subscription',
+              module: 'cardPaymentController.js',
+              userId: req.user ? req.user.user_id : null,
+              requestId: requestId,
+              method: req.method,
+              path: req.path,
+              action: 'Card Payment',
               statusCode: 500,
-              ip: req.clientIp,
+              clientIp: req.clientIp,
             },
           );
 
@@ -466,6 +495,22 @@ const validateCardTransactionCtrl = asyncWrapper(
             ),
           );
         }
+
+        logger.info(
+          ` Successful Subscription Payment  | Amount :  ${formatCurrency(
+            txInfo.amount,
+          )}. Subscription duration:${TIIZA_PREMIUM_DURATION} days, Subscription Name ${subName}`,
+          {
+            module: 'cardPaymentController.js',
+            userId: req.user ? req.user.user_id : null,
+            requestId: requestId,
+            method: req.method,
+            path: req.path,
+            action: 'Card Payment',
+            statusCode: 201,
+            clientIp: req.clientIp,
+          },
+        );
 
         req.session.charge_payload = {};
         req.session.custom_payload = {};
@@ -486,14 +531,16 @@ const validateCardTransactionCtrl = asyncWrapper(
       } else if (transaction.data.status == 'pending') {
         // LOG TO FILE
         logger.warn(
-          `Pending Transaction Amount:${requestPayload.amount} | transaction ref:${requestPayload.tx_ref}`,
+          `Pending Transaction. |  Amount:${requestPayload.amount} | transaction ref:${requestPayload.tx_ref}`,
           {
-            errorSource: 'Flutterwave',
-            userId: user_id,
-            errorType: 'Flutterwave Info',
-            action: 'Subscription',
+            module: 'cardPaymentController.js',
+            userId: req.user ? req.user.user_id : null,
+            requestId: requestId,
+            method: req.method,
+            path: req.path,
+            action: 'Card Payment',
             statusCode: 500,
-            ip: req.clientIp,
+            clientIp: req.clientIp,
           },
         );
 
@@ -504,7 +551,6 @@ const validateCardTransactionCtrl = asyncWrapper(
         }, 600000);
         setTimeout(() => {
           clearInterval(intervalId);
-          console.log('Polling stopped.');
         }, 14400000); // Stop after 4 hours (4 * 60 * 60 * 1000 = 14400000 ms)
         // return res.status(200).send({ success: false, payload: transaction });
       }
