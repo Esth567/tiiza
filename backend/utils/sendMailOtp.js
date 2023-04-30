@@ -4,14 +4,11 @@ const speakeasy = require('speakeasy');
 
 const service = process.env;
 async function sendMailOTP(email, req) {
-
   // generate otp secrete
-  var secret = speakeasy.generateSecret({ length: 20 });
-
+  var secret = speakeasy.generateSecret({length: 20});
 
   // store in session
   req.session.user_otp_auth = secret.base32;
-
 
   //   const storeSecrete = await OtpModel.create({
   //     email: email,
@@ -40,8 +37,6 @@ async function sendMailOTP(email, req) {
     },
   });
 
-
-
   const mailOptions = {
     from: service.EMAIL_SERVER_USERNAME,
     to: email,
@@ -59,12 +54,10 @@ async function sendMailOTP(email, req) {
         <h2>${token}</h2>
     </body>`,
   };
-  // console.log(isSent)
-  // console.log(mailOptions)
 
   const isSent = await transporter.sendMail(mailOptions);
   // console.log(isSent)
-  return isSent
+  return isSent;
 }
 
-module.exports = { sendMailOTP };
+module.exports = {sendMailOTP};

@@ -827,14 +827,14 @@ paths:
               schema:
                 type: object
                 properties:
-                  email:
+                  pin:
                     type: string
                     description: Card pin
                 
               examples:
                 example-1:
                   value:
-                    email: 1245
+                    pin: 1245
             
         responses:
           '200':
@@ -866,12 +866,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  email:
+                  otp:
                     type: number
                     description: Transaction OTP
               example:
-                value:
-                  email: 12345
+              
+                  otp: 12345
             
         responses:
           '200':
@@ -893,6 +893,7 @@ paths:
           '500':
             description: Internal server error 
 
+# =============== CREATE CONVERSATION ROUTE DOC========================= 
 
   /customer/create/conversation:
       post:
@@ -923,6 +924,7 @@ paths:
           '500':
             description: Internal server error 
 
+# =============== FETCH CONVERSATION ROUTE DOC========================= 
 
   /customer/fetch/conversations:
       get:
@@ -940,6 +942,7 @@ paths:
             description: Internal server error 
 
 
+# =============== FETCH MESSAGES ROUTE DOC========================= 
 
 
   /customer/fetch/messages/{conversationId}:
@@ -964,6 +967,7 @@ paths:
           '500':
             description: Internal server error 
 
+# =============== SEND MESSAGE ROUTE DOC========================= 
 
   /customer/send/message:
       post:

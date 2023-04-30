@@ -1,7 +1,9 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const {Sequelize, DataTypes} = require('sequelize');
 
-const { sequelize } = require('../db/connect');
+const {sequelize} = require('../db/connect');
 const UserModel = require('./userModel');
+const {logger} = require('../utils/winstonLogger');
+require('dotenv').config();
 
 const FoundItemModel = sequelize.define('found_items', {
   item_id: {
@@ -65,15 +67,31 @@ const FoundItemModel = sequelize.define('found_items', {
   is_resolved: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: false
-  }
+    defaultValue: false,
+  },
 });
 
 (async () => {
   try {
-    await sequelize.sync({ force: false });
+    await sequelize.sync({force: false});
+    logger.info(`Successfully created found_items table`, {
+      module: 'foundItemModel.js',
+      status: 'Created',
+      action: 'Create Table',
+      statusCode: 200,
+      tableName: 'found_items',
+      DB_NAME: process.env.DB_NAME,
+    });
     console.log(`found_items Table created successfully.`);
   } catch (error) {
+    logger.error(`${error.message}`, {
+      module: 'foundItemModel.js',
+      status: 'Failed',
+      action: 'Create Table',
+      statusCode: 500,
+      tableName: 'found_items',
+      DB_NAME: process.env.DB_NAME,
+    });
     console.error('Unable to create table:', error);
   }
 })();

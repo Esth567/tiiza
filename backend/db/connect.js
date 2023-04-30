@@ -1,5 +1,6 @@
-const { Sequelize } = require('sequelize');
+const {Sequelize} = require('sequelize');
 const mysql2 = require('mysql2/promise');
+const {logger} = require('../utils/winstonLogger');
 require('dotenv').config();
 
 // Create a new Sequelize instance
@@ -20,7 +21,7 @@ const sequelize = new Sequelize(
     dialectOptions: {
       // ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: true } : false,
     },
-  }
+  },
 );
 
 // Test the database connection
@@ -35,12 +36,31 @@ const connectDb = async () => {
     });
     await connection.connect();
     await connection.end();
-    console.log('Connection to the database has been established successfully.');
+    logger.info('Successfully Connected To Database', {
+      module: 'connect.js',
+      status: 'Connected',
+      action: 'Connect Database ',
+      statusCode: 200,
+      DB_HOST: process.env.DB_HOST,
+      DB_NAME: process.env.DB_NAME,
+    });
+
+    console.log(
+      'Connection to the database has been established successfully.',
+    );
   } catch (error) {
     console.error('Unable to connect to the database:', error);
+
+    logger.error(`${error.message}`, {
+      module: 'connect.js',
+      status: 'Failed',
+      action: 'Connect Database ',
+      statusCode: 500,
+      DB_HOST: process.env.DB_HOST,
+      DB_NAME: process.env.DB_NAME,
+    });
   }
 };
 
 // Export the Sequelize instance
-module.exports = { connectDb, sequelize };
-    
+module.exports = {connectDb, sequelize};
