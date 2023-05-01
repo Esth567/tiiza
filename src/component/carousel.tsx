@@ -80,17 +80,6 @@ const data = [
         <Text style={[styles.location, { color: index === 0 ? '#ffffff' : '#000000' }]}>
           {item.location}
         </Text>
-        <TouchableOpacity
-          style={styles.detailsCont}>
-          <Text
-            style={[
-              styles.subscriptionContainer,
-              { backgroundColor: index === 0 ? '#A8C2FB' : '#012454' },
-            ]}
-          >
-            View Details
-          </Text>
-        </TouchableOpacity>
       </View>
     );
     return (
@@ -155,7 +144,7 @@ const data = [
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
-      height: 280,
+      height: 260,
       width: '100%',
     },
     cardImage: {

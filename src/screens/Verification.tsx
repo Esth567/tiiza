@@ -1,90 +1,60 @@
-import React, {useState} from 'react';
-import { View, Text, KeyboardAvoidingView, TextInput, Dimensions, StyleSheet } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  View,
+  Text,
+  KeyboardAvoidingView,
+  TextInput,
+  Dimensions,
+  StyleSheet,
+  ScrollView,
+  StatusBar,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomBottom from '../component/CustomBottom';
-import { StackActions } from '@react-navigation/native';
-import images from '../constant/images';
 import { VerifyEmail } from '../utils/Auth';
+import images from '../constant/images';
+import OTPInputView from '@twotalltotems/react-native-otp-input'; 
 
-const inputs = Array(6).fill('');
-let newInputIndex = 0
 
-const isObjValid = (obj) => {
-  return Object.values(obj).every(val => val.trim())
-}
 
-const Verification = ({route, navigation}) => {
-  const {profile} = route.params
-  const [OTP, setOTP] = useState({0: '', 1: '', 2: '', 3: '', 4: '', 5: ''})
-  const [nextInputIndex, setNextInputIndex] = useState(0);
-   const [
-    isRegistraionSuccess,
-    setIsRegistraionSuccess
-  ] = useState(false);
+const Verification = () => {
 
-  const handleChangeText = () => {
-    const newOTP = {...OTP};
-    newOTP[index] = text;
-    setOTP(newOTP)
-
-    const lastInputIndex = inputs.length - 1;
-    if(!text) newInputIndex = index === 0 ? 0 : index -1;
-    else newInputIndex = index === lastInputIndex ? lastInputIndex
-    : index + 1;
-    setNextInputIndex(newInputIndex);
-  };
-
-  useFocusEffect(() => {
-    input.current.focus();
-  }, [nextInputIndex]);
-
-  const submitOTP = async () => {
-    Keyboard.dismiss();
-
-    if(isObjValid(OTP)) {
-      let val = '';
-
-      Object.values(OTP).forEach(V => {
-        val += v
-      })
-
-      const res = await VerifyEmail(val, profile.id);
-      if(!res.success) return console.log(res.error)
-
-      navigation.dispatch(
-        StackAction.replace('Verification', {profile: res.user }),
-      );
-    }
-  }
-
+ 
+ 
   return (
-    <KeyboardAvoidingView style={{flex: 1, justifyContent: 'center'}}>
-      <Text style={{textAlign: 'center', marginBottom: 50, }}>Please verify your email, Pin has been sent to your email</Text>
-      <View style={style.otpContainer}>
-        {inputs.map((inp, index) => {
-          return (
-          <View key={index.toString()} style={style.inputContainer}>
-          <TextInput
-          value={OTP[index]}
-          onChangeText = {() => handleChangeText(text, index)}
-          placeholder='0'
-          style={{fontSize: 25, paddingHorizontal: 15}}
-          keyboardType='numeric'
-          maxLength={1}
-          ref={nextInputIndex === index ? input : null}
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: COLORS.white, paddingTop: 50 }}>
+      <StatusBar backgroundColor={COLORS.white} barStyle="dark-content" />
+      <ScrollView
+        contentContainerStyle={{
+          paddingTop: 50,
+          marginHorizontal: 15,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <View style={{ marginBottom: 20 }}>
+          <Image
+            source={images.email2}
+            style={{
+              height: inputWidth * 3,
+              width: inputWidth * 3,
+            }}
           />
-          </View>
-          );      
-        })}       
-      </View>
-      <CustomBottom  onPress={SubmitOTP} />
+        </View>
+        <Text style={{ textAlign: 'center', marginBottom: 50 }}>
+          Please verify your email, Pin has been sent to your email
+        </Text>
+        <CustomBottom title="Verify" />
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const {width} = Dimensions.get('window')
-const inputWidth = Math.round(width / 6)
+const inputWidth = Math.round(width / 9)
 
 const style = StyleSheet.create({
   inputContainer: {
@@ -92,19 +62,25 @@ const style = StyleSheet.create({
     width: inputWidth,
     borderRadius: 2,
     borderColor: COLORS.primary,
-    justifyContent:'center', 
-    alignItems: 'center'
-  },
-  otpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: inputWidth / 2
-  },
-  successTextStyle: {
-    color: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
     textAlign: 'center',
-    fontSize: 18,
-    padding: 30,
+    marginBottom: 30,
+  },
+  borderStyleHighLighted: {
+    borderColor: "#03DAC6",
+  },
+
+  underlineStyleBase: {
+    width: 30,
+    height: 45,
+    borderWidth: 0,
+    borderBottomWidth: 1,
+  },
+
+  underlineStyleHighLighted: {
+    borderColor: "#03DAC6",
   },
 });
 

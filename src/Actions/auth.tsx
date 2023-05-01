@@ -1,3 +1,4 @@
+
 import {
   REGISTER_SUCCESS,
   REGISTER_FAIL,
@@ -7,10 +8,11 @@ import {
   SET_MESSAGE,
 } from './types';
 
+
 import authServices from '../services/auth.services';
 
 export const register = (fullname, email, phone, password, confirmPassword, location) => (dispatch) => {
-  return AuthService.register(fullname, email, phone, password, confirmPassword, location).then(
+  return authServices.register(fullname, email, phone, password, confirmPassword, location).then(
     (response) => {
       dispatch({
         type: REGISTER_SUCCESS,
@@ -44,7 +46,7 @@ export const register = (fullname, email, phone, password, confirmPassword, loca
 };
 
 export const login = (email, password) => (dispatch) => {
-  return AuthService.login(email, password).then(
+  return authServices.login(email, password).then(
     (data) => {
       dispatch({
         type: LOGIN_SUCCESS,
@@ -74,7 +76,7 @@ export const login = (email, password) => (dispatch) => {
 };
 
 export const logout = () => (dispatch) => {
-  AuthService.logout();
+  authServices.logout();
 
   dispatch({
     type: LOGOUT,

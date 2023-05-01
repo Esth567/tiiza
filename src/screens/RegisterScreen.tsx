@@ -1,4 +1,4 @@
-import React, { useState, createRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -21,6 +21,8 @@ import { COLORS } from '../constant/theme';
 import images from '../constant/images';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Verification from './Verification';
+import { useDispatch, useSelector } from "react-redux";
+import { register } from '../actions/auth';
 
 const RegisterScreen = ({props, navigation}) => {
   const [fullName, setFullName] = useState('');
@@ -34,6 +36,9 @@ const RegisterScreen = ({props, navigation}) => {
   const [isRegistraionSuccess, setIsRegistraionSuccess] = useState(false);
   
 
+ const dispatch = useDispatch(); 
+
+ const checkBtn = useRef();
 
   const handleSubmitButton = () => {
     setErrortext('');
@@ -63,70 +68,19 @@ const RegisterScreen = ({props, navigation}) => {
      }
     //Show Loader
     setLoading(true);
-    const payload = {
-      fullName,
-      email,
-      phone,
-      password,
-      confirmPassword,
-      location,
-    }; 
-      fetch('http://192.168.43.95:5000/api/v1/register', {
-        method: 'post',
-        headers: {
-          //Header Defination
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
-        .then((response) => response.json())
-        .then((responseJson) => {
-          //Hide Loader
-          setLoading(false);
-          console.log(responseJson);
-          // If server response message same as Data Matched
-          if (responseJson.status === 'success') {
-            setIsRegistraionSuccess(true);
-            console.log('Registration Successful. Please Login to proceed');
-            navigation.navigate('Verification');
-          } else {
-            setErrortext(responseJson.msg);
-          }
+    if (fullName && email && phone && password && confirmPassword && location) {
+      dispatch(register(fullName, email, phone, password, confirmPassword, location))
+        .then(() => {
+          console.log();
+          setIsRegistraionSuccess(true);
+          navigation.replace('Verification');
         })
-        .catch((error) => {
-          //Hide Loader
-          setLoading(false);
-          console.error(error);
+        .catch(() => {
+          setIsRegistraionSuccess(false);
         });
+    }
   };
-  if (isRegistraionSuccess) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: '#307ecc',
-          justifyContent: 'center',
-        }}
-      >
-        <Image
-          source={images.success}
-          style={{
-            height: 150,
-            resizeMode: 'contain',
-            alignSelf: 'center',
-          }}
-        />
-        <Text style={styles.successTextStyle}>Registration Successful</Text>
-        <TouchableOpacity
-          style={styles.buttonStyle}
-          activeOpacity={0.5}
-          onPress={() => props.navigation.dispatch('LoginScreen')}
-        >
-          <Text style={styles.buttonTextStyle}>Login Now</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>

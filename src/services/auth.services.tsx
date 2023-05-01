@@ -1,9 +1,11 @@
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const API_URL = 'http://192.168.43.95:5000/api';
+const API_URL = 'http://192.168.43.95:5000/api/v1/';
 
 const register = (fullName, email, phone, password, confirmPassword, location) => {
-  return axios.post(API_URL + 'v1/register', {
+  return axios.post(API_URL + 'register', {
     fullName,
     email,
     phone,
@@ -13,23 +15,29 @@ const register = (fullName, email, phone, password, confirmPassword, location) =
   });
 };
 
-const login = (email, password) => {
-  return axios
-    .post(API_URL + 'v1/login', {
+const login = async (email, password) => {
+  const response = await axios
+    .post(API_URL + 'login', {
       email,
       password,
-    })
-    .then((response) => {
-      if (response.data.accessToken) {
-        localStorage.setItem('user', JSON.stringify(response.data));
-      }
-
-      return response.data;
     });
+  if (response.data.accessToken) {
+    AsyncStorage.setItem('user', JSON.stringify(response.data));
+  }
+  return response.data;
 };
 
+const verifyEmail  = async (token) => {
+  try {
+    const { data } = await axios.post(API_URL + '/customer/validate-otp', { token });
+    return data;
+  } catch(error) {
+    return catchError(error);
+  }
+}
+
 const logout = () => {
-  localStorage.removeItem('user');
+  AsyncStorage.removeItem('user');
 };
 
 export default {

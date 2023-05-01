@@ -1,7 +1,7 @@
 import RegisterScreen from './RegisterScreen';
 import LoginScreen from './LoginScreen';
 import Dashboard from './Dashboard';
-import CreateReport from './Report';
+import Report from './Report';
 import FoundDetails from './FoundDetails';
 import CategoryScreen from './CategoryScreen';
 import DetailsScreen from './DetailsScreen';
@@ -16,7 +16,7 @@ export {
   LoginScreen,
   Dashboard,
   CategoryScreen,
-  CreateReport,
+  Report,
   DetailsScreen,
   ForgotPassword,
   SplashScreen,

@@ -13,7 +13,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Input from '../component/Input';
 import CustomButton from '../component/CustomBottom';
 import ItemPicker from '../component/ItemPicker';
-import SwitchButton from '../component/SwitchButton';
 
 const Report = ({navigation} : any) => {
 
@@ -27,7 +26,6 @@ const Report = ({navigation} : any) => {
           marginHorizontal: 15,
         }}
       >
-      <SwitchButton />
         <Text style={{ color: COLORS.black, fontSize: 12, marginBottom: 10 }}>
           Kindly provide details of the missing items
         </Text>

@@ -6,27 +6,20 @@
  */
 
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BottomTabNavigator, AuthNavigator } from './src/navigation';
-import { SplashScreen } from './src/screens';
+import AppNav from './src/navigation/AppNav';
+import store from './src/store';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider as StoreProvider } from 'react-redux';
 
-const Stack = createNativeStackNavigator();
+
 
 const App = () => {
-  
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {/* Navigation Bottom tab as a landing page */}
-        <Stack.Screen
-          name="BottomTabNavigator"
-          component={BottomTabNavigator}
-          // Hiding header for Bottom tab Navigation
-          options={{ headerShown: false }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <StoreProvider store={store}>
+      <SafeAreaProvider style={{ flex: 1 }}>
+        <AppNav />
+      </SafeAreaProvider>
+    </StoreProvider>
   );
 };
 
