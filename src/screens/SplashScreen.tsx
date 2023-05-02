@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, View, StyleSheet, Image, Text, StatusBar, TouchableOpacity, SafeAreaView  } from 'react-native';
 import { COLORS } from '../constant/theme';
-import Swiper from 'react-native-swipe-image';
+// import Swiper from 'react-native-swipe-image';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import images from '../constant/images';
 
-const SplashScreen = ({ navigation }) => {
+const SplashScreen = ({ navigation} :any) => {
 
     
   return (

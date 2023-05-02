@@ -18,13 +18,14 @@ import CustomBottom from '../component/CustomBottom';
 import { COLORS } from '../constant/theme';
 import images from '../constant/images';
 
-const RegisterScreen = ({navigation}) => {
+const RegisterScreen = ({navigation} :any) => {
 
-  const [fullname, setFullname] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phonenumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [errortext, setErrortext] = useState('');
   const [isRegistraionSuccess,setIsRegistraionSuccess] = useState(false);
@@ -33,7 +34,7 @@ const RegisterScreen = ({navigation}) => {
    const handleSubmitButton = () => {
      setErrortext('');
 
-     if (!fullname) {
+     if (!fullName) {
        alert('Please fill Name');
        return;
      }
@@ -53,16 +54,22 @@ const RegisterScreen = ({navigation}) => {
         alert('Please fill Confirm Password');
         return;
       }
+      if (!location) {
+        alert('Please fill Location');
+        return;
+      }
      //Show Loader
      setLoading(true);
      const dataToSend = {
-       fullname,
+       fullName,
        email,
        phonenumber,
        password,
+       confirmPassword,
+       location
      };
    
-     fetch('http://localhost:5000/register', {
+     fetch('http://localhost:5000/api/v1/register', {
        method: 'POST',
        body: JSON.stringify(dataToSend),
        headers: {
@@ -107,7 +114,7 @@ const RegisterScreen = ({navigation}) => {
              alignSelf: 'center',
            }}
          />
-         <Text style={styles.successTextStyle}>Registration Successful</Text>
+         <Text style={style.successTextStyle}>Registration Successful</Text>
          <TouchableOpacity
            style={style.buttonStyle}
            activeOpacity={0.5}
@@ -143,7 +150,7 @@ const RegisterScreen = ({navigation}) => {
             </Text>
             <View style={{ marginBottom: 15 }}>
               <Input
-                onChangeText={(fullname) => setFullname(fullname)}
+                onChangeText={(fullName) => setFullName(fullName)}
                 placeholder="Fullname"
                 iconName="user-o"
                 underlineColorAndroid="#f000"
@@ -190,8 +197,17 @@ const RegisterScreen = ({navigation}) => {
                 returnKeyType="next"
                 secureTextEntry={true}
               />
+              <Input
+                onChangeText={(location) => setLocation(location)}
+                placeholder="Fullname"
+                iconName="user-o"
+                underlineColorAndroid="#f000"
+                placeholderTextColor="#8b9cb5"
+                autoCapitalize="sentences"
+                // returnKeyType="next"eeeeee
+              />
             </View>
-            {errortext != '' ? <Text style={styles.errorTextStyle}>{errortext}</Text> : null} 
+            {errortext != '' ? <Text style={style.errorTextStyle}>{errortext}</Text> : null} 
             <CustomBottom title="Register" onPress={handleSubmitButton} />
             <View
               style={{

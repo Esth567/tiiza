@@ -5,6 +5,7 @@ import SeeallScreen from '../screens/SeeallScreen';
 
 const HomeNavigator = () => {
   const HomeStack = createNativeStackNavigator();
+  
   return (
     <HomeStack.Navigator initialRouteName="Home">
       <HomeStack.Screen name="Home" component={HomeScreen} />

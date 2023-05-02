@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, TextInput, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator, FlatList } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import CarouselComponent from '../component/carousel';
 import { COLORS } from '../constant/theme';
@@ -64,7 +64,7 @@ const SeeallScreen =({navigation} : any)=> {
             <TextInput 
              placeholder="Search for all items" 
              clearButtonMode='always'
-             style={style.searchBox}
+             style={styles.searchBox}
              autoCapitalize='none' 
              autoCorrect={false}
              value={searchQuery}

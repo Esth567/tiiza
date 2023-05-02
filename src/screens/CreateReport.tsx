@@ -12,9 +12,13 @@ import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Input from '../component/Input';
 import CustomButton from '../component/CustomBottom';
-import ItemPicker from '../component/ItemPicker';
+import SelectDropdown from 'react-native-select-dropdown';
+ 
+const options = ['Car', 'Documents', 'Key', 'Phone', 'Bag', 'Laptop'];
 
 const CreateReport = ({navigation} : any) => {
+
+  const [selectedOption, setSelectedOption] = useState('');
 
   const [selectCategory, setSelectCategory] = React.useState(1);
   return (
@@ -52,11 +56,15 @@ const CreateReport = ({navigation} : any) => {
         <Text style={{ color: COLORS.black, fontSize: 15, fontWeight: '500', marginBottom: 2 }}>
           Category
         </Text>
-        <View style={style.inputContainer}>
-          <TextInput placeholder="Item type" style={{ flex: 1 }} />
-          <TouchableOpacity onPress={ItemPicker}>
-            <FontAwesome name="caret-down" size={18} />
-          </TouchableOpacity>
+        <View style={style.pickerCont}>
+      <SelectDropdown
+        data={options}
+        onSelect={(selectedOption, index) => setSelectedOption(selectedOption)}
+        defaultButtonText="Item type"
+        buttonTextAfterSelection={(selectedOption, index) => selectedOption}
+        rowTextForSelection={(item, index) => item}
+        // style={style.dropdown} 
+       />
         </View>
         <View style={{ flexDirection: 'row', marginTop: 10 }}>
           <Text
@@ -180,6 +188,30 @@ const style = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: COLORS.secondary,
     justifyContent: 'center',
+    marginBottom: 10,
+  },
+  dropdown:{
+
+  },
+
+  // selectCont:{
+  //    flex: 1,
+  //    fontSize: 16,
+  //   color: '#333',
+  //   //  width: 50,
+  //   //  borderRadius: 50,
+  // },
+  pickerCont:{
+    // width: 300,
+    // borderWidth: 1,
+    borderRadius: 18,
+    height: 50,
+    // borderColor: '#ccc',
+    // padding: 10,
+    margin: 10,
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    // flexDirection: 'row',
     marginBottom: 10,
   },
   inputContainer: {

@@ -9,7 +9,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthNavigator, BottomTabNavigator } from './src/navigation';
-import { IntroScreen } from './src/screens';
+import { CreateReport, HomeScreen, IntroScreen } from './src/screens';
+import ChatScreen from './src/screens/ChatScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,8 +21,8 @@ const App = () => {
       <Stack.Navigator initialRouteName="IntroScreen">
         {/* SplashScreen which will come once for 10 Seconds */}
         <Stack.Screen
-          name="IntroScreen"
-          component={IntroScreen}
+          name="Introscreen"
+          component={HomeScreen}
           // Hiding header for Splash Screen
           options={{ headerShown: false }}
         />
