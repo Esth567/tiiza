@@ -50,4 +50,4 @@ const initiateMediaTransfer = (req, res, next, _path, dest) => {
   return upload.single('image')(req, res, next);
 };
 
-module.exports = {initiateMediaTransfer, InitiateUpload};
+module.exports = {initiateMediaTransfer};
