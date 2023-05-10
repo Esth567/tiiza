@@ -5,6 +5,9 @@ const {
   validateCardTransactionCtrl,
 } = require('../controllers');
 const VerifyUser = require('../../middleware/auth');
+const {
+  initiateMediaTransfer,
+} = require('../../services/multerConfig');
 
 router.post(
   '/flw/payment/card-payment',
