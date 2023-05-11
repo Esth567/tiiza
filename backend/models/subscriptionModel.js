@@ -2,6 +2,7 @@ const {Sequelize, DataTypes, Model} = require('sequelize');
 const {sequelize} = require('../db/connect');
 const UserModel = require('./userModel');
 const {logger} = require('../utils/winstonLogger');
+const LostItemModel = require('./lostItemModel');
 require('dotenv').config();
 
 // class SubscriptionModel extends Model { }
@@ -11,19 +12,15 @@ const SubscriptionModel = sequelize.define('Subscription', {
     autoIncrement: true,
     primaryKey: true,
   },
-  customer_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: UserModel,
-      key: 'user_id',
-    },
-  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
   duration: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  item_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
@@ -35,7 +32,15 @@ const SubscriptionModel = sequelize.define('Subscription', {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  is_extended: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
 });
+
+// SubscriptionModel.belongsTo(UserModel, {foreignKey: 'user_id'});
+SubscriptionModel.belongsTo(LostItemModel, {foreignKey: 'item_id'});
+SubscriptionModel.belongsTo(UserModel, {foreignKey: 'customer_id'});
 
 (async () => {
   try {

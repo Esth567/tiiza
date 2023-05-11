@@ -1,8 +1,9 @@
-const {Sequelize, DataTypes, BOOLEAN} = require('sequelize');
+const {Sequelize, DataTypes} = require('sequelize');
 
 const {sequelize} = require('../db/connect');
 const UserModel = require('./userModel');
 const {logger} = require('../utils/winstonLogger');
+const SubscriptionModel = require('./subscriptionModel');
 require('dotenv').config();
 
 const LostItemModel = sequelize.define('lost_items', {
@@ -51,10 +52,6 @@ const LostItemModel = sequelize.define('lost_items', {
   customer_email: {
     type: DataTypes.STRING(45),
     allowNull: false,
-    references: {
-      model: UserModel,
-      key: 'email',
-    },
   },
   phone_number: {
     type: DataTypes.STRING(20),

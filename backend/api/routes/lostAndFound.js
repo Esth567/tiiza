@@ -1,11 +1,16 @@
 const router = require('express').Router();
+const multer = require('multer');
 const VerifyUser = require('../../middleware/auth');
 const LostItemModel = require('../../models/lostItemModel');
+const SubscriptionModel = require('../../models/subscriptionModel');
+const UserModel = require('../../models/userModel');
 const {
   initiateMediaTransfer,
-  InitiateUpload,
+  // InitiateUpload,
 } = require('../../services/multerConfig');
-
+const {createSubscription} = require('../../utils/createSubRecord');
+const {image} = require('../controllers/lostAndFoundController');
+const path = require('path');
 const {
   lostItemCtrl,
   fetchLostItemsCtrl,
@@ -13,7 +18,27 @@ const {
   foundLostItemCtrl,
   fetchFoundItemsCtrl,
   fetchCustomerFoundItemsCtrl,
+  subscriptionCtrl,
 } = require('../controllers');
+const fs = require('fs');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './tmp');
+  },
+  filename: (req, file, cb) => {
+    const customerEmail = req.user.email;
+    cb(
+      null,
+      customerEmail +
+        '_Img' +
+        '-' +
+        Date.now() +
+        path.extname(file.originalname),
+    );
+  },
+});
+
+const upload = multer({storage: storage});
 
 router.get(
   '/fetch/lost-items',
@@ -37,6 +62,7 @@ router.get(
 );
 router.post(
   '/customer/register/found-items',
+
   VerifyUser.ensureAuthenticated,
   (req, res, next) => {
     initiateMediaTransfer(req, res, next, 'lost_and_found', 'found');
@@ -47,10 +73,15 @@ router.post(
 router.post(
   '/customer/register/lost-item',
   VerifyUser.ensureAuthenticated,
-  (req, res, next) => {
-    initiateMediaTransfer(req, res, next, 'lost_and_found', 'lost');
-  },
+  upload.single('image'),
   lostItemCtrl,
 );
+
+router.post(
+  '/customer/subscription-plan',
+
+  subscriptionCtrl,
+);
+router.post('/customer/subscription');
 
 module.exports = router;

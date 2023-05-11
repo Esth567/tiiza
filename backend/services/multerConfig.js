@@ -2,17 +2,24 @@ const multer = require('multer');
 const path = require('path');
 
 const initiateMediaTransfer = (req, res, next, _path, dest) => {
+  console.log(req.imageFile);
   if (_path === 'lost_and_found') {
   }
-  console.log(req.user.email)
   const customerEmail = req.user.email;
   dest = dest === '' ? req.user.email : dest;
   // if
   const storage = multer.diskStorage({
-    destination: `./uploads/${_path}/${dest}`,
+    destination: `./uploads/${_path}/${dest}/${customerEmail}`,
     filename: function (req, file, cb) {
       // console.log(file);
-      cb(null, customerEmail + "_Img" + '-' + Date.now() + path.extname(file.originalname));
+      cb(
+        null,
+        customerEmail +
+          '_Img' +
+          '-' +
+          Date.now() +
+          path.extname(file.originalname),
+      );
     },
   });
 
@@ -25,7 +32,10 @@ const initiateMediaTransfer = (req, res, next, _path, dest) => {
     ) {
       cb(null, true);
     } else {
-      cb(new Error('Only .jpeg,jpg and .png files are allowed'), false);
+      cb(
+        new Error('Only .jpeg,jpg and .png files are allowed'),
+        false,
+      );
     }
   };
 
@@ -33,56 +43,11 @@ const initiateMediaTransfer = (req, res, next, _path, dest) => {
 
   const upload = multer({
     storage: storage,
-    limits: { fileSize: 3000000 }, // 3MB
+    limits: {fileSize: 3000000}, // 3MB
     fileFilter: fileFilter,
   });
+  // const imageData = req.imageData;
   return upload.single('image')(req, res, next);
 };
-// console.log('-----------------------');
-// console.log(upload);
 
-class InitiateUpload {
-  constructor(path = '', dest = '') {
-    this.path = path;
-    this.dest = dest;
-    this.startInfoUpload = this.startInfoUpload.bind(this);
-  }
-
-  startInfoUpload(req, res, next, path) {
-    console.log('ododododo');
-    console.log(path, this.dest);
-    // return;
-    if (this.path) {
-      const storage = multer.diskStorage({
-        destination: `./uploads/${this.path}/${this.dest}`,
-        filename: function (req, file, cb) {
-          // console.log(file);
-          cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-        },
-      });
-
-      const fileFilter = function (req, file, cb) {
-        // Only accept certain file types
-        if (
-          file.mimetype === 'image/jpeg' ||
-          file.mimetype === 'image/png' ||
-          file.mimetype === 'image/jpg'
-        ) {
-          cb(null, true);
-        } else {
-          cb(new Error('Only .jpeg,jpg and .png files are allowed'), false);
-        }
-      };
-
-      // Set up the Multer middleware
-
-      const upload = multer({
-        storage: storage,
-        limits: { fileSize: 3000000 }, // 3MB
-        fileFilter: fileFilter,
-      });
-      return upload.single('image')(req, res, next);
-    }
-  }
-}
-module.exports = { initiateMediaTransfer, InitiateUpload };
+module.exports = {initiateMediaTransfer};
