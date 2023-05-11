@@ -1,10 +1,11 @@
-const asyncWrapper = require('../../middleware/asyncWrapper');
+require('dotenv').config();
+// *****************|| MODULES ||*****************************
+const {createSubscription} = require('../../utils/createSubRecord');
 const {createCustomError} = require('../../middleware/customError');
 const {createLostItem} = require('../../utils/createLostItem');
-const {createSubscription} = require('../../utils/createSubRecord');
-const {moveFile} = require('../../utils/moveFile');
+const asyncWrapper = require('../../middleware/asyncWrapper');
 const {logger} = require('../../utils/winstonLogger');
-require('dotenv').config();
+const {moveFile} = require('../../utils/moveFile');
 
 const subscriptionCtrl = asyncWrapper(async (req, res, next) => {
   const {email} = req.user;
@@ -30,13 +31,13 @@ const subscriptionCtrl = asyncWrapper(async (req, res, next) => {
       success: false,
       payload: 'Please Choose a subscription plan',
     });
-  const subscritionNames = [
+  const subscriptionNames = [
     TIIZA_REAL_PLUS,
     TIIZA_REAL,
     TIIZA_LITE,
     TIIZA_LITE_PLUS,
   ];
-  const subscritionAmounts = [
+  const subscriptionAmounts = [
     parseFloat(TIIZA_REAL_AMT),
     parseFloat(TIIZA_REAL_PLUS_AMT),
     parseFloat(TIIZA_LITE_AMT),
@@ -48,6 +49,9 @@ const subscriptionCtrl = asyncWrapper(async (req, res, next) => {
     itemInfo.lost_date = new Date(itemInfo.lost_date);
     itemInfo.customer_email = email;
     itemInfo.is_approved = false;
+
+    let {item_worth} = itemInfo;
+    item_worth = parseFloat(item_worth);
 
     const storedLostInfo = await createLostItem(
       req,
@@ -72,7 +76,7 @@ const subscriptionCtrl = asyncWrapper(async (req, res, next) => {
       });
       return res.status(500).send({
         success: false,
-        payload: 'Sorr,Something went wrong',
+        payload: 'Sorry,Something went wrong',
       });
     }
 
@@ -90,7 +94,7 @@ const subscriptionCtrl = asyncWrapper(async (req, res, next) => {
 
     if (!isSubscribed) {
       logger.error(
-        `Failed to create Subscrition record.| Amount ${formatCurrency(
+        `Failed to create Subscription record.| Amount ${formatCurrency(
           amount,
         )} | Subscription duration:${TIIZA_PREMIUM_DURATION} | Subscription Name ${subName} `,
         {
@@ -99,7 +103,7 @@ const subscriptionCtrl = asyncWrapper(async (req, res, next) => {
           requestId: requestId,
           method: req.method,
           path: req.path,
-          action: 'Create Sunbscription',
+          action: 'Create Subscription',
           statusCode: 500,
           clientIp: req.clientIp,
         },
@@ -112,9 +116,9 @@ const subscriptionCtrl = asyncWrapper(async (req, res, next) => {
     });
   }
 
-  if (!subscritionNames.includes(subscriptionName))
+  if (!subscriptionNames.includes(subscriptionName))
     return next(createCustomError('invalid subscription name', 400));
-  if (!subscritionAmounts.includes(parseFloat(subscriptionAmount)))
+  if (!subscriptionAmounts.includes(parseFloat(subscriptionAmount)))
     return next(
       createCustomError('invalid subscription Amount', 400),
     );

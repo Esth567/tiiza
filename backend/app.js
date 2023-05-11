@@ -21,12 +21,12 @@ const {createServer} = require('http');
 const {Server} = require('socket.io');
 const {logger} = require('./utils/winstonLogger');
 const {logRequest} = require('./middleware/logRequest');
+const path = require('path');
 const httpServer = createServer(app);
-// console.log(uuidv4());
 const io = new Server(httpServer, {
   /* options */
 });
-// require('./service/flutterwaveConfig');
+
 require('./services/socketConfig')(io);
 // store config
 
@@ -41,6 +41,7 @@ const sessionStore = new SequelizeStore({
   },
 });
 // middle wares
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(logRequest);
 app.use(cors());
 app.use(cookiePasser());

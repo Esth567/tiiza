@@ -44,13 +44,8 @@ const connectDb = async () => {
       DB_HOST: process.env.DB_HOST,
       DB_NAME: process.env.DB_NAME,
     });
-
-    console.log(
-      'Connection to the database has been established successfully.',
-    );
   } catch (error) {
     console.error('Unable to connect to the database:', error);
-
     logger.error(`${error.message}`, {
       module: 'connect.js',
       status: 'Failed',

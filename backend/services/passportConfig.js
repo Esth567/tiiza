@@ -1,8 +1,9 @@
 const LocalStrategy = require('passport-local').Strategy;
-const {LoginValidator} = require('../validation/validation');
-const bcrypt = require('bcrypt');
-const {UnHashPassword} = require('../authentication/password');
 const passport = require('passport');
+const bcrypt = require('bcrypt');
+// *****************|| MODULES ||********************************
+const {LoginValidator} = require('../validation/validation');
+const {UnHashPassword} = require('../authentication/password');
 const {logger} = require('../utils/winstonLogger');
 const {generateUniqueId} = require('../utils/uniqueIds');
 const requestId = generateUniqueId();
@@ -18,7 +19,12 @@ const initializePassport = (
     const {error} = new LoginValidator(validateData).validate();
 
     if (error)
-      return done(null, false, {payload: {message: error.message}});
+      return done(null, false, {
+        payload: {
+          message: error.message,
+          logMsg: 'Failed Login Attempt',
+        },
+      });
 
     const user = await getUserByEmail(email);
 
