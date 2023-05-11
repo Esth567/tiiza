@@ -11,11 +11,14 @@ const {
 } = require('../../utils/validateSubscription');
 const {logger} = require('../../utils/winstonLogger');
 const {Op} = require('sequelize');
+
 require('dotenv').config();
 
-const lostItemCtrl = asyncWrapper(async (req, res) => {
+const lostItemCtrl = asyncWrapper(async (req, res, next) => {
   const requestId = res.getHeader('X-request-Id');
-
+  const {path, originalname} = req.file;
+  const fileData = fs.readFileSync(path);
+  console.log(req.file);
   let {
     item_name,
     item_worth,
@@ -27,7 +30,20 @@ const lostItemCtrl = asyncWrapper(async (req, res) => {
     item_color,
     item_type,
   } = req.body;
-  const {email} = req.user;
+
+  console.log(
+    item_name,
+    item_worth,
+    lost_date,
+    lost_location,
+    phone_number,
+    description,
+    report_type,
+    item_color,
+    item_type,
+  );
+  const {email, user_id} = req.user;
+  console.log('-------------', user_id);
   if (
     !item_name ||
     !item_worth ||
@@ -81,12 +97,12 @@ const lostItemCtrl = asyncWrapper(async (req, res) => {
       payload: 'Please enter a valid description for your item',
     });
 
-  let {destination, path, filename} = req.file;
-  destination = destination.slice(2);
-  const fullPath = `${destination}${filename}`;
-
-  const storeLostInfo = await LostItemModel.create({
-    image_url: fullPath,
+  // let {destination, path, filename} = req.file;
+  // destination = destination.slice(2);
+  // const fullPath = `${destination}${filename}`;
+  // return;
+  req.session.lostItemDetails = {
+    // image_url: fullPath,
     item_name,
     item_worth,
     item_type,
@@ -98,28 +114,14 @@ const lostItemCtrl = asyncWrapper(async (req, res) => {
     item_color,
     customer_email: email,
     is_approved: false,
-  });
+    // customer_id: user_id,
+  };
+  console.log(`${process.env.DOMAIN_NAME}customer/subscription`);
+  console.log(fileData);
+  req.session.fileData = req.file;
 
-  if (!storeLostInfo) {
-    logger.error('Failed to register Lost Item in Database', {
-      module: 'lostAndFoundController.js',
-      userId: req.user ? req.user.user_id : null,
-      requestId: requestId,
-      method: req.method,
-      path: req.path,
-      action: 'Save Lost Item ',
-      statusCode: 500,
-      clientIp: req.clientIp,
-    });
-    return res
-      .status(500)
-      .send({success: false, payload: 'Sorr,Something went wrong'});
-  }
-  return res.status(200).send({
-    success: true,
-    payload:
-      'Thank you for submitting your report. We have received it and will publish it once it has been approved',
-  });
+  res.sendStatus(200);
+  // next();
 });
 
 const fetchLostItemsCtrl = asyncWrapper(async (req, res) => {
@@ -131,6 +133,7 @@ const fetchLostItemsCtrl = asyncWrapper(async (req, res) => {
         where: {
           is_approved: true,
           is_resolved: false,
+          is_found: false,
           lost_location: {
             [Op.regexp]: `(${_location}|${_location.toUpperCase()})`,
           },
@@ -172,7 +175,11 @@ const fetchLostItemsCtrl = asyncWrapper(async (req, res) => {
 const fetchCustomerLostItemsCtrl = asyncWrapper(async (req, res) => {
   const {email} = req.user;
   const customersItems = await LostItemModel.findAll({
-    where: {customer_email: email, is_approved: true},
+    where: {
+      customer_email: email,
+      is_approved: true,
+      // is_found: false,
+    },
   });
   if (customersItems.length == 0)
     return res
@@ -186,6 +193,7 @@ const fetchCustomerLostItemsCtrl = asyncWrapper(async (req, res) => {
 //====================================================FOUND SECTION===================================================================
 
 const foundLostItemCtrl = asyncWrapper(async (req, res) => {
+  console.log(req.body);
   const {
     item_name,
     discovery_location,
@@ -331,7 +339,6 @@ const fetchCustomerFoundItemsCtrl = asyncWrapper(async (req, res) => {
     where: {
       customer_email: email,
       is_approved: true,
-      is_resolved: false,
     },
   });
   if (customersItems.length == 0)

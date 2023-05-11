@@ -33,6 +33,7 @@ const {
   resetPasswordCtrl,
   confirmResetPasswordCtrl,
 } = require('./resetPasswordController');
+const {subscriptionCtrl} = require('./subscriptionController');
 
 module.exports = {
   updateCustomersProfileCtrl,
@@ -57,4 +58,5 @@ module.exports = {
   cardPaymentCtrl,
   cardAuthorizationCtrl,
   validateCardTransactionCtrl,
+  subscriptionCtrl,
 };

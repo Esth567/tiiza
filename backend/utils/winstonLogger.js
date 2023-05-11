@@ -13,14 +13,14 @@ const logger = createLogger({
   ),
   defaultMeta: {service: 'tiiza-app'},
   transports: [
-    new transports.Console({
-      format: format.combine(
-        format(info => {
-          info.message = `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
-          return info;
-        })(),
-      ),
-    }),
+    // new transports.Console({
+    //   format: format.combine(
+    //     format(info => {
+    //       info.message = `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
+    //       return info;
+    //     })(),
+    //   ),
+    // }),
     new transports.File({
       filename: path.join(__dirname, '../logs/error.log'),
       level: 'error',
