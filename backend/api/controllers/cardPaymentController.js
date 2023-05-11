@@ -291,11 +291,8 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
           subName,
           item_id: storedLostInfo.item_id,
           duration: TIIZA_PREMIUM_DURATION,
-          startDate: new Date(),
-          endDate: new Date(
-            // Date.now() + 1440 * TIIZA_PREMIUM_DURATION * 60 * 1000,
-            Date.now() + 2 * 60 * 1000,
-          ),
+          startDate: null,
+          endDate: null,
           customer_id: user_id,
         });
 
@@ -549,11 +546,8 @@ const validateCardTransactionCtrl = asyncWrapper(
           subName,
           item_id: storedLostInfo.item_id,
           duration: TIIZA_PREMIUM_DURATION,
-          startDate: new Date(),
-          endDate: new Date(
-            // Date.now() + 1440 * TIIZA_PREMIUM_DURATION * 60 * 1000,
-            Date.now() + 2 * 60 * 1000,
-          ),
+          startDate: null,
+          endDate: null,
           customer_id: user_id,
         });
 

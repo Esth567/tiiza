@@ -82,6 +82,13 @@ router.post(
 
   subscriptionCtrl,
 );
-router.post('/customer/subscription');
+router.post('/customer/subscription', async (req, res) => {
+  const u = await LostItemModel.findOne({
+    where: {customer_id: 1},
+    include: {model: SubscriptionModel},
+  });
+
+  res.send(u);
+});
 
 module.exports = router;

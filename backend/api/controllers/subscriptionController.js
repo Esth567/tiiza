@@ -23,6 +23,9 @@ const subscriptionCtrl = asyncWrapper(async (req, res, next) => {
     //
     TIIZA_PREMIUM_DURATION,
   } = process.env;
+  const itemInfo = req.session.lostItemDetails;
+  let {item_worth} = itemInfo;
+  item_worth = parseFloat(item_worth);
 
   let {subscriptionName, subscriptionAmount} = req.body;
   subscriptionAmount = parseFloat(subscriptionAmount);
@@ -45,75 +48,75 @@ const subscriptionCtrl = asyncWrapper(async (req, res, next) => {
   ];
   // console.log('amount', TIIZA_REAL_AMT);
   if (subscriptionName === TIIZA_MINOR) {
-    const itemInfo = req.session.lostItemDetails;
-    itemInfo.lost_date = new Date(itemInfo.lost_date);
-    itemInfo.customer_email = email;
-    itemInfo.is_approved = false;
+    if (item_worth >= 1000 && item_worth <= 10000) {
+      itemInfo.lost_date = new Date(itemInfo.lost_date);
+      itemInfo.customer_email = email;
+      itemInfo.is_approved = false;
 
-    let {item_worth} = itemInfo;
-    item_worth = parseFloat(item_worth);
+      const storedLostInfo = await createLostItem(
+        req,
+        res,
+        next,
+        itemInfo,
+      );
 
-    const storedLostInfo = await createLostItem(
-      req,
-      res,
-      next,
-      itemInfo,
-    );
+      moveFile(req, res, next);
+      // console.log('moved', isMoved);
 
-    moveFile(req, res, next);
-    // console.log('moved', isMoved);
-
-    if (storedLostInfo === null) {
-      logger.error('Failed to register Lost Item in Database', {
-        module: 'subscriptionController.js',
-        userId: req.user ? req.user.user_id : null,
-        requestId: requestId,
-        method: req.method,
-        path: req.path,
-        action: 'Save Lost Item ',
-        statusCode: 500,
-        clientIp: req.clientIp,
-      });
-      return res.status(500).send({
-        success: false,
-        payload: 'Sorry,Something went wrong',
-      });
-    }
-
-    const isSubscribed = await createSubscription({
-      subName: subscriptionName,
-      item_id: storedLostInfo.item_id,
-      duration: TIIZA_PREMIUM_DURATION,
-      startDate: new Date(),
-      endDate: new Date(
-        // Date.now() + 1440 * TIIZA_PREMIUM_DURATION * 60 * 1000,
-        Date.now() + 2 * 60 * 1000,
-      ),
-      customer_id: req.user.user_id,
-    });
-
-    if (!isSubscribed) {
-      logger.error(
-        `Failed to create Subscription record.| Amount ${formatCurrency(
-          amount,
-        )} | Subscription duration:${TIIZA_PREMIUM_DURATION} | Subscription Name ${subName} `,
-        {
+      if (storedLostInfo === null) {
+        logger.error('Failed to register Lost Item in Database', {
           module: 'subscriptionController.js',
           userId: req.user ? req.user.user_id : null,
           requestId: requestId,
           method: req.method,
           path: req.path,
-          action: 'Create Subscription',
+          action: 'Save Lost Item ',
           statusCode: 500,
           clientIp: req.clientIp,
-        },
-      );
+        });
+        return res.status(500).send({
+          success: false,
+          payload: 'Sorry,Something went wrong',
+        });
+      }
+
+      const isSubscribed = await createSubscription({
+        subName: subscriptionName,
+        item_id: storedLostInfo.item_id,
+        duration: TIIZA_PREMIUM_DURATION,
+        startDate: null,
+        endDate: null,
+        customer_id: req.user.user_id,
+      });
+
+      if (!isSubscribed) {
+        logger.error(
+          `Failed to create Subscription record.| Amount ${formatCurrency(
+            amount,
+          )} | Subscription duration:${TIIZA_PREMIUM_DURATION} | Subscription Name ${subName} `,
+          {
+            module: 'subscriptionController.js',
+            userId: req.user ? req.user.user_id : null,
+            requestId: requestId,
+            method: req.method,
+            path: req.path,
+            action: 'Create Subscription',
+            statusCode: 500,
+            clientIp: req.clientIp,
+          },
+        );
+      }
+      return res.status(200).send({
+        success: true,
+        payload:
+          'Thank you for submitting your report. We have received it and will publish it once it has been approved',
+      });
+    } else {
+      return res.status(400).send({
+        success: true,
+        payload: `The worth of the item you have submitted is not compatible with the current subscription plan. Please select an appropriate subscription plan that corresponds to the worth of your item. `,
+      });
     }
-    return res.status(200).send({
-      success: true,
-      payload:
-        'Thank you for submitting your report. We have received it and will publish it once it has been approved',
-    });
   }
 
   if (!subscriptionNames.includes(subscriptionName))
