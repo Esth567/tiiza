@@ -6,7 +6,6 @@ const SubscriptionModel = require('../../models/subscriptionModel');
 const UserModel = require('../../models/userModel');
 const {
   initiateMediaTransfer,
-  // InitiateUpload,
 } = require('../../services/multerConfig');
 const {createSubscription} = require('../../utils/createSubRecord');
 const {image} = require('../controllers/lostAndFoundController');
@@ -20,6 +19,7 @@ const {
   fetchCustomerFoundItemsCtrl,
   subscriptionCtrl,
 } = require('../controllers');
+
 const fs = require('fs');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -79,9 +79,16 @@ router.post(
 
 router.post(
   '/customer/subscription-plan',
-
+  VerifyUser.ensureAuthenticated,
   subscriptionCtrl,
 );
-router.post('/customer/subscription');
+router.post('/customer/subscription', async (req, res) => {
+  const u = await LostItemModel.findOne({
+    where: {customer_id: 1},
+    include: {model: SubscriptionModel},
+  });
+
+  res.send(u);
+});
 
 module.exports = router;

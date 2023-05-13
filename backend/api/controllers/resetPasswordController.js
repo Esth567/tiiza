@@ -11,7 +11,7 @@ const {
 } = require('../../validation/validation');
 require('dotenv').config();
 
-// ===============================CUSTOMER RESET PASSWORD ===============================
+// ===============================|| CUSTOMER RESET PASSWORD ||===============================
 
 const resetPasswordCtrl = asyncWrapper(async (req, res, next) => {
   const email = req.body.email;

@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const path = require('path');
 const VerifyUser = require('../../middleware/auth');
 const {
   resetPasswordCtrl,
@@ -11,4 +12,9 @@ router.post(
   confirmResetPasswordCtrl,
 );
 
+router.get('/customer/reset', (req, res) => {
+  return res.sendFile(
+    path.join(__dirname, '../../public', 'resetPassword.html'),
+  );
+});
 module.exports = router;
