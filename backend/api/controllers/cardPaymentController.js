@@ -522,7 +522,6 @@ const validateCardTransactionCtrl = asyncWrapper(
           next,
           itemInfo,
         );
-        console.log(storedLostInfo);
 
         if (storedLostInfo === null) {
           logger.error('Failed to register Lost Item in Database', {
