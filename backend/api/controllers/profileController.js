@@ -99,7 +99,7 @@ const updateNumberCtrl = asyncWrapper(async (req, res, next) => {
   if (!getUser)
     return next(
       createCustomError(
-        'Sorry, Systeme is unable to find account. please try again',
+        'Sorry, System is unable to find account. please try again',
         404,
       ),
     );

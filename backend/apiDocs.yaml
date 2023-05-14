@@ -164,7 +164,7 @@ paths:
 # ====================== CONFIRM PASSWORD RESET ROUTE==============================================
 
   /customer/confirm-password/{token}:
-    post:
+    patch:
       summary: Confirm customer password reset
       description: Use this endpoint to confirm a customer's password reset.
       parameters:
@@ -680,7 +680,7 @@ paths:
                       type: string
                       description: The phone number of the customer who lost the item.
                   
-            examples:
+            example:
                 value:
                   item_id: 1
                   image_url: uploads/lost_and_found/lost/callistus406@gmail.com_Img-1681741418688.jpg 

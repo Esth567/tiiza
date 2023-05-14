@@ -2,8 +2,6 @@ const {Sequelize, Op} = require('sequelize');
 const SubscriptionModel = require('../models/subscriptionModel');
 const {sequelize} = require('../db/connect');
 require('dotenv').config();
-// const SubscriptionModel = require('../models/subscriptionModel');
-require('dotenv').config();
 
 const {
   TIIZA_REAL,
@@ -51,7 +49,7 @@ const manageSubscriptions = async () => {
           const currentEndDate = new Date(subscription.endDate);
           const newEndDate = new Date(
             // subscription.endDate + 1440 * extensionDays * 60 * 1000,
-            currentEndDate.getTime() + 3 * 60 * 1000,
+            currentEndDate.getTime() + extensionDays * 60 * 1000,
           );
           // const now = new Date(subscription.endDate);
 
@@ -91,3 +89,5 @@ const manageSubscriptions = async () => {
 };
 
 module.exports = manageSubscriptions;
+
+// op will approve the registered item and also approve subscription for that specific item
