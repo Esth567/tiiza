@@ -1,7 +1,8 @@
 import React from 'react';
 // import CustomBottom from './constant';
-import { View, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity, Text, Dimensions } from 'react-native';
 import { COLORS } from '../constant/theme';
+
 
 const CustomButton = ({ title, onPress = () => {} } : any) => {
   return (

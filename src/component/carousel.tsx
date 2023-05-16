@@ -4,34 +4,34 @@ import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { COLORS } from '../constant/theme';
 
 const data = [
-    {
-      id: 1,
-      title: 'Iphone X',
-      status: 'Stolen',
-      image: require('../assets/phone7.png'),
-      description: 'Color Black',
-      lastseen: '3 hours ago',
-      location: 'last seen at Lekki',
-      // backgroundColor: '#012454',
-    },
+ 
     {
       id: 2,
-      title: 'Iphone X',
-      status: 'Stolen',
-      image: require('../assets/phone7.png'),
+      title: 'Bag',
+      status: 'Missing',
+      image: require('../assets/images/bag1.jpg'),
       description: 'Color Black',
       lastseen: '3 hours ago',
       location: 'last seen at Lekki',
     },
     {
         id: 3,
-        title: 'Iphone X',
-        status: 'Lost',
-        image: require('../assets/phone7.png'),
+        title: 'Envelope',
+        status: 'Found',
+        image: require('../assets/images/envelop.jpg'),
         description: 'Color Black',
         lastseen: '3 hours ago',
         location: 'last seen at Lekki',
-    }
+    },
+      {
+      id: 2,
+      title: 'IphoneX',
+      status: 'Missing',
+      image: require('../assets/images/phone2.jpg'),
+      description: 'Color Black',
+      lastseen: '3 hours ago',
+      location: 'last seen at Lekki',
+    },
   ];
   
   const CarouselComponent = (props) => {
@@ -54,39 +54,28 @@ const data = [
       
      
     const renderItem = ({ item, index }) => (
-      <View style={[styles.card, { backgroundColor: index === 0 ? '#012454' : '#A8C2FB' }]}>
-        <View style={styles.imagecontainer}>
+      <View style={styles.card}>
+        <View>
           <Image source={item.image} style={styles.cardImage} />
-          <View style={styles.separator} />
-          <View
-            style={[
-              styles.subscriptionContainer2,
-              { backgroundColor: index === 0 ? '#A8C2FB' : '#012454' },
-              { color: index === 0 ? '#000000' : '#0000b3' },
-            ]}
-          >
-            <Text style={styles.textContainer2}>{item.status}</Text>
+          <View />
+          <View style={{ flexDirection: 'row', marginTop: 10 }}>
+            <Text style={styles.cardTitle}>{item.title}</Text>
+            <Text style={[styles.textContainer2, { color: index === 1 ? '#006000' : '#CA0C3A' }]}>
+              {item.status}
+            </Text>
           </View>
         </View>
-        <Text style={[styles.cardTitle, { color: index === 0 ? '#ffffff' : '#000000' }]}>
-          {item.title}
-        </Text>
-        <Text style={[styles.cardDescription, { color: index === 0 ? '#ffffff' : '#000000' }]}>
-          {item.description}
-        </Text>
-        <Text style={[styles.lastseen, , { color: index === 0 ? '#ffffff' : '#000000' }]}>
-          {item.lastseen}
-        </Text>
-        <Text style={[styles.location, { color: index === 0 ? '#ffffff' : '#000000' }]}>
-          {item.location}
-        </Text>
+        <Text style={styles.cardDescription}>{item.description}</Text>
+        <Text style={styles.lastseen}>{item.lastseen}</Text>
+        <Text style={styles.location}>{item.location}</Text>
       </View>
     );
     return (
       <View style={styles.container}>
         <Carousel
-         layout="default"
-         ref={carouselRef}
+          layout="default"
+          layoutCardOffset={9}
+          ref={carouselRef}
           data={data}
           renderItem={renderItem}
           sliderWidth={sliderWidth}
@@ -106,16 +95,9 @@ const data = [
   };
   
   const sliderWidth = Dimensions.get('window').width;
-  const itemWidth = sliderWidth * 0.8;
+  const itemWidth = sliderWidth * 0.6;
   
   const styles = StyleSheet.create({
-    imagecontainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: 20,
-      // paddingVertical: 10,
-    },
     container: {
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -130,52 +112,54 @@ const data = [
       marginBottom: 10,
     },
     textContainer2: {
-      color: COLORS.white,
-      textAlign: 'center',
-      paddingTop: 10,
-      fontSize: 15,
-      fontWeight: '600',
-    },
-    separator: {
-      width: 30,
+      fontSize: 14,
+      fontWeight: 'bold',   
+      marginRight: 15,
+      color: COLORS.primary,
     },
     card: {
-      backgroundColor: '#A8C2FB',
+      backgroundColor: 'white',
       borderRadius: 10,
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: 260,
-      width: '100%',
+      width: itemWidth,
+      marginBottom: 10,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 3,
+      },
+      shadowOpacity: 0.29,
+      shadowRadius: 4.65,
+      elevation: 7,
     },
     cardImage: {
-      flexDirection: 'row',
-      width: 100,
-      height: 100,
-      resizeMode: 'contain',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: 20,
-      paddingVertical: 10,
+      width: itemWidth,
+      height: 190,
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
     },
     cardTitle: {
       fontSize: 15,
       fontWeight: 'bold',
-      marginTop: 10,
+      paddingLeft: 15,
+      flex: 1,
     },
     cardDescription: {
       fontSize: 12,
       fontWeight: 400,
       marginBottom: 8,
-      textAlign: 'center',
+      paddingLeft: 15,
     },
     lastseen: {
       fontSize: 12,
       fontWeight: 400,
+      paddingLeft: 15,
     },
     location: {
       fontSize: 12,
       fontWeight: 500,
-      marginTop: 8,
+      marginTop: 5,
+      paddingLeft: 15,
+      marginBottom: 15,
     },
     paginationContainer: {
       paddingVertical: 8,
@@ -186,7 +170,7 @@ const data = [
       borderRadius: 8,
       marginHorizontal: 5,
       backgroundColor: 'rgba(0, 0, 0, 0.92)',
-      marginTop: 10
+      marginTop: 10,
     },
     subscriptionContainer: {
       height: 48,
@@ -198,13 +182,7 @@ const data = [
       fontStyle: 'normal',
       fontWeight: 500,
     },
-    detailsCont: {
-      height: 30,
-      width: '99%',
-      marginTop: 15,
-      borderBottomRightRadius: 20,
-      textAlign: 'center'
-    },
+ 
   });
   
 export default CarouselComponent;

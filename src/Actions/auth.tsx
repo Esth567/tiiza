@@ -6,6 +6,8 @@ import {
   LOGIN_FAIL,
   LOGOUT,
   SET_MESSAGE,
+  OTP_SUCCESS,
+  OTP_FAIL,
 } from './types';
 
 
@@ -81,4 +83,35 @@ export const logout = () => (dispatch) => {
   dispatch({
     type: LOGOUT,
   });
+};
+
+
+export const validateOtp = (token) => (dispatch) => {
+  return authServices.validateOtp(token).then(
+    (data) => {
+      dispatch({
+        type: OTP_SUCCESS,
+        payload: { user: data },
+      });
+
+      return Promise.resolve();
+    },
+    (error) => {
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+
+      dispatch({
+        type: OTP_FAIL,
+      });
+
+      dispatch({
+        type: SET_MESSAGE,
+        payload: message,
+      });
+
+      return Promise.reject();
+    }
+  );
 };

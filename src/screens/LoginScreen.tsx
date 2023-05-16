@@ -18,6 +18,8 @@ import CustomBottom from '../component/CustomBottom';
 import { COLORS } from '../constant/theme';
 import images from '../constant/images';
 import axios from 'axios';
+import { login } from '../actions/auth';
+import { useSelector, useDispatch } from 'react-redux';
 
 const LoginScreen = ({navigation}) => {
 
@@ -27,13 +29,13 @@ const LoginScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [errortext, setErrortext] = useState('');
   const [message, SetMessage] = useState();
-   const [messageType, SetMessageType] = useState();
-  const [isRegistraionSuccess,setIsRegistraionSuccess] = useState(false);
+  const [messageType, SetMessageType] = useState();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const dispatch = useDispatch(); 
 
+   const handleSubmitButton = () => {
 
-   const handleSubmitButton = (credentials) => {
      setErrortext('');
-
      if (!email) {
        alert('Please fill Email');
        return;
@@ -45,45 +47,24 @@ const LoginScreen = ({navigation}) => {
   
      //Show Loader
      setLoading(true);
-     let dataToSend = { email, password };
-      let formBody = [];
-      for (let key in dataToSend) {
-        let encodedKey = encodeURIComponent(key);
-        let encodedValue = encodeURIComponent(dataToSend[key]);
-        formBody.push(encodedKey + '=' + encodedValue);
-      }
-      formBody = formBody.join('&');
+     if(email && password) {
+      dispatch(login(email, password))
+        .then((res) => {
+          console.log(res);
+          navigation.navigate('BottomTabNavigator');
+        })
+        .catch(() => {
+          setLoading(false);
+        });
+     } else {
+      setLoading(false);
+    }  
+};
 
-     fetch('http://localhost:3000/api/user/login', {
-      method: 'POST',
-      body: formBody,
-      headers: {
-        //Header Defination
-        'Content-Type':
-        'application/x-www-form-urlencoded;charset=UTF-8',
-      },
-    })
-      .then((response) => response.json())
-      .then((responseJson) => {
-        //Hide Loader
-        setLoading(false);
-        console.log(responseJson);
-        // If server response message same as Data Matched
-        if (responseJson.status === 'success') {
-          AsyncStorage.setItem('user_id', responseJson.data.email);
-          console.log(responseJson.data.email);
-          navigation.replace('BottomTabNavigator');
-        } else {
-          setErrortext(responseJson.msg);
-          console.log('Please check your email id or password');
-        }
-      })
-      .catch((error) => {
-        //Hide Loader
-        setLoading(false);
-        console.error(error);
-      });
-   };
+ if(isLoggedIn) {
+  navigation.navigate('BottomTabNavigator');
+ }
+
 
 
   return (

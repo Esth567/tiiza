@@ -27,14 +27,12 @@ const login = async (email, password) => {
   return response.data;
 };
 
-const verifyEmail  = async (token) => {
-  try {
-    const { data } = await axios.post(API_URL + '/customer/validate-otp', { token });
-    return data;
-  } catch(error) {
-    return catchError(error);
-  }
-}
+const validateOtp = async (token) => {
+  const response = await axios.post(API_URL + 'customer/validate-otp', {
+   token,
+  });
+};
+
 
 const logout = () => {
   AsyncStorage.removeItem('user');
@@ -44,4 +42,7 @@ export default {
   register,
   login,
   logout,
+  validateOtp,
 };
+
+

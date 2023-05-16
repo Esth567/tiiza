@@ -24,7 +24,11 @@ import Verification from './Verification';
 import { useDispatch, useSelector } from "react-redux";
 import { register } from '../actions/auth';
 
+
 const RegisterScreen = ({props, navigation}) => {
+
+   const strongRegex = new RegExp("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$");
+
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -54,8 +58,8 @@ const RegisterScreen = ({props, navigation}) => {
       alert('Please fill phone');
       return;
     }
-    if (!password) {
-      alert('Please fill Address');
+    if (!password.length < 8) {
+      alert('Please fill password');
       return;
     }
     if (!confirmPassword) {
@@ -98,7 +102,6 @@ const RegisterScreen = ({props, navigation}) => {
         <View style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
           <Image source={images.lost12} />
         </View>
-
         <KeyboardAvoidingView enabled>
           <View style={{ marginBottom: 15 }}>
             <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 10 }}>
@@ -173,7 +176,7 @@ const RegisterScreen = ({props, navigation}) => {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'center',   
               marginBottom: 80,
             }}
           >
