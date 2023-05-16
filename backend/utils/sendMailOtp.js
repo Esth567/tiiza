@@ -1,22 +1,15 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 const speakeasy = require('speakeasy');
-
 const service = process.env;
 async function sendMailOTP(email, req) {
   // generate otp secrete
   var secret = speakeasy.generateSecret({length: 20});
 
-  // store in session
+  // cache
   req.session.user_otp_auth = secret.base32;
 
-  //   const storeSecrete = await OtpModel.create({
-  //     email: email,
-  //     tow_factor_secret: secret.base32,
-  //   });
-  //   TODO:validate
   // Generate a time-based token based on the base-32 key.
-
   var token = speakeasy.totp({
     secret: secret.base32,
     encoding: 'base32',
@@ -50,13 +43,13 @@ async function sendMailOTP(email, req) {
         <title>OTP</title>
     </head>
     <body>
-        <p>To authenticate,Please use the following One Time Password (OTP):</p>
+        <p>To authenticate,Please use the following One Time Password (OTP), it lasts for 10 minutes:</p>
+        <br />
         <h2>${token}</h2>
     </body>`,
   };
 
   const isSent = await transporter.sendMail(mailOptions);
-  // console.log(isSent)
   return isSent;
 }
 

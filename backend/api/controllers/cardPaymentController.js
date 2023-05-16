@@ -1,6 +1,3 @@
-/***
- * *NOTE: THIS CODE HAS NOT BEEN REFACTORED
- */
 const {
   pollPaymentStatus,
 } = require('../../utils/transactionVerificationJob');
@@ -21,7 +18,12 @@ const {
   logPendingTransaction,
 } = require('../../utils/fileLogger');
 const {logger} = require('../../utils/winstonLogger');
+const {createSubscription} = require('../../utils/createSubRecord');
+const LostItemModel = require('../../models/lostItemModel');
+const {createLostItem} = require('../../utils/createLostItem');
+const {moveFile} = require('../../utils/moveFile');
 require('dotenv').config();
+// ************************ ENV VARIABLE INITIALIZATION ***********************
 const TIIZA_MINOR = process.env.TIIZA_MINOR;
 const TIIZA_REAL = process.env.TIIZA_REAL;
 const TIIZA_REAL_PLUS = process.env.TIIZA_REAL_PLUS;
@@ -29,9 +31,11 @@ const TIIZA_LITE = process.env.TIIZA_LITE;
 const TIIZA_LITE_PLUS = process.env.TIIZA_LITE_PLUS;
 const TIIZA_PREMIUM_DURATION = process.env.TIIZA_PREMIUM_DURATION;
 const TIIZA_MINOR_DURATION = process.env.TIIZA_MINOR_DURATION;
-// =======================================INITIALIZE CARD PAYMENT=====================================================
+
+// =======================================|| INITIALIZE CARD PAYMENT ||=====================================================
 const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
   const requestId = res.getHeader('X-request-Id');
+  let {subscriptionAmount: amount} = req.session.lostItemDetails;
 
   const loggedInUser = req.user?.user_id;
   const envVar = process.env;
@@ -41,14 +45,14 @@ const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
     email,
     expiry_month,
     expiry_year,
-    amount,
+    // amount,
     currency,
     phone_number,
     fullname,
     subscription_name,
   } = req.body;
   // currency must be in NGN
-  // const currency = 'NGN';
+
   const validateData = {
     card_number,
     cvv,
@@ -76,6 +80,7 @@ const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
     fullname,
   };
   if (error) return next(createCustomError(error.message, 400));
+
   // generate universal unique code
   const uniqueString = generateUniqueId();
 
@@ -93,7 +98,8 @@ const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
     if (response.meta.authorization.mode === 'pin') {
       req.session.charge_payload = payload;
       req.session.custom_payload = {};
-
+      req.session.custom_payload.lostItemDetails =
+        req.session.lostItemDetails;
       req.session.charge_payload.authorization = {
         mode: 'pin',
       };
@@ -123,6 +129,7 @@ const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
         payload: {
           ...req.session.charge_payload,
           ...req.session.custom_payload,
+          ...req.session.lostItemDetails,
         },
       });
     } else {
@@ -153,14 +160,15 @@ const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
   }
   // Authorizing transactions
 });
+
 /**
- * ===============================================================!THIS CTRL VALIDATES CARD TRANSACTION WITH PIN===================================================================================
+ * ===============================================================|| THIS CTRL VALIDATES CARD TRANSACTION WITH PIN ||===================================================================================
  */
 
 const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
   const requestId = res.getHeader('X-request-Id');
 
-  const {user_id, phone} = req.user;
+  const {user_id, phone, email} = req.user;
   const payload = req.session.charge_payload;
   const custom_payload = req.session.custom_payload;
   if (
@@ -204,6 +212,7 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
       });
       if (transaction.data.status == 'successful') {
         //
+        const txInfo = transaction.data;
         const commission = parseFloat(
           req.session.custom_payload.commission,
         );
@@ -218,7 +227,8 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
           customer_name: response.data.customer.name,
           currency: response.data.currency,
           charged: payload.commission,
-          subscription_name: payload.subscription_name,
+          subscription_name:
+            custom_payload.lostItemDetails.subscriptionName,
           status: response.data.status,
         });
 
@@ -249,19 +259,46 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
           );
         }
 
-        const isSubscribed = await SubscriptionModel.create({
-          name: subName,
+        const itemInfo = custom_payload.lostItemDetails;
+        itemInfo.lost_date = new Date(itemInfo.lost_date);
+        itemInfo.customer_email = email;
+        itemInfo.is_approved = false;
+
+        const storedLostInfo = await createLostItem(
+          req,
+          res,
+          next,
+          itemInfo,
+        );
+        if (storedLostInfo === null) {
+          logger.error('Failed to register Lost Item in Database', {
+            module: 'lostAndFoundController.js',
+            userId: req.user ? req.user.user_id : null,
+            requestId: requestId,
+            method: req.method,
+            path: req.path,
+            action: 'Save Lost Item ',
+            statusCode: 500,
+            clientIp: req.clientIp,
+          });
+          return res.status(500).send({
+            success: false,
+            payload: 'Sorry,Something went wrong',
+          });
+        }
+
+        const isSubscribed = await createSubscription({
+          subName,
+          item_id: storedLostInfo.item_id,
+          duration: TIIZA_PREMIUM_DURATION,
+          startDate: null,
+          endDate: null,
           customer_id: user_id,
-          duration: TIIZA_PREMIUM_DURATION, // in days
-          startDate: new Date(),
-          endDate: new Date(
-            Date.now() + 1440 * TIIZA_PREMIUM_DURATION * 60 * 1000,
-          ),
         });
 
         if (!isSubscribed) {
           logger.error(
-            `Failed to create Subscrition record.| Amount ${formatCurrency(
+            `Failed to create Subscription record.| Amount ${formatCurrency(
               amount,
             )} | Subscription duration:${TIIZA_PREMIUM_DURATION} | Subscription Name ${subName} `,
             {
@@ -270,7 +307,7 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
               requestId: requestId,
               method: req.method,
               path: req.path,
-              action: 'Create Sunbscription',
+              action: 'Create Subscription',
               statusCode: 500,
               clientIp: req.clientIp,
             },
@@ -283,13 +320,23 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
             ),
           );
         }
+        moveFile(req, res, next);
 
         req.session.charge_payload = {};
         req.session.custom_payload = {};
+
         return res.status(200).send({
           success: true,
-          payload:
-            'Pin Authorization complete.OTP has been sent to your phone number.Please use it to authenticate your payment.',
+          payload: receiptGenerator(
+            'Card Payment',
+            txInfo.amount,
+            txInfo.tx_ref,
+            `${custom_payload.lostItemDetails.subscriptionName} Subscription`,
+            txInfo.status,
+            new Date(),
+          ),
+          message:
+            'Thank you for submitting your report. We have received it and will publish it once it has been approve',
         });
       } else if (transaction.data.status == 'pending') {
         // LOG TO FILE
@@ -353,13 +400,13 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
   }
 });
 
-//================================= !VALIDATES CARD TRANSACTION WITH OTP====================================================
+//=================================|| VALIDATES CARD TRANSACTION WITH OTP ||====================================================
 
 const validateCardTransactionCtrl = asyncWrapper(
   async (req, res, next) => {
     const requestId = res.getHeader('X-request-Id');
 
-    const {user_id, phone} = req.user;
+    const {user_id, phone, email} = req.user;
 
     const requestPayload = req.session.charge_payload;
     const custom_payload = req.session.custom_payload;
@@ -418,7 +465,9 @@ const validateCardTransactionCtrl = asyncWrapper(
         const commission = parseFloat(
           req.session.custom_payload.commission,
         );
-        const subName = req.session.custom_payload.subscription_name;
+        const subName =
+          req.session.custom_payload?.lostItemDetails
+            .subscriptionName;
         // return
         const isLogged = await TransactionLogModel.create({
           customer_id: user_id,
@@ -437,7 +486,7 @@ const validateCardTransactionCtrl = asyncWrapper(
           logger.error(
             `Failed to create  transaction record |  Amount:  ${formatCurrency(
               txInfo.amount,
-            )}. Transaction refrence:${
+            )}. Transaction reference:${
               txInfo.tx_ref
             }, Transaction code ${txInfo.id}`,
             {
@@ -459,16 +508,46 @@ const validateCardTransactionCtrl = asyncWrapper(
             ),
           );
         }
+        // create item
+
+        const itemInfo = custom_payload.lostItemDetails;
+        itemInfo.lost_date = new Date(itemInfo.lost_date);
+        itemInfo.customer_email = email;
+        itemInfo.is_approved = false;
+
+        // console.log(...itemInfo);
+        const storedLostInfo = await createLostItem(
+          req,
+          res,
+          next,
+          itemInfo,
+        );
+
+        if (storedLostInfo === null) {
+          logger.error('Failed to register Lost Item in Database', {
+            module: 'lostAndFoundController.js',
+            userId: req.user ? req.user.user_id : null,
+            requestId: requestId,
+            method: req.method,
+            path: req.path,
+            action: 'Save Lost Item ',
+            statusCode: 500,
+            clientIp: req.clientIp,
+          });
+          return res.status(500).send({
+            success: false,
+            payload: 'Sorry,Something went wrong',
+          });
+        }
+
         // register subscription
-        const isSubscribed = await SubscriptionModel.create({
-          name: subName,
+        const isSubscribed = await createSubscription({
+          subName,
+          item_id: storedLostInfo.item_id,
+          duration: TIIZA_PREMIUM_DURATION,
+          startDate: null,
+          endDate: null,
           customer_id: user_id,
-          duration: TIIZA_PREMIUM_DURATION, // in days
-          startDate: new Date(),
-          endDate: new Date(
-            Date.now() + 3 * 60 * 1000,
-            // Date.now() + 8 * 60 * 1000,
-          ),
         });
 
         if (!isSubscribed) {
@@ -511,6 +590,10 @@ const validateCardTransactionCtrl = asyncWrapper(
             clientIp: req.clientIp,
           },
         );
+        // move the media file
+        await moveFile(req, res, next);
+
+        // if(isMoved ===false ) return res.send("unable to add attachment")
 
         req.session.charge_payload = {};
         req.session.custom_payload = {};
@@ -520,12 +603,13 @@ const validateCardTransactionCtrl = asyncWrapper(
             'Card Payment',
             txInfo.amount,
             txInfo.tx_ref,
+            `${custom_payload.lostItemDetails.subscriptionName} Subscription`,
             txInfo.status,
             new Date(),
-            response.data.status,
           ),
+          message:
+            'Thank you for submitting your report. We have received it and will publish it once it has been approve',
         });
-        // TODO: refund or decline payment
 
         // :?check webhook
       } else if (transaction.data.status == 'pending') {

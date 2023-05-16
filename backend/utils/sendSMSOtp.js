@@ -12,12 +12,6 @@ async function sendSMSOtp(fromNumber, toNumber, req) {
   // cache
   req.session.user_otp_auth = secret.base32;
 
-  //   const storeSecrete = await OtpModel.create({
-  //     email: email,
-  //     tow_factor_secret: secret.base32,
-  //   });
-  //   TODO:validate
-  //
   var token = speakeasy.totp({
     secret: secret.base32,
     encoding: 'base32',

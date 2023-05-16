@@ -1,5 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const {Op} = require('sequelize');
+require('dotenv').config();
+// ************************|| MODULES || **********************
 const {upload} = require('../../services/multerConfig');
 const LostItemModel = require('../../models/lostItemModel');
 const asyncWrapper = require('../../middleware/asyncWrapper');
@@ -10,11 +13,13 @@ const {
   checkSubscription,
 } = require('../../utils/validateSubscription');
 const {logger} = require('../../utils/winstonLogger');
-const {Op} = require('sequelize');
-require('dotenv').config();
 
-const lostItemCtrl = asyncWrapper(async (req, res) => {
-  const requestId = res.getHeader('X-request-Id');
+//==================================================== || REGISTER LOST ITEM || ===================================================================
+
+const lostItemCtrl = asyncWrapper(async (req, res, next) => {
+  if (!req.file)
+    return next(createCustomError('Missing Attachment', 400));
+  const {path} = req.file;
 
   let {
     item_name,
@@ -27,7 +32,8 @@ const lostItemCtrl = asyncWrapper(async (req, res) => {
     item_color,
     item_type,
   } = req.body;
-  const {email} = req.user;
+
+  const {email, user_id} = req.user;
   if (
     !item_name ||
     !item_worth ||
@@ -47,24 +53,12 @@ const lostItemCtrl = asyncWrapper(async (req, res) => {
   if (isNaN(item_worth))
     return next(
       createCustomError(
-        'Please enter a  vaid  amount for your item worth',
+        'Please enter a  valid  amount for your item worth',
         400,
       ),
     );
   item_worth = parseFloat(item_worth);
 
-  if (item_worth >= process.env.TIIZA_REAL_CHARGE)
-    return res.status(307).send({
-      success: false,
-      payload: {
-        message: `Sorry, Our free package Only allows registration of items NOT up to the value of ${formatCurrency(
-          10000,
-        )}. However, if you wish to register an item worth more than this amount, we kindly request that you upgrade to our premium package for a registration fee of ${formatCurrency(
-          2500,
-        )}`,
-        redirectUrl: '/customer/subscriptions',
-      },
-    });
   //check for invalid date
   const date = new Date(lost_date);
   if (isNaN(date.getTime()))
@@ -81,12 +75,7 @@ const lostItemCtrl = asyncWrapper(async (req, res) => {
       payload: 'Please enter a valid description for your item',
     });
 
-  let {destination, path, filename} = req.file;
-  destination = destination.slice(2);
-  const fullPath = `${destination}${filename}`;
-
-  const storeLostInfo = await LostItemModel.create({
-    image_url: fullPath,
+  req.session.lostItemDetails = {
     item_name,
     item_worth,
     item_type,
@@ -98,29 +87,13 @@ const lostItemCtrl = asyncWrapper(async (req, res) => {
     item_color,
     customer_email: email,
     is_approved: false,
-  });
+  };
+  req.session.fileData = req.file;
 
-  if (!storeLostInfo) {
-    logger.error('Failed to register Lost Item in Database', {
-      module: 'lostAndFoundController.js',
-      userId: req.user ? req.user.user_id : null,
-      requestId: requestId,
-      method: req.method,
-      path: req.path,
-      action: 'Save Lost Item ',
-      statusCode: 500,
-      clientIp: req.clientIp,
-    });
-    return res
-      .status(500)
-      .send({success: false, payload: 'Sorr,Something went wrong'});
-  }
-  return res.status(200).send({
-    success: true,
-    payload:
-      'Thank you for submitting your report. We have received it and will publish it once it has been approved',
-  });
+  res.sendStatus(200);
 });
+
+//==================================================== || FETCH LOST ITEM || ===================================================================
 
 const fetchLostItemsCtrl = asyncWrapper(async (req, res) => {
   const {user_id, location} = req.user;
@@ -131,6 +104,7 @@ const fetchLostItemsCtrl = asyncWrapper(async (req, res) => {
         where: {
           is_approved: true,
           is_resolved: false,
+          is_found: false,
           lost_location: {
             [Op.regexp]: `(${_location}|${_location.toUpperCase()})`,
           },
@@ -162,17 +136,23 @@ const fetchLostItemsCtrl = asyncWrapper(async (req, res) => {
     return res.status(200).send({
       success: true,
       payload: {
-        message: `Please renew your subscription to access items found in other states.`,
+        // message: `Please renew your subscription to access items found in other states.`,
         data: lostItems,
       },
     });
   }
 });
 
+//==================================================== || FETCH CUSTOMER LOST ITEM || ===================================================================
+
 const fetchCustomerLostItemsCtrl = asyncWrapper(async (req, res) => {
   const {email} = req.user;
   const customersItems = await LostItemModel.findAll({
-    where: {customer_email: email, is_approved: true},
+    where: {
+      customer_email: email,
+      is_approved: true,
+      // is_found: false,
+    },
   });
   if (customersItems.length == 0)
     return res
@@ -183,7 +163,7 @@ const fetchCustomerLostItemsCtrl = asyncWrapper(async (req, res) => {
     .send({success: true, payload: customersItems});
 });
 
-//====================================================FOUND SECTION===================================================================
+//========================================================== || FOUND SECTION || ===================================================================
 
 const foundLostItemCtrl = asyncWrapper(async (req, res) => {
   const {
@@ -196,13 +176,7 @@ const foundLostItemCtrl = asyncWrapper(async (req, res) => {
     item_color,
     description,
   } = req.body;
-  console.log(
-    item_name,
-    discovery_location,
-    date_found,
-    pickup_location,
-    phone_number,
-  );
+
   if (
     !item_name ||
     !discovery_location ||
@@ -234,7 +208,7 @@ const foundLostItemCtrl = asyncWrapper(async (req, res) => {
       .send({success: false, payload: 'Please select an image file'});
   let {destination, path, filename} = req.file;
   destination = destination.slice(2);
-  const fullPath = `${destination}${filename}`;
+  const fullPath = `${process.env.DOMAIN_NAME}${destination}/${filename}`;
   //   return;
   const {email, user_id} = req.user;
 
@@ -268,12 +242,15 @@ const foundLostItemCtrl = asyncWrapper(async (req, res) => {
       .status(500)
       .send({success: false, payload: 'Sorry,something went wrong'});
   }
+
   return res.status(201).send({
     success: true,
     payload:
       'Thank you for submitting your report. We have received it and will publish it once it has been approved',
   });
 });
+
+//========================================================== || FETCH FOUND ITEMS  || ===================================================================
 
 const fetchFoundItemsCtrl = asyncWrapper(async (req, res) => {
   const {user_id, location} = req.user;
@@ -323,6 +300,8 @@ const fetchFoundItemsCtrl = asyncWrapper(async (req, res) => {
   }
 });
 
+//========================================================== || FETCH CUSTOMER FOUND ITEMS  || ===================================================================
+
 const fetchCustomerFoundItemsCtrl = asyncWrapper(async (req, res) => {
   const {email} = req.user;
 
@@ -331,7 +310,6 @@ const fetchCustomerFoundItemsCtrl = asyncWrapper(async (req, res) => {
     where: {
       customer_email: email,
       is_approved: true,
-      is_resolved: false,
     },
   });
   if (customersItems.length == 0)
@@ -345,9 +323,9 @@ const fetchCustomerFoundItemsCtrl = asyncWrapper(async (req, res) => {
 
 module.exports = {
   lostItemCtrl,
-  fetchLostItemsCtrl,
   foundLostItemCtrl,
-  fetchCustomerLostItemsCtrl,
+  fetchLostItemsCtrl,
   fetchFoundItemsCtrl,
+  fetchCustomerLostItemsCtrl,
   fetchCustomerFoundItemsCtrl,
 };

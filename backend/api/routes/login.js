@@ -5,8 +5,6 @@ const UserModel = require('../../models/userModel');
 const {sendSMSOtp} = require('../../utils/sendSMSOtp');
 const {createCustomError} = require('../../middleware/customError');
 const {logger} = require('../../utils/winstonLogger');
-const {errorLogger} = require('../../utils/fileLogger');
-// const {generateUniqueId} = require('../../utils/uniqueIds');
 require('dotenv').config();
 initializePassport(
   passport,
@@ -28,9 +26,10 @@ router.post(
       }
 
       if (!user) {
-        console.log(info);
-        const message = info.payload.logMsg;
-        logger.warn(`${message ? message : 'Validation Error '}`, {
+        const message = info.payload.logMsg
+          ? info.payload.logMsg
+          : 'Validation Error ';
+        logger.warn(`${message}`, {
           module: 'login.js',
           requestId: requestId,
           userId: req.user ? req.user.user_id : null,
@@ -109,7 +108,7 @@ router.post(
 router.post('/logout', (req, res, next) => {
   req.logOut(function (error) {
     if (error) return next(error);
-    return res.redirect('/customer/dashboard');
+    return res.sendStatus(200);
   });
   return res.status(200).json({
     success: true,

@@ -164,7 +164,7 @@ paths:
 # ====================== CONFIRM PASSWORD RESET ROUTE==============================================
 
   /customer/confirm-password/{token}:
-    post:
+    patch:
       summary: Confirm customer password reset
       description: Use this endpoint to confirm a customer's password reset.
       parameters:
@@ -680,11 +680,10 @@ paths:
                       type: string
                       description: The phone number of the customer who lost the item.
                   
-            examples:
-              example-1:
+            example:
                 value:
                   item_id: 1
-                  image_url: uploads/lost_and_found/foundcallistus406@gmail.com_Img-1681741418688.jpg 
+                  image_url: uploads/lost_and_found/lost/callistus406@gmail.com_Img-1681741418688.jpg 
                   item_type: phone
                   item_name: battery
                   item_color: blue
@@ -695,20 +694,17 @@ paths:
                   description: this item was found in a bus
                   customer_email: callistus406@gmail.com
                   phone_number: 08032344321
-                  is_approved: true
+                  is_approved: false
                   is_resolved: false
                   createdAt: 2023-04-17T14:23:38.000Z
                   updatedAt: 2023-04-17T14:23:38.000Z
       responses:
-        '201':
-          description: Returns an object with success messageg
+        '200':
+          description: returns status 200 and text OK
           content:
                 application/json:
                   example:
-                    success:
-                      true
-                    payload:
-                      Thank you for submitting your report. We have received it and will publish it once it has been approved
+                    OK
         '400':
           description: Bad request - Invalid or missing request parameters
         '500':
@@ -717,7 +713,7 @@ paths:
 
 
 
-# ====================== CARD PAYMENT DOCS================================================
+# ======================|| CARD PAYMENT DOCS ||================================================
 
   /flw/payment/card-payment:
       post:
@@ -967,7 +963,7 @@ paths:
           '500':
             description: Internal server error 
 
-# =============== SEND MESSAGE ROUTE DOC========================= 
+# ===============|| SEND MESSAGE ROUTE DOC ||========================= 
 
   /customer/send/message:
       post:
@@ -998,6 +994,40 @@ paths:
         responses:
           '200':
               description: Returns an object payload of  the sent message in the specified conversation id.
+          '400':
+            description: Bad request - Invalid or missing request parameters
+          '500':
+            description: Internal server error 
+
+
+# ===============|| SEND MESSAGE ROUTE DOC ||========================= 
+
+  /customer/subscription-plan:
+      post:
+        summary: Creates  Subscription
+        description: Use this endpoint to create messages for a specified conversation
+        requestBody:
+          description: Start conversation
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscriptionName:
+                    type: string
+                    description: name of the subscription; this cannot be an arbitrary value
+                    example: tiiza_real
+                  subscriptionAmount:
+                    type: number
+                    description: amount of the subscription plan 
+              example:     
+                  subscriptionName: tiiza_real
+                  subscriptionAmount: 2500
+         
+        responses:
+          '200':
+              description: Returns a success message on tiiza minor subscription and OK text on tiiza premium subscription .
           '400':
             description: Bad request - Invalid or missing request parameters
           '500':

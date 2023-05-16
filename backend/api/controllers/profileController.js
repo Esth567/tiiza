@@ -1,4 +1,6 @@
 const {Op} = require('sequelize');
+require('dotenv').config();
+// *********************|| MODULES ||************************
 const UserModel = require('../../models/userModel');
 const asyncWrapper = require('../../middleware/asyncWrapper');
 const {
@@ -7,8 +9,7 @@ const {
 } = require('../../validation/validation');
 const {createCustomError} = require('../../middleware/customError');
 const {sendSMSOtp} = require('../../utils/sendSMSOtp');
-require('dotenv').config();
-// ===============================CUSTOMER GET PROFILE ===============================
+// ===============================|| CUSTOMER GET PROFILE ||===============================
 
 const getCustomersProfileCtrl = asyncWrapper(async (req, res) => {
   const {user_id} = req.user;
@@ -27,7 +28,7 @@ const getCustomersProfileCtrl = asyncWrapper(async (req, res) => {
   return res.status(200).send({success: true, payload: userProfile});
 });
 
-// ===============================UPDATE CUSTOMERS PROFILE===============================
+// ===============================|| UPDATE CUSTOMERS PROFILE ||===============================
 
 const updateCustomersProfileCtrl = asyncWrapper(
   async (req, res, next) => {
@@ -80,7 +81,7 @@ const updateCustomersProfileCtrl = asyncWrapper(
   },
 );
 
-// ===============================CUSTOMER UPDATE NUMBER ===============================
+// ===============================|| CUSTOMER UPDATE NUMBER ||===============================
 
 const updateNumberCtrl = asyncWrapper(async (req, res, next) => {
   const requestId = res.getHeader('X-request-Id');
@@ -98,7 +99,7 @@ const updateNumberCtrl = asyncWrapper(async (req, res, next) => {
   if (!getUser)
     return next(
       createCustomError(
-        'Sorry, Systeme is unable to find account. please try again',
+        'Sorry, System is unable to find account. please try again',
         404,
       ),
     );
@@ -159,7 +160,7 @@ const updateNumberCtrl = asyncWrapper(async (req, res, next) => {
 });
 
 module.exports = {
-  getCustomersProfileCtrl,
   updateCustomersProfileCtrl,
+  getCustomersProfileCtrl,
   updateNumberCtrl,
 };

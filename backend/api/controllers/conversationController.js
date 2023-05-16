@@ -9,6 +9,8 @@ const {
 } = require('../../models/chatModels');
 const UserModel = require('../../models/userModel');
 
+//========================================================== || INITIATE CONVERSATION CTRL  || ===================================================================
+
 const InitiateConversationCtrl = asyncWrapper(async (req, res) => {
   const {senderId, receiverId} = req.body;
   console.log(senderId);
@@ -52,6 +54,8 @@ const InitiateConversationCtrl = asyncWrapper(async (req, res) => {
   return res.status(200).send({success: true, payload: conversation});
 });
 
+//========================================================== || SEND MSG CTRL  || ===================================================================
+
 const sendMessageCtrl = asyncWrapper(async (req, res, next) => {
   const {user_id} = req.user;
 
@@ -81,6 +85,8 @@ const sendMessageCtrl = asyncWrapper(async (req, res, next) => {
     .status(200)
     .send({success: true, payload: createMessage});
 });
+//========================================================== || FETCH MSG CTRL  || ===================================================================
+
 const fetchMessageCtrl = asyncWrapper(async (req, res, next) => {
   const {user_id} = req.user;
   const {conversationId} = req.params;
@@ -95,6 +101,8 @@ const fetchMessageCtrl = asyncWrapper(async (req, res, next) => {
 
   return res.status(200).send({success: true, payload: findMessages});
 });
+
+//========================================================== || GET CONVERSATION CTRL  || ===================================================================
 
 const getConversationCtrl = asyncWrapper(async (req, res, next) => {
   const {user_id} = req.user;
@@ -115,6 +123,6 @@ const getConversationCtrl = asyncWrapper(async (req, res, next) => {
 module.exports = {
   InitiateConversationCtrl,
   getConversationCtrl,
-  sendMessageCtrl,
   fetchMessageCtrl,
+  sendMessageCtrl,
 };

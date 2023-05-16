@@ -1,12 +1,13 @@
 const {
   emailOtpValidationCtrl,
-  requestOtpCtrl,
   smsOtpValidationCtrl,
+  requestSMSOtpCtrl,
+  requestOtpCtrl,
 } = require('./OTPController');
 const {
-  cardPaymentCtrl,
-  cardAuthorizationCtrl,
   validateCardTransactionCtrl,
+  cardAuthorizationCtrl,
+  cardPaymentCtrl,
 } = require('./cardPaymentController');
 const {registerController} = require('./registerController');
 const {
@@ -16,12 +17,12 @@ const {
   fetchMessageCtrl,
 } = require('./conversationController');
 const {
-  lostItemCtrl,
-  fetchLostItemsCtrl,
-  fetchCustomerLostItemsCtrl,
-  foundLostItemCtrl,
-  fetchFoundItemsCtrl,
   fetchCustomerFoundItemsCtrl,
+  fetchCustomerLostItemsCtrl,
+  fetchFoundItemsCtrl,
+  fetchLostItemsCtrl,
+  foundLostItemCtrl,
+  lostItemCtrl,
 } = require('./lostAndFoundController');
 const {
   getCustomersProfileCtrl,
@@ -33,28 +34,31 @@ const {
   resetPasswordCtrl,
   confirmResetPasswordCtrl,
 } = require('./resetPasswordController');
+const {subscriptionCtrl} = require('./subscriptionController');
 
 module.exports = {
   updateCustomersProfileCtrl,
-  getCustomersProfileCtrl,
-  resetPasswordCtrl,
-  confirmResetPasswordCtrl,
-  foundLostItemCtrl,
-  fetchFoundItemsCtrl,
-  emailOtpValidationCtrl,
-  registerController,
-  requestOtpCtrl,
-  fetchCustomerFoundItemsCtrl,
-  fetchLostItemsCtrl,
-  lostItemCtrl,
   fetchCustomerLostItemsCtrl,
-  InitiateConversationCtrl,
-  getConversationCtrl,
-  sendMessageCtrl,
-  fetchMessageCtrl,
-  smsOtpValidationCtrl,
-  updateNumberCtrl,
-  cardPaymentCtrl,
-  cardAuthorizationCtrl,
   validateCardTransactionCtrl,
+  fetchCustomerFoundItemsCtrl,
+  confirmResetPasswordCtrl,
+  InitiateConversationCtrl,
+  getCustomersProfileCtrl,
+  emailOtpValidationCtrl,
+  cardAuthorizationCtrl,
+  smsOtpValidationCtrl,
+  fetchFoundItemsCtrl,
+  getConversationCtrl,
+  registerController,
+  fetchLostItemsCtrl,
+  resetPasswordCtrl,
+  foundLostItemCtrl,
+  requestSMSOtpCtrl,
+  fetchMessageCtrl,
+  updateNumberCtrl,
+  subscriptionCtrl,
+  sendMessageCtrl,
+  cardPaymentCtrl,
+  requestOtpCtrl,
+  lostItemCtrl,
 };
