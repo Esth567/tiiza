@@ -1,6 +1,3 @@
-/***
- * *NOTE: THIS CODE HAS NOT BEEN REFACTORED
- */
 const {
   pollPaymentStatus,
 } = require('../../utils/transactionVerificationJob');
@@ -26,6 +23,7 @@ const LostItemModel = require('../../models/lostItemModel');
 const {createLostItem} = require('../../utils/createLostItem');
 const {moveFile} = require('../../utils/moveFile');
 require('dotenv').config();
+// ************************ ENV VARIABLE INITIALIZATION ***********************
 const TIIZA_MINOR = process.env.TIIZA_MINOR;
 const TIIZA_REAL = process.env.TIIZA_REAL;
 const TIIZA_REAL_PLUS = process.env.TIIZA_REAL_PLUS;
@@ -33,11 +31,12 @@ const TIIZA_LITE = process.env.TIIZA_LITE;
 const TIIZA_LITE_PLUS = process.env.TIIZA_LITE_PLUS;
 const TIIZA_PREMIUM_DURATION = process.env.TIIZA_PREMIUM_DURATION;
 const TIIZA_MINOR_DURATION = process.env.TIIZA_MINOR_DURATION;
-// =======================================INITIALIZE CARD PAYMENT=====================================================
+
+// =======================================|| INITIALIZE CARD PAYMENT ||=====================================================
 const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
   const requestId = res.getHeader('X-request-Id');
   let {subscriptionAmount: amount} = req.session.lostItemDetails;
-  // const
+
   const loggedInUser = req.user?.user_id;
   const envVar = process.env;
   let {
@@ -53,7 +52,7 @@ const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
     subscription_name,
   } = req.body;
   // currency must be in NGN
-  // const currency = 'NGN';
+
   const validateData = {
     card_number,
     cvv,
@@ -81,10 +80,6 @@ const cardPaymentCtrl = asyncWrapper(async (req, res, next) => {
     fullname,
   };
   if (error) return next(createCustomError(error.message, 400));
-
-  console.log(req.imageData);
-  // if (!req.fileData)
-  //   return res.status(400).send('Missing Item attachment');
 
   // generate universal unique code
   const uniqueString = generateUniqueId();
@@ -288,26 +283,22 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
           });
           return res.status(500).send({
             success: false,
-            payload: 'Sorr,Something went wrong',
+            payload: 'Sorry,Something went wrong',
           });
         }
 
         const isSubscribed = await createSubscription({
           subName,
-
           item_id: storedLostInfo.item_id,
           duration: TIIZA_PREMIUM_DURATION,
-          startDate: new Date(),
-          endDate: new Date(
-            // Date.now() + 1440 * TIIZA_PREMIUM_DURATION * 60 * 1000,
-            Date.now() + 2 * 60 * 1000,
-          ),
+          startDate: null,
+          endDate: null,
           customer_id: user_id,
         });
 
         if (!isSubscribed) {
           logger.error(
-            `Failed to create Subscrition record.| Amount ${formatCurrency(
+            `Failed to create Subscription record.| Amount ${formatCurrency(
               amount,
             )} | Subscription duration:${TIIZA_PREMIUM_DURATION} | Subscription Name ${subName} `,
             {
@@ -316,7 +307,7 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
               requestId: requestId,
               method: req.method,
               path: req.path,
-              action: 'Create Sunbscription',
+              action: 'Create Subscription',
               statusCode: 500,
               clientIp: req.clientIp,
             },
@@ -409,7 +400,7 @@ const cardAuthorizationCtrl = asyncWrapper(async (req, res, next) => {
   }
 });
 
-//================================= !VALIDATES CARD TRANSACTION WITH OTP====================================================
+//=================================|| VALIDATES CARD TRANSACTION WITH OTP ||====================================================
 
 const validateCardTransactionCtrl = asyncWrapper(
   async (req, res, next) => {
@@ -495,7 +486,7 @@ const validateCardTransactionCtrl = asyncWrapper(
           logger.error(
             `Failed to create  transaction record |  Amount:  ${formatCurrency(
               txInfo.amount,
-            )}. Transaction refrence:${
+            )}. Transaction reference:${
               txInfo.tx_ref
             }, Transaction code ${txInfo.id}`,
             {
@@ -531,7 +522,6 @@ const validateCardTransactionCtrl = asyncWrapper(
           next,
           itemInfo,
         );
-        console.log(storedLostInfo);
 
         if (storedLostInfo === null) {
           logger.error('Failed to register Lost Item in Database', {
@@ -546,7 +536,7 @@ const validateCardTransactionCtrl = asyncWrapper(
           });
           return res.status(500).send({
             success: false,
-            payload: 'Sorr,Something went wrong',
+            payload: 'Sorry,Something went wrong',
           });
         }
 
@@ -555,11 +545,8 @@ const validateCardTransactionCtrl = asyncWrapper(
           subName,
           item_id: storedLostInfo.item_id,
           duration: TIIZA_PREMIUM_DURATION,
-          startDate: new Date(),
-          endDate: new Date(
-            // Date.now() + 1440 * TIIZA_PREMIUM_DURATION * 60 * 1000,
-            Date.now() + 2 * 60 * 1000,
-          ),
+          startDate: null,
+          endDate: null,
           customer_id: user_id,
         });
 
@@ -623,7 +610,6 @@ const validateCardTransactionCtrl = asyncWrapper(
           message:
             'Thank you for submitting your report. We have received it and will publish it once it has been approve',
         });
-        // TODO: refund or decline payment
 
         // :?check webhook
       } else if (transaction.data.status == 'pending') {

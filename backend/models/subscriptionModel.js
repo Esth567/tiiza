@@ -26,11 +26,19 @@ const SubscriptionModel = sequelize.define('Subscription', {
   },
   startDate: {
     type: DataTypes.DATE,
-    allowNull: false,
+    allowNull: true,
   },
   endDate: {
     type: DataTypes.DATE,
-    allowNull: false,
+    allowNull: true,
+  },
+  is_active: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  is_confirmed: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   is_extended: {
     type: DataTypes.BOOLEAN,

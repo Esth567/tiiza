@@ -1,3 +1,5 @@
+require('dotenv').config();
+// ***************|| MODULES ||***********************
 const UserModel = require('../../models/userModel');
 const asyncWrapper = require('../../middleware/asyncWrapper');
 const {HashPassword} = require('../../authentication/password');
@@ -6,7 +8,8 @@ const {createCustomError} = require('../../middleware/customError');
 const {sendMailOTP} = require('../../utils/sendMailOtp');
 const {logger} = require('../../utils/winstonLogger');
 const {generateUniqueId} = require('../../utils/uniqueIds');
-require('dotenv').config();
+
+//========================================================== || REGISTER CTRL  || ===================================================================
 
 const registerController = asyncWrapper(async (req, res, next) => {
   const requestId = res.getHeader('X-request-Id');
@@ -77,12 +80,14 @@ const registerController = asyncWrapper(async (req, res, next) => {
     );
   }
 
-  req.session.customer_details = {};
-  req.session.customer_details.password = hashPassword;
-  req.session.customer_details.email = email;
-  req.session.customer_details.phone = phone;
-  req.session.customer_details.full_name = full_name;
-  req.session.customer_details.location = location;
+  req.session.customer_details = {
+    password: hashPassword,
+    email,
+    phone,
+    fullName,
+    location,
+  };
+
   sendMailOTP(email, req)
     .then(response => {
       return res.status(200).json({
@@ -95,7 +100,7 @@ const registerController = asyncWrapper(async (req, res, next) => {
     })
     .catch(error => {
       logger.error(`${error.message}`, {
-        module: 'reisterController.js',
+        module: 'registerController.js',
         userId: req.user ? req.user.user_id : null,
         requestId: requestId,
         action: 'Send mail OTP',

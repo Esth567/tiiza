@@ -4,11 +4,18 @@ const asyncWrapper = require('../../middleware/asyncWrapper');
 const {sendMailOTP} = require('../../utils/sendMailOtp');
 const {createCustomError} = require('../../middleware/customError');
 const {logger} = require('../../utils/winstonLogger');
+const {sendSMSOtp} = require('../../utils/sendSMSOtp');
+const {
+  PhoneValidator,
+  EmailValidator,
+} = require('../../validation/validation');
 require('dotenv').config();
+
+//========================================================== || EMAIL OTP VALIDATION  || ===================================================================
+
 const emailOtpValidationCtrl = asyncWrapper(
   async (req, res, next) => {
     const requestId = res.getHeader('X-request-Id');
-
     const {token} = req.body;
     if (!token)
       return next(createCustomError('Input cannot be empty', 400));
@@ -66,6 +73,8 @@ const emailOtpValidationCtrl = asyncWrapper(
   },
 );
 
+//========================================================== || SMS OTP VALIDATION  || ===================================================================
+
 const smsOtpValidationCtrl = asyncWrapper(async (req, res, next) => {
   const requestId = res.getHeader('X-request-Id');
 
@@ -84,7 +93,7 @@ const smsOtpValidationCtrl = asyncWrapper(async (req, res, next) => {
     secret: secret,
     encoding: 'base32',
     token: token,
-    time: 600, //last for 10 minss
+    time: 600, //last for 10 mins
   });
 
   const {email} = req.session.customer_details;
@@ -124,10 +133,14 @@ const smsOtpValidationCtrl = asyncWrapper(async (req, res, next) => {
       .send({success: true, payload: 'Login successful'});
   });
 });
+//========================================================== || REQUEST EMAIL OTP VALIDATION  || ===================================================================
 
 const requestOtpCtrl = asyncWrapper((req, res, next) => {
   const requestId = res.getHeader('X-request-Id');
   const {email} = req.body;
+
+  const {error} = new EmailValidator(email).validate();
+  if (error) return next(createCustomError(error.message, 400));
   sendMailOTP(email, req)
     .then(response => {
       return res.status(200).json({
@@ -158,8 +171,48 @@ const requestOtpCtrl = asyncWrapper((req, res, next) => {
     });
 });
 
+//========================================================== || SMS OTP VALIDATION  || ===================================================================
+
+const requestSMSOtpCtrl = asyncWrapper((req, res, next) => {
+  const fromNumber = process.env.TWILIO_FROM_NUMBER;
+  const requestId = res.getHeader('X-request-Id');
+  const {phone} = req.body;
+
+  const {error} = new PhoneValidator(phone).validate();
+  if (error) return next(createCustomError(error.message, 400));
+  sendSMSOtp(fromNumber, phone, req)
+    .then(_ => {
+      return res.status(200).json({
+        success: true,
+        payload: {
+          message: `OTP has been sent to ${phone}`,
+          authUrl: '/customer/validate-sms-otp',
+        },
+      });
+    })
+    .catch(error => {
+      logger.error(`${error.message}`, {
+        module: 'OTPController.js',
+        userId: req.user ? req.user.user_id : null,
+        requestId: requestId,
+        action: 'Send SMS',
+        method: req.method,
+        path: req.path,
+        statusCode: 500,
+        clientIp: req.clientIp,
+      });
+      return next(
+        createCustomError(
+          `System is unable to send Otp to ${phone}. please try again later`,
+          500,
+        ),
+      );
+    });
+});
+
 module.exports = {
   emailOtpValidationCtrl,
-  requestOtpCtrl,
   smsOtpValidationCtrl,
+  requestSMSOtpCtrl,
+  requestOtpCtrl,
 };

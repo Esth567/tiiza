@@ -80,7 +80,6 @@ const LostItemModel = sequelize.define('lost_items', {
       tableName: 'lost_items',
       DB_NAME: process.env.DB_NAME,
     });
-    console.log(`lostItem Table created successfully.`);
   } catch (error) {
     logger.error(`${error.message}`, {
       module: 'lostItemModel.js',

@@ -1,7 +1,6 @@
 const {createCustomError} = require('../middleware/customError');
 const LostItemModel = require('../models/lostItemModel');
 const {moveFile} = require('./moveFile');
-const {logger} = require('./winstonLogger');
 
 const createLostItem = async (req, res, next, ...rest) => {
   const payload = {};
