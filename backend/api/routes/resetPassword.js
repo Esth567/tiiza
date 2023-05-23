@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const path = require('path');
-const VerifyUser = require('../../middleware/auth');
 const {
   resetPasswordCtrl,
   confirmResetPasswordCtrl,
