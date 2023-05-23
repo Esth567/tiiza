@@ -80,12 +80,13 @@ const registerController = asyncWrapper(async (req, res, next) => {
     );
   }
 
-  req.session.customer_details = {
+  req.session.user_details = {
     password: hashPassword,
     email,
     phone,
-    fullName,
+    full_name,
     location,
+    user_role: null,
   };
 
   sendMailOTP(email, req)
@@ -94,7 +95,7 @@ const registerController = asyncWrapper(async (req, res, next) => {
         success: true,
         payload: {
           message: `OTP has been sent to ${email}`,
-          authUrl: '/customer/validate-otp',
+          authUrl: '/validate-otp',
         },
       });
     })

@@ -19,7 +19,7 @@ const emailOtpValidationCtrl = asyncWrapper(
     const {token} = req.body;
     if (!token)
       return next(createCustomError('Input cannot be empty', 400));
-    if (!req.session.user_otp_auth || !req.session.customer_details)
+    if (!req.session.user_otp_auth || !req.session.user_details)
       return next(
         createCustomError(
           'Sorry You are not authorized to access this resource',
@@ -36,14 +36,15 @@ const emailOtpValidationCtrl = asyncWrapper(
     });
 
     if (!verified) return next(createCustomError('Invalid OTP', 400));
-    const {password, phone, email, full_name, location} =
-      req.session.customer_details;
+    const {password, phone, email, full_name, location, user_role} =
+      req.session.user_details;
     const createdUser = await UserModel.create({
       full_name,
       email,
       phone,
       password,
       location,
+      user_role: user_role ? 2003 : 2001,
     });
 
     if (!Object.values(createdUser.dataValues).length > 0) {
@@ -65,7 +66,7 @@ const emailOtpValidationCtrl = asyncWrapper(
       );
     }
 
-    req.session.customer_details = {};
+    req.session.user_details = {};
     req.session.user_otp_auth = '';
     return res
       .status(201)
@@ -82,7 +83,7 @@ const smsOtpValidationCtrl = asyncWrapper(async (req, res, next) => {
   if (!token)
     return next(createCustomError('Input cannot be empty', 400));
   const secret = req.session?.user_otp_auth;
-  if (!req.session.user_otp_auth || !req.session.customer_details)
+  if (!req.session.user_otp_auth || !req.session.user_details)
     return next(
       createCustomError(
         'Sorry You are not authorized to access this resource',
@@ -96,8 +97,8 @@ const smsOtpValidationCtrl = asyncWrapper(async (req, res, next) => {
     time: 600, //last for 10 mins
   });
 
-  const {email} = req.session.customer_details;
-  const user = req.session.customer_details;
+  const {email} = req.session.user_details;
+  const user = req.session.user_details;
   if (!verified) return next(createCustomError('Invalid OTP', 400));
 
   const updateUser = await UserModel.update(
@@ -126,7 +127,7 @@ const smsOtpValidationCtrl = asyncWrapper(async (req, res, next) => {
     if (err) {
       return next(err);
     }
-    req.session.customer_details = {};
+    req.session.user_details = {};
     req.session.user_otp_auth = '';
     return res
       .status(200)
@@ -147,7 +148,7 @@ const requestOtpCtrl = asyncWrapper((req, res, next) => {
         success: true,
         payload: {
           message: `OTP has been sent to ${email}`,
-          authUrl: '/customer/validate-otp',
+          authUrl: '/validate-otp',
         },
       });
     })
