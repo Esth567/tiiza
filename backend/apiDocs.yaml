@@ -30,7 +30,7 @@ paths:
                 password:
                   type: string
       responses:
-        '200':
+        '201':
           description: Returns an object with success message
         '400':
           description: Bad request - Invalid or missing request parameters
@@ -262,15 +262,15 @@ paths:
               success:
                  true
               payload:
-                OTP has been sent to "+2348137439434", authUrl:'/customer/validate-otp'              
+                OTP has been sent to "+2348137439434", authUrl:'/validate-otp'              
         '400':
           description: The request is invalid or missing required parameters.
         '500':
-            description: Unexpected error occured on the server
+            description: Unexpected error occurred on the server
             
-  # ======================VALIDATE OTP ROUTE===========================================
+  # ======================|| VALIDATE OTP ROUTE ||===========================================
 
-  /customer/validate-otp:
+  /validate-otp:
     post:
       summary: Customer registration Email OTP verification
       description: Use this endpoint to validate customer email one time password before completing registration
@@ -338,7 +338,7 @@ paths:
   /customer/profile:
       get:
         summary: Get customer profile
-        description: Retrieve the profile information for a specific customer in the application.
+        description: Retrieve the profile information of a specific customer in the application.
         responses:
           '200':
             description: Customer profile information was successfully retrieved.
@@ -593,9 +593,8 @@ paths:
                     phone_number:
                       type: string
                       description: The phone number of the customer who found the item.
-            examples:
-              example-1:
-                value:
+            example:
+
                   item_id: 1
                   image_url: uploads/lost_and_found/foundcallistus406@gmail.com_Img-1681741418688.jpg 
                   item_type: phone
@@ -761,7 +760,7 @@ paths:
                   fullname:
                     type: string
                     description: Location of the customer to be registered
-                  subscription_name:
+                  payment_purpose:
                     type: string
                     description: package the customer is subscribing to
               examples:
@@ -776,10 +775,10 @@ paths:
                     fullname: Julius Benz
                     email: callistus406@gmail.com
                     phone_number: 08137127355
-                    subscription_name: tiiza_real   
+                    payment_purpose: tiiza_real_subscription   
         responses:
           '200':
-              description: Returns payload of transactiondetails
+              description: Returns payload of transaction details
               content:
                 application/json:
                   example:
@@ -800,7 +799,7 @@ paths:
                       authUrl: /api/v1/flw/payment/card-payment/authorization'
                       totalDebit: 18302
                       commission: 302
-                      subscription_name: tiiza     
+                      payment_purpose: tiiza     
 
           '400':
             description: Bad request - Invalid or missing request parameters or un supported card type
@@ -1017,12 +1016,12 @@ paths:
                   subscriptionName:
                     type: string
                     description: name of the subscription; this cannot be an arbitrary value
-                    example: tiiza_real
+                    example: tiiza_real_subscription
                   subscriptionAmount:
                     type: number
                     description: amount of the subscription plan 
               example:     
-                  subscriptionName: tiiza_real
+                  subscriptionName: tiiza_real_subscription
                   subscriptionAmount: 2500
          
         responses:
@@ -1032,3 +1031,292 @@ paths:
             description: Bad request - Invalid or missing request parameters
           '500':
             description: Internal server error 
+
+
+
+  # ======================GET CUSTOMERS  ROUTE DOC===========================================
+  /admin/fetch/customers:
+      get:
+        summary: Fetch  registered customers
+        description: Use this route retrieve  to retrieve all registered customers in  the application
+        responses:
+          '200':
+            description: Returns a payload of all available customers .
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      user_id:
+                        type: integer
+                        description: The unique identifier of the customer.
+                      email:
+                        type: string
+                        description: The email address associated with the customer account.
+                      full_name:
+                        type: string
+                        description: The first name of the user.
+                      phone:
+                        type: string
+                        description: The phone number associated with the users account.
+                      location:
+                        type: string
+                        description: The location associated with the users account.    
+          '404':
+            description: No customer found
+          '500':
+            description: Internal server error   
+
+
+
+  # ======================GET CUSTOMERS  ROUTE DOC===========================================
+  /admin/fetch/subscriptions:
+      get:
+        summary: Fetch  Subscriptions
+        description: Use this route retrieve  all subscriptions
+        responses:
+          '200':
+            description: Returns a payload of all available subscriptions .
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: The unique identifier of the customer.
+                      name:
+                        type: string
+                        description: The name associated with the subscription
+                      duration:
+                        type: string
+                        description: The duration associated with the subscription
+                      item_id:
+                        type: string
+                        description: The links to the item associated with the subscription
+                      startDate:
+                        type: string
+                        description: The start date of the subscription
+                       
+                      is_active:
+                        type: string
+                        description: The state of the subscription.    
+                      is_confirmed:
+                        type: string
+                        description: The indicates if the subscription is approved
+                      is_extended:
+                        type: string
+                        description: The depicts if the subscription is extended
+          '404':
+            description: No subscription found
+          '500':
+            description: Internal server error         
+
+
+
+
+
+# ====================== FETCH FOUND ITEM ROUTE==============================================
+
+  /admin/fetch/found-items:
+    get:
+      summary: Retrieve found items for
+      description: Returns all found items in the  system
+      responses:
+        '200':
+          description: A list of found items was successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    item_id:
+                      type: integer
+                      description: The unique identifier of the lost item.
+                    item_name:
+                      type: string
+                      description: The name of the lost item.
+                    item_type:
+                      type: string
+                      description: The type of item found.
+                    image_url:
+                      type: string
+                      description: The URL of the item image.
+                    item_color:
+                      type: string
+                      description: The color of the found item.
+                    report_type:
+                      type: string
+                      description: The report type of the found item.
+                    date_found:
+                      type: string
+                      description: The date the item was found.
+                      example: 2021-12-31T00:00:00.000Z
+                    discovery_location:
+                      type: string
+                      description: The location where the item was found.
+                    description:
+                      type: string
+                      description: A short description of the found item.
+                    customer_email:
+                      type: string
+                      description: The email of the customer who found the item.
+                    pickup_location:
+                      type: string
+                      description: The location where the item can be retrived
+                    phone_number:
+                      type: string
+                      description: The phone number of the customer who found the item.
+                    createdAt:
+                      type: string
+                      description: The date and time the item was reported found.
+                      example: 2023-04-17T14:49:50.000Z
+                    message: 
+                      type: string
+                      description: A message reminding the customer to renew their subscription.
+                      example: Please renew your subscription to access items found in other states.
+              # example:
+                  
+              #       item_id: 2
+              #       image_url: uploads/lost_and_found/lostcallistus506@gmail.com_Img-1682083301914.jpg
+              #       item_name: battery
+              #       item_color: red
+              #       report_type: missing
+              #       date_found: 2021-12-31T00:00:00.000Z
+              #       discovery_location: lekki
+              #       pickup_location: lekki
+              #       description: this was lost at oshodi
+              #       customer_email: callistus406@gmail.com
+              #       phone_number: 08032344321
+              #       createdAt: 2023-04-17T14:49:50.000Z
+        '404':
+          description: No lost items were found that match the customer's subscription criteria.
+        '500':
+          description: Server Error.
+
+
+
+
+# ====================== FETCH LOST ITEMS==============================================
+  
+  /admin fetch/lost-items:
+    get:
+      summary: Retrieve lost items in the system
+      description: Returns all lost items that match a customer's subscription criteria.
+      responses:
+        '200':
+          description: A list of lost items was successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    item_id:
+                      type: integer
+                      description: The unique identifier of the lost item.
+                    item_name:
+                      type: string
+                      description: The name of the lost item.
+                    item_type:
+                      type: string
+                      description: The type of item lost.
+                    image_url:
+                      type: string
+                      description: The URL of the item image.
+                    item_color:
+                      type: string
+                      description: The color of the lost item.
+                    report_type:
+                      type: string
+                      description: The report type of the lost item.
+                    item_worth:
+                      type: number
+                      description: The value of the lost item in NGN.
+                    lost_date:
+                      type: string
+                      description: The date the item was lost.
+                      example: 2021-12-31T00:00:00.000Z
+                    lost_location:
+                      type: string
+                      description: The location where the item was lost.
+                    description:
+                      type: string
+                      description: A short description of the lost item.
+                    customer_email:
+                      type: string
+                      description: The email of the customer who lost the item.
+                    phone_number:
+                      type: string
+                      description: The phone number of the customer who lost the item.
+                    createdAt:
+                      type: string
+                      description: The date and time the item was reported lost.
+                      example: 2023-04-17T14:49:50.000Z
+                    message: 
+                      type: string
+                      description: A message reminding the customer to renew their subscription.
+                      example: Please renew your subscription to access items found in other states.
+              # example:
+              #     summary: Example of a lost item response
+              #     value:
+              #       item_id: 2
+              #       image_url: uploads/lost_and_found/lostcallistus506@gmail.com_Img-1682083301914.jpg
+              #       item_name: battery
+              #       item_color: red
+              #       report_type: missing
+              #       item_worth: 2000.00
+              #       lost_date: 2021-12-31T00:00:00.000Z
+              #       lost_location: lekki
+              #       description: this was lost at oshodi
+              #       customer_email: callistus406@gmail.com
+              #       phone_number: 08032344321
+              #       createdAt: 2023-04-17T14:49:50.000Z
+        '404':
+          description: No lost items were found that match the customer's subscription criteria.
+        '500':
+          description: Server Error.
+
+
+
+# ====================== CONFIRM PASSWORD RESET ROUTE==============================================
+
+  /admin/fetch/subscription/{token}:
+    patch:
+      summary: Confirm customer password reset
+      description: Use this endpoint to confirm a customer's password reset.
+      parameters:
+        - in: path
+          name: token
+          required: true
+          description: Token received from password reset email.
+          schema:
+            type: string
+      requestBody:
+        description: New password for the customer account.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  minLength: 8
+                  example: Password123#
+      responses:
+        '200':
+          description: Returns an object with success message
+        '400':
+          description: The request is malformed or missing required parameters.
+        '401':
+          description: Authentication error.
+        '500':
+          description: Server error
