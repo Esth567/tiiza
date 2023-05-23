@@ -34,6 +34,11 @@ UserModel.init(
       allowNull: false,
       defaultValue: false,
     },
+    user_role: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 2001,
+    },
     location: {
       type: DataTypes.STRING(50),
       allowNull: false,
@@ -41,7 +46,6 @@ UserModel.init(
   },
   {sequelize, modelName: 'user'},
 );
-// TODO:add is verified true or false by KYC:add as a middleware
 (async () => {
   try {
     await sequelize.sync({force: false});
