@@ -275,8 +275,28 @@ class CardPaymentValidator extends Validation {
     return validateSchema.validate(this.data);
   }
 }
+
+class ItemUpdateValidator extends Validation {
+  constructor(validationInfo) {
+    super(validationInfo);
+  }
+
+  schema() {
+    return joi.object({
+      item_id: joi.number().required(),
+      itemType: joi.string().max(10).min(3).required(),
+      status: joi.string().max(10).min(3).required(),
+      comment: joi.string().max(15).max(200).required(),
+    });
+  }
+  validate() {
+    let validateSchema = this.schema();
+    return validateSchema.validate(this.data);
+  }
+}
 module.exports = {
   CardPaymentValidator,
+  ItemUpdateValidator,
   PasswordValidator,
   RegisterValidator,
   ProfileValidator,
