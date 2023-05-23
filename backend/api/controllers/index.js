@@ -4,11 +4,7 @@ const {
   requestSMSOtpCtrl,
   requestOtpCtrl,
 } = require('./OTPController');
-const {
-  validateCardTransactionCtrl,
-  cardAuthorizationCtrl,
-  cardPaymentCtrl,
-} = require('./cardPaymentController');
+const {CardPaymentCtrl} = require('./cardPaymentController');
 const {registerController} = require('./registerController');
 const {
   InitiateConversationCtrl,
@@ -35,21 +31,45 @@ const {
   confirmResetPasswordCtrl,
 } = require('./resetPasswordController');
 const {subscriptionCtrl} = require('./subscriptionController');
-
+const {
+  adminFetchSubscriptionCtrl,
+  adminFetchFoundItemsCtrl,
+  adminFetchCustomersCtrl,
+  adminFetchLostItemsCtrl,
+  adminCreateUserCtrl,
+  adminUpdateItemCtrl,
+  updatePasswordCtrl,
+  adminFetchActivities,
+  adminFetchPayments,
+} = require('./adminController');
+const {
+  qrCodeOrderCtrl,
+  fetchQRCodeOrdersCtrl,
+} = require('./bookingController');
 module.exports = {
   updateCustomersProfileCtrl,
   fetchCustomerLostItemsCtrl,
-  validateCardTransactionCtrl,
   fetchCustomerFoundItemsCtrl,
+  adminFetchSubscriptionCtrl,
   confirmResetPasswordCtrl,
   InitiateConversationCtrl,
+  adminFetchFoundItemsCtrl,
+  adminFetchCustomersCtrl,
+  adminFetchLostItemsCtrl,
+  adminUpdateItemCtrl,
   getCustomersProfileCtrl,
   emailOtpValidationCtrl,
-  cardAuthorizationCtrl,
+  adminCreateUserCtrl,
+  qrCodeOrderCtrl,
+  CardPaymentCtrl,
+  fetchQRCodeOrdersCtrl,
+  adminFetchActivities,
+  adminFetchPayments,
   smsOtpValidationCtrl,
   fetchFoundItemsCtrl,
   getConversationCtrl,
   registerController,
+  updatePasswordCtrl,
   fetchLostItemsCtrl,
   resetPasswordCtrl,
   foundLostItemCtrl,
@@ -58,7 +78,6 @@ module.exports = {
   updateNumberCtrl,
   subscriptionCtrl,
   sendMessageCtrl,
-  cardPaymentCtrl,
   requestOtpCtrl,
   lostItemCtrl,
 };

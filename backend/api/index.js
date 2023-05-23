@@ -8,12 +8,15 @@ const cardPayment = require('./routes/cardPayment');
 const conversation = require('./routes/conversation');
 const resetPassword = require('./routes/resetPassword');
 const lostAndFound = require('./routes/lostAndFound');
-
+const qrCodeOrder = require('./routes/qrcodeBooking');
+const adminRoutes = require('./routes/admin');
 router.use(resetPassword);
 router.use(conversation);
 router.use(lostAndFound);
+router.use(qrCodeOrder);
 
 router.use(cardPayment);
+router.use(adminRoutes);
 router.use(otpAction);
 router.use(dashboard);
 router.use(register);
