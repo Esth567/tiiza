@@ -74,11 +74,23 @@ paths:
                   email: johndoe@example.com
                   fullName: John Doe
                   phone: "+2348137439434"
-                  password: password123
+                  password: password123#
                   location: Lagos    
       responses:
         '200':
-          description: An OTP has been sent to the customer's email address along with the authUrl
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: returns true .
+                  name:
+                    type: string
+                    description: returns success message.
+
         '400':
           description: Bad request - Invalid or missing request parameters
         '500':
@@ -104,7 +116,18 @@ paths:
                   example: johndoe@example.com
       responses:
         '200':
-          description: A password reset email has been sent to the provided email address.
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: returns true .
+                  name:
+                    type: string
+                    description: returns success message
         '400':
           description: The request is malformed or missing required parameters.
         '500':
@@ -129,7 +152,18 @@ paths:
                   example: johndoe@example.com
       responses:
         '200':
-          description: OTP has been sent to "exampl@gmail.com" .
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: returns true .
+                  name:
+                    type: string
+                    description: returns success message
         '400':
           description: The request is malformed or missing required parameters.
         '500':
@@ -154,7 +188,18 @@ paths:
                   example: "+234983443292"
       responses:
         '200':
-          description: Returns an object with success message .
+          description: Returns an object with true and  success message .
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: returns true .
+                  name:
+                    type: string
+                    description: returns success message
         '400':
           description: The request is malformed or missing required parameters.
         '500':
@@ -189,6 +234,17 @@ paths:
       responses:
         '200':
           description: Returns an object with success message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: returns true .
+                  name:
+                    type: string
+                    description: returns success message
         '400':
           description: The request is malformed or missing required parameters.
         '401':
@@ -220,7 +276,18 @@ paths:
                   example: "+2348137439434"
       responses:
         '200':
-          description: The customer profile has been updated successfully.
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: returns true .
+                  name:
+                    type: string
+                    description: returns success message
         '400':
           description:  Returns an object with error message
           content:
@@ -266,7 +333,7 @@ paths:
         '400':
           description: The request is invalid or missing required parameters.
         '500':
-            description: Unexpected error occurred on the server
+            description: returns  an object with server error message
             
   # ======================|| VALIDATE OTP ROUTE ||===========================================
 
@@ -335,7 +402,7 @@ paths:
 
 
   # ======================GET CUSTOMER PROFILE ROUTE DOC===========================================
-  /customer/profile:
+  /profile:
       get:
         summary: Get customer profile
         description: Retrieve the profile information of a specific customer in the application.
@@ -383,7 +450,7 @@ paths:
       description: Returns all lost items that match a customer's subscription criteria.
       responses:
         '200':
-          description: A list of lost items was successfully retrieved.
+          description: Ok
           content:
             application/json:
               schema:
@@ -436,10 +503,7 @@ paths:
                       type: string
                       description: A message reminding the customer to renew their subscription.
                       example: Please renew your subscription to access items found in other states.
-              examples:
-                example-1:
-                  summary: Example of a lost item response
-                  value:
+              example:
                     item_id: 2
                     image_url: uploads/lost_and_found/lostcallistus506@gmail.com_Img-1682083301914.jpg
                     item_name: battery
@@ -467,7 +531,7 @@ paths:
       description: Returns all found items that match a customer's subscription criteria.
       responses:
         '200':
-          description: A list of found items was successfully retrieved.
+          description: OK
           content:
             application/json:
               schema:
@@ -508,7 +572,7 @@ paths:
                       description: The email of the customer who found the item.
                     pickup_location:
                       type: string
-                      description: The location where the item can be retrived
+                      description: The location where the item can be retrieved
                     phone_number:
                       type: string
                       description: The phone number of the customer who found the item.
@@ -520,9 +584,7 @@ paths:
                       type: string
                       description: A message reminding the customer to renew their subscription.
                       example: Please renew your subscription to access items found in other states.
-              examples:
-                example-1:
-                  summary: Example of a found item response
+              example:
                   value:
                     item_id: 2
                     image_url: uploads/lost_and_found/lostcallistus506@gmail.com_Img-1682083301914.jpg
@@ -716,7 +778,7 @@ paths:
 
   /flw/payment/card-payment:
       post:
-        summary: Card payment
+        summary: Use this endpoint to receive payment for subscriptions and QRCode purchase 
         description: Use this endpoint to accept card payment
         requestBody:
           description: Card details
@@ -776,6 +838,18 @@ paths:
                     email: callistus406@gmail.com
                     phone_number: 08137127355
                     payment_purpose: tiiza_real_subscription   
+                example-2:
+                  value:
+                    card_number: 5531886652142950
+                    cvv: 564
+                    expiry_month: 09
+                    expiry_year: 32
+                    currency: NGN
+                    amount: 18000
+                    fullname: Julius Benz
+                    email: callistus406@gmail.com
+                    phone_number: 08137127355
+                    payment_purpose: QRcode_purchase   
         responses:
           '200':
               description: Returns payload of transaction details
@@ -799,7 +873,7 @@ paths:
                       authUrl: /api/v1/flw/payment/card-payment/authorization'
                       totalDebit: 18302
                       commission: 302
-                      payment_purpose: tiiza     
+                      payment_purpose: tiiza_real_subscription     
 
           '400':
             description: Bad request - Invalid or missing request parameters or un supported card type
@@ -812,7 +886,7 @@ paths:
 
   /flw/payment/card-payment/authorization:
       post:
-        summary: payment Authorization with pin
+        summary: Use this endpoint to Authorization  card payment   with pin
         description: Use this endpoint to  authorize payment with pin
         requestBody:
           description: Enter card pin
@@ -851,7 +925,7 @@ paths:
 # =============== OTP AUTHORIZATION ROUTE DOC========================= 
   /flw/payment/card-payment/validation:
       post:
-        summary: payment Authentication  with OTP
+        summary: Use this endpoint to authenticate  payment  with OTP
         description: Use this endpoint to  Authenticate payment with OTP
         requestBody:
           description: Enter OTP
@@ -865,9 +939,7 @@ paths:
                     type: number
                     description: Transaction OTP
               example:
-              
                   otp: 12345
-            
         responses:
           '200':
               description: Pin Authorization complete.An OTP has been sent to your phone number.Please use it to authenticate your payment.
@@ -1181,6 +1253,7 @@ paths:
                       type: string
                       description: A message reminding the customer to renew their subscription.
                       example: Please renew your subscription to access items found in other states.
+                    
               # example:
                   
               #       item_id: 2
@@ -1286,37 +1359,117 @@ paths:
 
 
 
-# ====================== CONFIRM PASSWORD RESET ROUTE==============================================
 
-  /admin/fetch/subscription/{token}:
-    patch:
-      summary: Confirm customer password reset
-      description: Use this endpoint to confirm a customer's password reset.
-      parameters:
-        - in: path
-          name: token
+
+  # ======================GET CUSTOMERS  ROUTE DOC===========================================
+  /admin/fetch/qrcode-orders:
+      get:
+        summary: Fetch QRCode orders
+        description: Use this route retrieve all qrcode orders
+        responses:
+          '200':
+            description: Returns a payload of all available QRCode orders .
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      booking_id:
+                        type: integer
+                        description: The unique identifier of the order.
+                      amount:
+                        type: number
+                        description: Amount paid by the customer.
+                      status:
+                        type: string
+                        description: Payment status.
+                      address:
+                        type: string
+                        description: The customers delivery address.
+                      payment_name:
+                        type: string
+                        description: Name of payment.    
+                      createdAt:
+                        type: string
+                        description: Date of purchase.    
+                      updatedAt:
+                        type: string
+                        description: update timestamp.    
+                      customer_id:
+                        type: integer
+                        description: Id of the customer that made the payment 
+                      user:
+                        type: object
+                        properties:
+                          full_name:
+                            type: string
+                            description: Customers full name.             
+                          email:
+                            type: string
+                            description: Customers email address.             
+                          location:
+                            type: string
+                            description: Customers location.             
+          '404':
+            description: returns an object  No order found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                    payload:
+                      type: string
+
+          '500':
+            description: Internal server error   
+
+
+
+# ===============|| SEND MESSAGE ROUTE DOC ||========================= 
+
+  /admin/update-password:
+      post:
+        summary: Password Reset
+        description: Use this endpoint to reset password for admin user
+        requestBody:
+          description: reset password
           required: true
-          description: Token received from password reset email.
-          schema:
-            type: string
-      requestBody:
-        description: New password for the customer account.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                password:
-                  type: string
-                  minLength: 8
-                  example: Password123#
-      responses:
-        '200':
-          description: Returns an object with success message
-        '400':
-          description: The request is malformed or missing required parameters.
-        '401':
-          description: Authentication error.
-        '500':
-          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  oldPassword:
+                    type: string
+                    description: name of the subscription; this cannot be an arbitrary value
+                    example: passwd123#
+                  newPassword:
+                    type: string
+                    description: enter new password
+                    example: qwertY123#
+                  confirmPassword:
+                    type: string
+                    description: confirm new password 
+                    example: qwertY123#
+
+         
+        responses:
+          '200':
+              description: OK .
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      success:
+                        type: boolean
+                      payload:
+                        type: string
+          '400':
+            description: Bad request - Invalid or missing request parameters
+          '500':
+            description: Internal server error 
