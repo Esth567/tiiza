@@ -1,6 +1,6 @@
-const {Sequelize, DataTypes, Model} = require('sequelize');
-const {sequelize} = require('../db/connect');
-const {logger} = require('../utils/winstonLogger');
+const { Sequelize, DataTypes, Model } = require('sequelize');
+const { sequelize } = require('../db/connect');
+const { logger } = require('../utils/winstonLogger');
 require('dotenv').config();
 class UserModel extends Model {}
 UserModel.init(
@@ -44,11 +44,11 @@ UserModel.init(
       allowNull: false,
     },
   },
-  {sequelize, modelName: 'user'},
+  { sequelize, modelName: 'user' }
 );
 (async () => {
   try {
-    await sequelize.sync({force: false});
+    await sequelize.sync({ force: false });
     logger.info(`Successfully created users table`, {
       module: 'userModel.js',
       status: 'Created',

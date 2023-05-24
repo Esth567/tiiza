@@ -1,8 +1,9 @@
-const {emailTemplate} = require('../utils/resetPasswordTemplate');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 const service = process.env;
-async function sendResetEmail(email, resetUrl) {
+async function sendMail(options, callback) {
+  console.log(options);
+  console.log('----------------------------');
   // send an email to the user with a link that includes the reset token
 
   let transporter = nodemailer.createTransport({
@@ -21,12 +22,12 @@ async function sendResetEmail(email, resetUrl) {
 
   const mailOptions = {
     from: process.env.EMAIL_SERVER_USERNAME,
-    to: email,
-    subject: 'Reset your password',
-    html: emailTemplate(email, resetUrl),
+    to: options.email,
+    subject: options.emailTitle,
+    html: callback(options),
   };
 
   await transporter.sendMail(mailOptions);
 }
 
-module.exports = {sendResetEmail};
+module.exports = { sendMail };

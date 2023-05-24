@@ -1,30 +1,31 @@
-const {
-  HashPassword,
-  UnHashPassword,
-} = require('../../authentication/password');
+const { HashPassword, UnHashPassword } = require('../../authentication/password');
 const asyncWrapper = require('../../middleware/asyncWrapper');
-const {createCustomError} = require('../../middleware/customError');
+const { createCustomError } = require('../../middleware/customError');
 const TransactionLogModel = require('../../models/TransactionLoggerModel');
-const {
-  AdminActivityModel,
-} = require('../../models/adminActivityModel');
+const { AdminActivityModel } = require('../../models/adminActivityModel');
+const SubscriptionModel = require('../../models/subscriptionModel');
 const FoundItemModel = require('../../models/foundItemModel');
 const LostItemModel = require('../../models/lostItemModel');
-const SubscriptionModel = require('../../models/subscriptionModel');
 const UserModel = require('../../models/userModel');
-const {sendMailOTP} = require('../../utils/sendMailOtp');
+// const { sendMailOTP } = require('../../utils/sendMailOtp');
 const {
   RegisterValidator,
   PasswordValidator,
   ItemUpdateValidator,
 } = require('../../validation/validation');
+const { sendMail } = require('../../utils/sendMail');
+const { itemApprovalTemplate } = require('../../utils/emailTemplates/itemApprovalTemplate');
+const { itemRejectionTemplate } = require('../../utils/emailTemplates/itemRejectionTemplate');
+const { logger } = require('../../utils/winstonLogger');
 // ======================||UPDATE ITEMS ||=============================
 
 const adminUpdateItemCtrl = asyncWrapper(async (req, res, next) => {
-  const {user_id, email, full_name} = req.user;
-  const {itemId: item_id, itemType, comment, status} = req.body;
+  const { user_id, email, full_name } = req.user;
+  const requestId = res.getHeader('X-request-Id');
 
-  const {error} = new ItemUpdateValidator({
+  const { itemId: item_id, itemType, comment, status, customer_email } = req.body;
+
+  const { error } = new ItemUpdateValidator({
     item_id,
     itemType,
     comment,
@@ -32,38 +33,24 @@ const adminUpdateItemCtrl = asyncWrapper(async (req, res, next) => {
   }).validate();
 
   if (error) return next(createCustomError(error.message, 400));
-  const convertStatus =
-    status === 'approve' || status === 'decline'
-      ? `${status}d`
-      : null;
+  const convertStatus = status === 'approve' || status === 'decline' ? `${status}d` : null;
 
-  if (!convertStatus)
-    return next(
-      createCustomError('Please provide a valid action', 400),
-    );
+  if (!convertStatus) return next(createCustomError('Please provide a valid action', 400));
   if (itemType === 'lostItem') {
     // check if record already exist in activity table
     const isFound = await AdminActivityModel.findOne({
-      where: {item_id, item_type: itemType},
+      where: { item_id, item_type: itemType },
     });
 
-    if (isFound)
-      return next(
-        createCustomError('Sorry,Record already exist', 409),
-      );
+    if (isFound) return next(createCustomError('Sorry,Record already exist', 409));
 
     const isApproved = await LostItemModel.update(
-      {is_approved: convertStatus === 'approved' ? true : false},
-      {where: {item_id}},
+      { is_approved: convertStatus === 'approved' ? true : false },
+      { where: { item_id } }
     );
 
     if (!isApproved[0])
-      return next(
-        createCustomError(
-          'Unable to update LostItem.Please try again',
-          500,
-        ),
-      );
+      return next(createCustomError('Unable to update LostItem.Please try again', 500));
     //
 
     const createActivityRecord = await AdminActivityModel.create({
@@ -79,14 +66,14 @@ const adminUpdateItemCtrl = asyncWrapper(async (req, res, next) => {
       return next(
         createCustomError(
           'Unable to create Activity record.Please contact tech team immediately for support.',
-          500,
-        ),
+          500
+        )
       );
     }
 
     const isSubUpdated = await SubscriptionModel.update(
-      {is_confirmed: convertStatus === 'approved' ? true : false},
-      {where: {item_id}},
+      { is_confirmed: convertStatus === 'approved' ? true : false },
+      { where: { item_id } }
     );
 
     // if (!isSubUpdated[0])
@@ -97,30 +84,39 @@ const adminUpdateItemCtrl = asyncWrapper(async (req, res, next) => {
     //     ),
     //   );
 
-    return res.status(200).json({
-      success: true,
-      payload: 'Item approved and Subscription activated ',
-    });
+    // send mail to customer
+
+    if (convertStatus === 'approved') {
+      alertCustomer({
+        message: 'Item approved and Subscription activated ',
+        customer_email,
+        callback: itemApprovalTemplate,
+        req,
+        res,
+        next,
+      });
+    } else {
+      alertCustomer({
+        message: 'Operation Successful ',
+        customer_email,
+        callback: itemRejectionTemplate,
+        req,
+        res,
+        next,
+      });
+    }
   } else if (itemType === 'foundItem') {
     const isFound = await AdminActivityModel.findOne({
-      where: {item_id, item_type: itemType},
+      where: { item_id, item_type: itemType },
     });
-    if (isFound)
-      return next(
-        createCustomError('Sorry,Record already exist', 409),
-      );
+    if (isFound) return next(createCustomError('Sorry,Record already exist', 409));
     const isApproved = await FoundItemModel.update(
-      {is_approved: convertStatus === 'approved' ? true : false},
-      {where: {item_id}},
+      { is_approved: convertStatus === 'approved' ? true : false },
+      { where: { item_id } }
     );
 
     if (!isApproved[0])
-      return next(
-        createCustomError(
-          'Unable to update Found item.Please try again',
-          500,
-        ),
-      );
+      return next(createCustomError('Unable to update Found item.Please try again', 500));
 
     const createActivityRecord = await AdminActivityModel.create({
       comment,
@@ -134,90 +130,80 @@ const adminUpdateItemCtrl = asyncWrapper(async (req, res, next) => {
       return next(
         createCustomError(
           'Unable to create Activity record.Please contact tech team immediately for support.',
-          500,
-        ),
+          500
+        )
       );
     }
-    return res.status(200).json({
-      success: true,
-      payload: 'Operation Successful:Item approved',
-    });
+
+    if (convertStatus === 'approved') {
+      alertCustomer({
+        message: 'Item approved and Subscription activated ',
+        customer_email,
+        callback: itemApprovalTemplate,
+        req,
+        res,
+        next,
+      });
+    } else {
+      alertCustomer({
+        message: 'Operation Successful ',
+        customer_email,
+        callback: itemRejectionTemplate,
+        req,
+        res,
+        next,
+      });
+    }
   } else {
     return next(createCustomError('Invalid Item', 400));
   }
 });
 // ======================||FETCH CUSTOMERS ||=============================
 
-const adminFetchCustomersCtrl = asyncWrapper(
-  async (req, res, next) => {
-    const customers = await UserModel.findAll({
-      exclude: ['password', 'user_role', 'user_id'],
-    });
+const adminFetchCustomersCtrl = asyncWrapper(async (req, res, next) => {
+  const customers = await UserModel.findAll({
+    exclude: ['password', 'user_role', 'user_id'],
+  });
 
-    if (customers.length == 0)
-      return next(createCustomError('No customer found', 404));
+  if (customers.length == 0) return next(createCustomError('No customer found', 404));
 
-    res.status(200).json({success: true, payload: customers});
-  },
-);
+  res.status(200).json({ success: true, payload: customers });
+});
 // ======================||SUBSCRIPTIONS ||=============================
-const adminFetchSubscriptionCtrl = asyncWrapper(
-  async (req, res, next) => {
-    const subscriptions = await SubscriptionModel.findAll();
+const adminFetchSubscriptionCtrl = asyncWrapper(async (req, res, next) => {
+  const subscriptions = await SubscriptionModel.findAll();
 
-    if (subscriptions.length == 0)
-      return next(createCustomError('No customer found', 404));
+  if (subscriptions.length == 0) return next(createCustomError('No customer found', 404));
 
-    res.status(200).json({success: true, payload: subscriptions});
-  },
-);
+  res.status(200).json({ success: true, payload: subscriptions });
+});
 // ======================||FETCH LOST ITEMS ||=============================
 
-const adminFetchLostItemsCtrl = asyncWrapper(
-  async (req, res, next) => {
-    const lostItems = await LostItemModel.findAll();
+const adminFetchLostItemsCtrl = asyncWrapper(async (req, res, next) => {
+  const lostItems = await LostItemModel.findAll();
 
-    if (lostItems.length == 0)
-      return next(createCustomError('No customer found', 404));
+  if (lostItems.length == 0) return next(createCustomError('No customer found', 404));
 
-    res.status(200).json({success: true, payload: lostItems});
-  },
-);
-const adminFetchFoundItemsCtrl = asyncWrapper(
-  async (req, res, next) => {
-    const lostItems = await FoundItemModel.findAll();
-    if (lostItems.length == 0)
-      return next(createCustomError('No customer found', 404));
+  res.status(200).json({ success: true, payload: lostItems });
+});
+const adminFetchFoundItemsCtrl = asyncWrapper(async (req, res, next) => {
+  const lostItems = await FoundItemModel.findAll();
+  if (lostItems.length == 0) return next(createCustomError('No customer found', 404));
 
-    res.status(200).json({success: true, payload: lostItems});
-  },
-);
+  res.status(200).json({ success: true, payload: lostItems });
+});
 
 // ======================||CREATE ADMIN ||=============================
 
 const adminCreateUserCtrl = asyncWrapper(async (req, res, next) => {
-  const {
-    fullName,
-    email,
-    phone,
-    password,
-    confirmPassword,
-    location,
-  } = req.body;
-  const validateData = {email, fullName, phone, password, location};
+  const { fullName, email, phone, password, confirmPassword, location } = req.body;
+  const validateData = { email, fullName, phone, password, location };
 
-  const {error} = new RegisterValidator(
-    validateData,
-  ).checkValidation();
-  if (error)
-    return res
-      .status(200)
-      .json({success: false, payload: error.message});
+  const { error } = new RegisterValidator(validateData).checkValidation();
+  if (error) return res.status(200).json({ success: false, payload: error.message });
 
   if (password !== confirmPassword)
-    return next(
-      createCustomError('The passwords entered do not match. ', 400),
-    );
+    return next(createCustomError('The passwords entered do not match. ', 400));
   const findEmail = await UserModel.findOne({
     where: {
       email,
@@ -227,20 +213,17 @@ const adminCreateUserCtrl = asyncWrapper(async (req, res, next) => {
   const full_name = fullName;
   if (findEmail)
     return next(
-      createCustomError(
-        'Sorry You cannot use this email address.Please try another one',
-        409,
-      ),
+      createCustomError('Sorry You cannot use this email address.Please try another one', 409)
     );
   const isPhoneFound = await UserModel.findOne({
-    where: {phone: phone},
+    where: { phone: phone },
   });
   if (isPhoneFound)
     return next(
       createCustomError(
         'Sorry, Phone number already exist in our system. please try another one',
-        409,
-      ),
+        409
+      )
     );
   const hashPassword = await new HashPassword(password).hash();
   if (!hashPassword) {
@@ -254,12 +237,7 @@ const adminCreateUserCtrl = asyncWrapper(async (req, res, next) => {
       statusCode: 500,
       clientIp: req.clientIp,
     });
-    return next(
-      createCustomError(
-        'Sorry!, Something went wrong.Please try again later',
-        500,
-      ),
-    );
+    return next(createCustomError('Sorry!, Something went wrong.Please try again later', 500));
   }
   req.session.user_details = {
     password: hashPassword,
@@ -270,8 +248,17 @@ const adminCreateUserCtrl = asyncWrapper(async (req, res, next) => {
     user_role: 2003,
   };
 
-  sendMailOTP(email, req)
-    .then(response => {
+  const options = {
+    companyName: process.env.COMPANY_NAME,
+    homeUrl: process.env.DOMAIN_NAME,
+    currentYear: new Date().getFullYear(),
+    itemName: 'placeholder',
+    emailTitle: '',
+    email,
+    req,
+  };
+  sendMail(options)
+    .then((response) => {
       return res.status(200).json({
         success: true,
         payload: {
@@ -280,7 +267,7 @@ const adminCreateUserCtrl = asyncWrapper(async (req, res, next) => {
         },
       });
     })
-    .catch(error => {
+    .catch((error) => {
       logger.error(`${error.message}`, {
         module: 'adminController.js',
         userId: req.user ? req.user.user_id : null,
@@ -292,10 +279,7 @@ const adminCreateUserCtrl = asyncWrapper(async (req, res, next) => {
         clientIp: req.clientIp,
       });
       return next(
-        createCustomError(
-          'System is unable to sent Otp to your Mail. please try again later',
-          500,
-        ),
+        createCustomError('System is unable to sent Otp to your Mail. please try again later', 500)
       );
     });
 });
@@ -303,24 +287,20 @@ const adminCreateUserCtrl = asyncWrapper(async (req, res, next) => {
 // =======================================|| UPDATE PASSWORD CTRL ||====================================================
 
 const updatePasswordCtrl = asyncWrapper(async (req, res, next) => {
-  const {oldPassword, newPassword, confirmPassword} = req.body;
-  const {email} = req.user;
-  const loggedInUser = await UserModel.findOne({where: {email}});
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+  const { email } = req.user;
+  const loggedInUser = await UserModel.findOne({ where: { email } });
 
-  const {error} = new PasswordValidator({
+  const { error } = new PasswordValidator({
     password: oldPassword,
   }).validate();
   if (error) return next(createCustomError(error.message, 400));
   // compare password
-  const isMatch = await new UnHashPassword(
-    oldPassword,
-    loggedInUser.dataValues.password,
-  ).compare();
+  const isMatch = await new UnHashPassword(oldPassword, loggedInUser.dataValues.password).compare();
 
-  if (!isMatch)
-    return next(createCustomError('Incorrect Password', 409));
+  if (!isMatch) return next(createCustomError('Incorrect Password', 409));
   // validate new passwords
-  const {error: error2} = new PasswordValidator({
+  const { error: error2 } = new PasswordValidator({
     password: newPassword,
   }).validate();
 
@@ -331,42 +311,27 @@ const updatePasswordCtrl = asyncWrapper(async (req, res, next) => {
   // hash password
   const hashedPassword = await new HashPassword(newPassword).hash();
   if (!hashedPassword)
-    return next(
-      createCustomError(
-        'Sorry!, Something went wrong.Please try again',
-        500,
-      ),
-    );
+    return next(createCustomError('Sorry!, Something went wrong.Please try again', 500));
 
-  const isUpdated = await UserModel.update(
-    {password: hashedPassword},
-    {where: {email}},
-  );
-  if (!isUpdated[0])
-    return next(
-      createCustomError('System is unable to update password', 500),
-    );
+  const isUpdated = await UserModel.update({ password: hashedPassword }, { where: { email } });
+  if (!isUpdated[0]) return next(createCustomError('System is unable to update password', 500));
 
-  return res
-    .status(200)
-    .json({success: true, payload: 'Password updated successfully'});
+  return res.status(200).json({ success: true, payload: 'Password updated successfully' });
 });
 
 const adminFetchPayments = asyncWrapper(async (req, res, next) => {
   const payments = await TransactionLogModel.findAll();
 
-  if (payments.length === 0)
-    return next(createCustomError('No payment found', 404));
+  if (payments.length === 0) return next(createCustomError('No payment found', 404));
 
-  return res.status(200).json({success: true, payload: payments});
+  return res.status(200).json({ success: true, payload: payments });
 });
 const adminFetchActivities = asyncWrapper(async (req, res, next) => {
   const activities = await AdminActivityModel.findAll();
 
-  if (activities.length === 0)
-    return next(createCustomError('No payment found', 404));
+  if (activities.length === 0) return next(createCustomError('No payment found', 404));
 
-  return res.status(200).json({success: true, payload: activities});
+  return res.status(200).json({ success: true, payload: activities });
 });
 module.exports = {
   adminFetchCustomersCtrl,
@@ -378,4 +343,45 @@ module.exports = {
   updatePasswordCtrl,
   adminFetchActivities,
   adminFetchPayments,
+};
+
+const alertCustomer = ({ message, customer_email, callback, req, res, next }) => {
+  const requestId = res.getHeader('X-request-Id');
+
+  const options = {
+    companyName: process.env.COMPANY_NAME,
+    homeUrl: process.env.DOMAIN_NAME,
+    currentYear: new Date().getFullYear(),
+    itemName: 'placeholder',
+    customerName: req.user.full_name,
+    emailTitle: 'TIIZA:Item confirmation',
+    email: customer_email,
+  };
+
+  sendMail(options, callback)
+    .then((response) => {
+      return res.status(200).json({
+        success: true,
+        payload: `${message}.Mail has been sent to: ${customer_email}`,
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      logger.error(`${error.message}`, {
+        module: 'adminController.js',
+        userId: req.user ? req.user.user_id : null,
+        requestId: requestId,
+        action: 'Send Item confirmation mail ',
+        method: req.method,
+        path: req.path,
+        statusCode: 500,
+        clientIp: req.clientIp,
+      });
+      return res.status(500).send({
+        success: false,
+        payload: `${message}. But System was unable to send Mail to customer`,
+      });
+    });
+
+  // -----------------------
 };
