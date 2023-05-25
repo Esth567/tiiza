@@ -58,12 +58,12 @@ router.post(
               req,
             )
               .then(response => {
-                req.session.customer_details = user;
+                req.session.user_details = user;
                 return res.status(200).json({
                   success: true,
                   payload: {
                     message: `OTP has been sent to ${user.phone}`,
-                    authUrl: '/customer/validate-otp',
+                    authUrl: '/validate-otp',
                   },
                 });
               })

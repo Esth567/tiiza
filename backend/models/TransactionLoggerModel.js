@@ -21,7 +21,7 @@ TransactionLogModel.init(
       },
     },
     transaction_type: {
-      type: DataTypes.STRING(45), //debit or credit
+      type: DataTypes.STRING(45),
       allowNull: false,
     },
     transaction_ref: {
@@ -48,7 +48,7 @@ TransactionLogModel.init(
       type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
     },
-    subscription_name: {
+    payment_name: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
@@ -57,7 +57,7 @@ TransactionLogModel.init(
       allowNull: false,
     },
   },
-  {sequelize, modelName: 'transactionLog'},
+  {sequelize, modelName: 'transaction_Log'},
 );
 
 //
