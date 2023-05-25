@@ -7,7 +7,7 @@ async function sendMailOTP(options) {
   var secret = speakeasy.generateSecret({ length: 20 });
 
   // cache
-  req.session.user_otp_auth = secret.base32;
+  options.req.session.user_otp_auth = secret.base32;
 
   // Generate a time-based token based on the base-32 key.
   var token = speakeasy.totp({
@@ -32,7 +32,7 @@ async function sendMailOTP(options) {
 
   const mailOptions = {
     from: service.EMAIL_SERVER_USERNAME,
-    to: email,
+    to: options.email,
     subject: options.emailTitle,
     html: `<!DOCTYPE html>
     <html lang="en">
