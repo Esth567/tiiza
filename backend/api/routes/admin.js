@@ -13,69 +13,66 @@ const {
   adminFetchPayments,
   qrCodeOrderCtrl,
 } = require('../controllers');
-const {
-  fetchLostItemsCtrl,
-  fetchQRCodeOrdersCtrl,
-} = require('../controllers');
+const { fetchLostItemsCtrl, fetchQRCodeOrdersCtrl } = require('../controllers');
 router.get(
   '/admin/fetch/users',
   VerifyUser.ensureAuthenticated,
   VerifyUser.isAdmin,
-  adminFetchCustomersCtrl,
+  adminFetchCustomersCtrl
 );
 router.get(
   '/admin/fetch/lost-items',
   VerifyUser.ensureAuthenticated,
   VerifyUser.isAdmin,
-  adminFetchLostItemsCtrl,
+  adminFetchLostItemsCtrl
 );
 router.get(
   '/admin/fetch/found-items',
   VerifyUser.ensureAuthenticated,
   VerifyUser.isAdmin,
-  adminFetchFoundItemsCtrl,
+  adminFetchFoundItemsCtrl
 );
 router.get(
   '/admin/fetch/payments',
   VerifyUser.ensureAuthenticated,
   VerifyUser.isAdmin,
-  adminFetchPayments,
+  adminFetchPayments
 );
 router.get(
   '/admin/fetch/activities',
   VerifyUser.ensureAuthenticated,
   VerifyUser.isAdmin,
-  adminFetchActivities,
+  adminFetchActivities
 );
 router.get(
   '/admin/fetch/subscriptions',
   VerifyUser.ensureAuthenticated,
   VerifyUser.isAdmin,
-  adminFetchSubscriptionCtrl,
+  adminFetchSubscriptionCtrl
 );
 router.patch(
   '/admin/update/item',
   VerifyUser.ensureAuthenticated,
   VerifyUser.isAdmin,
-  adminUpdateItemCtrl,
+  adminUpdateItemCtrl
 );
 router.post(
   '/admin/create-user',
   VerifyUser.ensureAuthenticated,
   VerifyUser.isAdmin,
-  adminCreateUserCtrl,
+  adminCreateUserCtrl
 );
 router.patch(
   '/admin/update-password',
   VerifyUser.ensureAuthenticated,
   VerifyUser.isAdmin,
-  updatePasswordCtrl,
+  updatePasswordCtrl
 );
 router.get(
   '/admin/fetch/qrcode-orders',
   VerifyUser.ensureAuthenticated,
   VerifyUser.isAdmin,
-  fetchQRCodeOrdersCtrl,
+  fetchQRCodeOrdersCtrl
 );
 
 module.exports = router;
