@@ -71,7 +71,7 @@ const registerController = asyncWrapper(async (req, res, next) => {
     homeUrl: process.env.DOMAIN_NAME,
     currentYear: new Date().getFullYear(),
     itemName: 'Email Confirmation',
-    emailTitle: '',
+    emailTitle: 'Account Security: OTP Authentication',
     email,
     req,
   };
@@ -87,6 +87,8 @@ const registerController = asyncWrapper(async (req, res, next) => {
       });
     })
     .catch((error) => {
+      console.log(error);
+
       logger.error(`${error.message}`, {
         module: 'registerController.js',
         userId: req.user ? req.user.user_id : null,
