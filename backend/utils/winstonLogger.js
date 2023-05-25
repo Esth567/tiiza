@@ -1,4 +1,4 @@
-const {createLogger, format, transports} = require('winston');
+const { createLogger, format, transports } = require('winston');
 const path = require('path');
 const conditionalFields = (_action, _message) => {
   return `${_message} ${_action}`;
@@ -6,12 +6,12 @@ const conditionalFields = (_action, _message) => {
 const logger = createLogger({
   level: 'info',
   format: format.combine(
-    format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'}),
-    format.errors({stack: true}),
+    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    format.errors({ stack: true }),
     format.splat(),
-    format.json(),
+    format.json()
   ),
-  defaultMeta: {service: 'tiiza-app'},
+  defaultMeta: { service: 'tiiza-app' },
   transports: [
     // new transports.Console({
     //   format: format.combine(
@@ -28,10 +28,10 @@ const logger = createLogger({
       maxFiles: 5,
       tailable: true,
       format: format.combine(
-        format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'}),
-        format.errors({stack: true}),
+        format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        format.errors({ stack: true }),
         format.splat(),
-        format.json(),
+        format.json()
       ),
     }),
     new transports.File({
@@ -40,10 +40,10 @@ const logger = createLogger({
       maxFiles: 5,
       tailable: true,
       format: format.combine(
-        format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'}),
-        format.errors({stack: true}),
+        format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        format.errors({ stack: true }),
         format.splat(),
-        format.json(),
+        format.json()
       ),
     }),
     new transports.File({
@@ -53,10 +53,10 @@ const logger = createLogger({
       maxFiles: 5,
       tailable: true,
       format: format.combine(
-        format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'}),
-        format.errors({stack: true}),
+        format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        format.errors({ stack: true }),
         format.splat(),
-        format.json(),
+        format.json()
       ),
     }),
     new transports.File({
@@ -66,13 +66,13 @@ const logger = createLogger({
       maxFiles: 5,
       tailable: true,
       format: format.combine(
-        format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'}),
-        format.errors({stack: true}),
+        format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        format.errors({ stack: true }),
         format.splat(),
-        format.json(),
+        format.json()
       ),
     }),
   ],
 });
 
-module.exports = {logger};
+module.exports = { logger };

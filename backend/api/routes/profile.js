@@ -6,16 +6,8 @@ const {
 } = require('../controllers');
 const VerifyUser = require('../../middleware/auth');
 
-router.get(
-  '/customer/profile',
-  VerifyUser.ensureAuthenticated,
-  getCustomersProfileCtrl,
-);
-router.patch('/customer/update/phone', updateNumberCtrl);
-router.patch(
-  '/customer/update/profile',
-  VerifyUser.ensureAuthenticated,
-  updateCustomersProfileCtrl,
-);
+router.get('/profile', VerifyUser.ensureAuthenticated, getCustomersProfileCtrl);
+router.patch('/update/phone', updateNumberCtrl);
+router.patch('/update/profile', VerifyUser.ensureAuthenticated, updateCustomersProfileCtrl);
 
 module.exports = router;

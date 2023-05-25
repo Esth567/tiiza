@@ -86,14 +86,14 @@ const updateCustomersProfileCtrl = asyncWrapper(
 const updateNumberCtrl = asyncWrapper(async (req, res, next) => {
   const requestId = res.getHeader('X-request-Id');
 
-  if (!req.session.customer_details)
+  if (!req.session.user_details)
     return next(
       createCustomError(
         "Sorry,you don't have access to this resource ",
         403,
       ),
     );
-  const {email} = req.session.customer_details;
+  const {email} = req.session.user_details;
   const {phone} = req.body;
   const getUser = await UserModel.findOne({where: {email}});
   if (!getUser)
@@ -135,7 +135,7 @@ const updateNumberCtrl = asyncWrapper(async (req, res, next) => {
         success: true,
         payload: {
           message: `OTP has been sent to ${phone}`,
-          authUrl: '/customer/validate-otp',
+          authUrl: '/validate-otp',
         },
       });
     })
