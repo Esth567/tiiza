@@ -23,7 +23,7 @@ const subscriptionCtrl = asyncWrapper(async (req, res, next) => {
     //
     TIIZA_PREMIUM_DURATION,
   } = process.env;
-  const itemInfo = req.session.lostItemDetails;
+  const itemInfo = req.session.paymentPayload;
   let {item_worth} = itemInfo;
   item_worth = parseFloat(item_worth);
 
@@ -155,9 +155,9 @@ const subscriptionCtrl = asyncWrapper(async (req, res, next) => {
       createCustomError('Invalid subscription details', 400),
     );
 
-  req.session.lostItemDetails.subscriptionName = subscriptionName;
-  req.session.lostItemDetails.subscriptionAmount = subscriptionAmount;
-
+  req.session.paymentPayload.payment_name = subscriptionName;
+  req.session.paymentPayload.amount = subscriptionAmount;
+  // todo:change subscription amount to amount
   res.sendStatus(200);
 });
 module.exports = {subscriptionCtrl};

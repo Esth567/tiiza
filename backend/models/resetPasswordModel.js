@@ -21,7 +21,7 @@ ResetPasswordModel.init(
       allowNull: false,
     },
   },
-  {sequelize, modelName: 'resetPassword'},
+  {sequelize, modelName: 'reset_Password'},
 );
 
 (async () => {

@@ -2,9 +2,9 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 const speakeasy = require('speakeasy');
 const service = process.env;
-async function sendMailOTP(email, req) {
+async function sendMailOTP(options) {
   // generate otp secrete
-  var secret = speakeasy.generateSecret({length: 20});
+  var secret = speakeasy.generateSecret({ length: 20 });
 
   // cache
   req.session.user_otp_auth = secret.base32;
@@ -33,7 +33,7 @@ async function sendMailOTP(email, req) {
   const mailOptions = {
     from: service.EMAIL_SERVER_USERNAME,
     to: email,
-    subject: 'OTP Authentication',
+    subject: options.emailTitle,
     html: `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -53,4 +53,4 @@ async function sendMailOTP(email, req) {
   return isSent;
 }
 
-module.exports = {sendMailOTP};
+module.exports = { sendMailOTP };

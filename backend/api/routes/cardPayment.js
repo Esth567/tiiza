@@ -1,25 +1,26 @@
 const router = require('express').Router();
-const {
-  cardPaymentCtrl,
-  cardAuthorizationCtrl,
-  validateCardTransactionCtrl,
-} = require('../controllers');
+const {CardPaymentCtrl} = require('../controllers');
 const VerifyUser = require('../../middleware/auth');
 
 router.post(
   '/flw/payment/card-payment',
   VerifyUser.ensureAuthenticated,
-  cardPaymentCtrl,
+  VerifyUser.isCustomer,
+  CardPaymentCtrl.initiatePayment,
 );
 router.post(
   '/flw/payment/card-payment/authorization',
   VerifyUser.ensureAuthenticated,
-  cardAuthorizationCtrl,
+  VerifyUser.isCustomer,
+
+  CardPaymentCtrl.cardAuthorization,
 );
 router.post(
   '/flw/payment/card-payment/validation',
   VerifyUser.ensureAuthenticated,
-  validateCardTransactionCtrl,
+  VerifyUser.isCustomer,
+
+  CardPaymentCtrl.validateCardTransaction,
 );
 
 module.exports = router;

@@ -75,7 +75,7 @@ const lostItemCtrl = asyncWrapper(async (req, res, next) => {
       payload: 'Please enter a valid description for your item',
     });
 
-  req.session.lostItemDetails = {
+  req.session.paymentPayload = {
     item_name,
     item_worth,
     item_type,
@@ -96,7 +96,7 @@ const lostItemCtrl = asyncWrapper(async (req, res, next) => {
 //==================================================== || FETCH LOST ITEM || ===================================================================
 
 const fetchLostItemsCtrl = asyncWrapper(async (req, res) => {
-  const {user_id, location} = req.user;
+  const {user_id, location, user_role} = req.user;
 
   async function fetchItems(_location) {
     if (_location) {
