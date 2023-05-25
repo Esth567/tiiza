@@ -1,8 +1,10 @@
-import { combineReducers } from 'redux';
-import message from './message';
+import { combineReducers } from "redux";
 import auth from './auth';
+import messages from './messages';
+import lostFound from "./lostFound";
 
 export default combineReducers({
   auth,
-  message,
+  messages,
+  lostFound,
 });

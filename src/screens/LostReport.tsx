@@ -13,21 +13,20 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import { COLORS } from '../constant/theme';
 import { Button } from 'react-native';
-import CustomButton from '../component/CustomBottom';
+import CustomButton from '../component/CustomBotton';
 import BottomSheet from '../component/BottomSheet';
 import DatePicker from 'react-native-date-picker';
 
 const CIRCLE_SIZE = 40;
 const CIRCLE_RING_SIZE = 2;
 
-const LostReport = ({navigation}) => {
-
+const LostReport = ({ navigation }) => {
   const Colors = [
     'red',
     'purple',
     'blue',
     'cyan',
-    'green', 
+    'green',
     'yellow',
     'orange',
     'black',
@@ -35,38 +34,34 @@ const LostReport = ({navigation}) => {
     'gray',
   ];
 
+  const category = [
+    { label: 'Airpod', value: '1' },
+    { label: 'Bag', value: '2' },
+    { label: 'Charger', value: '3' },
+    { label: 'Cloth', value: '4' },
+    { label: 'Document', value: '5' },
+    { label: 'Flashdrive', value: '6' },
+    { label: 'Headset', value: '7' },
+    { label: 'Key', value: '8' },
+    { label: 'Laptop', value: '9' },
+    { label: 'Monitor', value: '10' },
+    { label: 'Phone', value: '11' },
+    { label: 'Printer', value: '12' },
+    { label: 'Tablet', value: '13' },
+    { label: 'Watch', value: '14' },
+  ];
 
-   const category = [
-     { label: 'Airpod', value: '1' },
-     { label: 'Bag', value: '2' },
-     { label: 'Charger', value: '3' },
-     { label: 'Cloth', value: '4' },
-     { label: 'Document', value: '5' },
-     { label: 'Flashdrive', value: '6' },
-     { label: 'Headset', value: '7' },
-     { label: 'Key', value: '8' },
-     { label: 'Laptop', value: '9' },
-     { label: 'Monitor', value: '10' },
-     { label: 'Phone', value: '11' },
-     { label: 'Printer', value: '12' },
-     { label: 'Tablet', value: '13' },
-     { label: 'Watch', value: '14' },
-   ];
+  const worth = [
+    { label: 'N1,000-N10,000', value: '1' },
+    { label: 'N10,000-N100,000', value: '2' },
+    { label: 'N101,000-N1M', value: '2' },
+  ];
 
-  
- 
+  const report = [
+    { label: 'Stolen', value: '1' },
+    { label: 'Missing', value: '2' },
+  ];
 
-    const worth = [
-      { label: 'N1,000-N10,000', value: '1' },
-      { label: 'N10,000-N100,000', value: '2' },
-      { label: 'N101,000-N1M', value: '2' },
-    ];
-
-     const report = [
-      { label: 'Stolen', value: '1' },
-      { label: 'Missing', value: '2' },
-     ];
-  
   const [item_name, setItem_name] = useState('');
   const [item_worth, setItem_worth] = useState(worth);
   const [lost_date, setLost_date] = useState('');
@@ -75,52 +70,49 @@ const LostReport = ({navigation}) => {
   const [report_type, setReport_type] = useState(report);
   const [item_color, setItem_color] = useState(0);
   const [item_type, setItem_type] = useState(category);
- const [date, setDate] = useState(new Date('01-05-2023'));
- const [open, setOpen] = useState(false);
+  const [date, setDate] = useState(new Date('01-05-2023'));
+  const [open, setOpen] = useState(false);
 
-    const [formInput, setFormInput] = useState(false);
+  const [formInput, setFormInput] = useState(false);
 
-    const onsubmit = () => {
-      alert(
-        '${item_name} ${item_worth} ${lost_date} ${lost_location} ${description} ${report_type} ${item_color} ${item_type}'
-      );
+  const onsubmit = () => {
+    alert(
+      '${item_name} ${item_worth} ${lost_date} ${lost_location} ${description} ${report_type} ${item_color} ${item_type}'
+    );
+  };
+
+  useEffect(() => {
+    setFormInput(
+      item_name &&
+        item_worth &&
+        lost_date &&
+        lost_location &&
+        description &&
+        report_type &&
+        item_color &&
+        item_type
+    );
+
+    return () => {
+      setFormInput(false);
     };
+  }, [
+    item_name,
+    item_worth,
+    lost_date,
+    lost_location,
+    description,
+    report_type,
+    item_color,
+    item_type,
+  ]);
 
-    useEffect(() => {
-      setFormInput(
-        item_name &&
-          item_worth &&
-          lost_date &&
-          lost_location &&
-          description &&
-          report_type &&
-          item_color &&
-          item_type
-      );
+  const [showBottomSheet, setShowBottomSheet] = React.useState(false);
 
-      return () => {
-        setFormInput(false);
-      };
-    }, [
-      item_name,
-      item_worth,
-      lost_date,
-      lost_location,
-      description,
-      report_type,
-      item_color,
-      item_type,
-    ]);
+  const hide = () => {
+    setShowBottomSheet(false);
+  };
 
- 
-
-     const [showBottomSheet, setShowBottomSheet] = React.useState(false);
-
-     const hide = () => {
-       setShowBottomSheet(false);
-     };
-
-      
   return (
     <View style={styles.container}>
       <BottomSheet show={showBottomSheet} height={290} onOuterClick={hide}>
@@ -209,7 +201,9 @@ const LostReport = ({navigation}) => {
           }}
         />
         <View style={{ flexDirection: 'row' }}>
-          <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15, flex: 1 }}>Report Type</Text>
+          <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15, flex: 1 }}>
+            Report Type
+          </Text>
           <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15, marginRight: 30 }}>
             Color
           </Text>

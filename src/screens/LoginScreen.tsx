@@ -1,4 +1,4 @@
-import React, {useState, createRef} from 'react';
+import React, { useState, createRef } from 'react';
 import {
   View,
   Text,
@@ -10,149 +10,184 @@ import {
   ActivityIndicator,
   StyleSheet,
   Image,
+  Alert,
+  SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
 import Input from '../component/Input';
 import Loader from '../component/Loader';
-import CustomBottom from '../component/CustomBottom';
+import CustomBottom from '../component/CustomBotton';
 import { COLORS } from '../constant/theme';
 import images from '../constant/images';
 import axios from 'axios';
-import { login } from '../actions/auth';
+import { login } from '../actions/authAction';
 import { useSelector, useDispatch } from 'react-redux';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const LoginScreen = ({navigation}) => {
+const LoginScreen = ({ navigation }) => {
 
+  const API_URL = 'http://192.168.43.95:5000/api/v1/';
+
+  const [isLoggedIn, setIsLogged] = useState();
  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [errortext, setErrortext] = useState('');
-  const [message, SetMessage] = useState();
-  const [messageType, SetMessageType] = useState();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const dispatch = useDispatch(); 
+  const dispatch = useDispatch();
 
-   const handleSubmitButton = () => {
+      const SignupSchema = Yup.object().shape({
+        email: Yup.string().email('Invalid email').required('Please enter your email address'),
+        password: Yup.string()
+          .min(8)
+          .required('Please enter your password')
+          .matches(
+            /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
+            'Password must contain minimum of 8 characters, at least one uppercase letter and one special character'
+          ),
+      });
 
-     setErrortext('');
-     if (!email) {
-       alert('Please fill Email');
-       return;
-     }
-     if (!password) {
-       alert('Please fill Password');
-       return;
-     }
-  
-     //Show Loader
-     setLoading(true);
-     if(email && password) {
-      dispatch(login(email, password))
-        .then((res) => {
-          console.log(res);
-          navigation.navigate('BottomTabNavigator');
-        })
-        .catch(() => {
-          setLoading(false);
-        });
-     } else {
-      setLoading(false);
-    }  
-};
+    const handleSubmit = (values, { setSubmitting }) => {
+          const { email, password } = values;
+          if (values) {
+            dispatch(login(values))
+              .then(() => {
+                Alert.alert('Check mail for verification');
+                 navigation.navigate('SmsOtp', { phoneNumber: formattedValue });
 
- if(isLoggedIn) {
-  navigation.navigate('BottomTabNavigator');
- }
-
-
+              })
+              .catch((error) => {
+                setSubmitting(false);
+              });
+          }
+    }
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.primary }}>
-      <StatusBar backgroundColor={'#012454'} barStyle="white-content" />
-      <Loader loading={loading} />
-      <View style={{ marginTop: 20, justifyContent: 'center', alignItems: 'center' }}>
-        <Image source={images.lost15} />
-      </View>
-      <View style={style.inputContainer}>
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{
-            paddingTop: 15,
-            marginHorizontal: 15,
-          }}
-        >
-          <KeyboardAvoidingView enabled>
-            <Text
-              style={{ fontSize: 15, fontWeight: '600', textAlign: 'center', marginBottom: 20 }}
-            >
-              Login to get started
-            </Text>
-            <View style={{ marginBottom: 15 }}>
-              <Input
-                onChangeText={(email) => setEmail(email)}
-                placeholder="Email"
-                iconName="envelope-o"
-                autoCapitalize="none"
-                underlineColorAndroid="#f000"
-                placeholderTextColor="#8b9cb5"
-                keyboardType="email-address"
-                returnKeyType="next"
-              />
-              <Input
-                onChangeText={(password) => setPassword(password)}
-                placeholder="Password"
-                iconName="lock"
-                password
-                underlineColorAndroid="#f000"
-                placeholderTextColor="#8b9cb5"
-                returnKeyType="next"
-                secureTextEntry={true}
-              />
+    <Formik
+      initialValues={{
+        email: '',
+        password: '',
+      }}
+      validationSchema={SignupSchema}
+      onSubmit={handleSubmit}
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleChange,
+        setFieldTouched,
+        isSubmitting,
+        handleSubmit,
+        isValid,
+      }) => (
+        <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
+          <StatusBar backgroundColor={'#ffffff'} barStyle="dark-content" />
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{
+              paddingTop: 60,
+              marginHorizontal: 15,
+            }}
+          >
+            <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 30 }}>
+              <Image source={images.foundItem} style={{ height: 180, width: 130 }} />
             </View>
-            {errortext != '' ? <Text style={style.errorTextStyle}>{errorText}</Text> : null}
-            <TouchableOpacity>
-              <Text
-                style={{
-                  textAlign: 'center',
-                  fontSize: 13,
-                  color: COLORS.primary,
-                  fontWeight: '500',
-                  marginBottom: 10,
-                }}
-              >
-                Forgot password
+            <KeyboardAvoidingView enabled>
+              <Text style={{ fontSize: 15, fontWeight: '600', marginBottom: 10 }}>
+                Login to get started
               </Text>
-            </TouchableOpacity>
-            <CustomBottom title="Login" onPress={handleSubmitButton} />
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: 10,
-              }}
-            >
-              <Text style={{ textAlign: 'center', fontSize: 12 }}>Dont have an account?</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+              <View style={{ marginTop: 15 }}>
+                <Input
+                  underlineColorAndroid="#f000"
+                  placeholder="Enter Email"
+                  autoCapitalize="none"
+                  iconName="envelope-o"
+                  placeholderTextColor="#8b9cb5"
+                  keyboardType="email-address"
+                  value={values.email}
+                  onChangeText={handleChange('email')}
+                  onBlur={() => setFieldTouched('email')}
+                />
+                {touched.email && errors.email && (
+                  <Text style={{ color: COLORS.red, fontSize: 12, marginBottom: 10 }}>
+                    {errors.email}
+                  </Text>
+                )}
+                <Input
+                  underlineColorAndroid="#f000"
+                  placeholder="Password"
+                  iconName="lock"
+                  password
+                  placeholderTextColor="#8b9cb5"
+                  autoCapitalize="sentences"
+                  value={values.password}
+                  onChangeText={handleChange('password')}
+                  onBlur={() => setFieldTouched('password')}
+                />
+                {touched.password && errors.password && (
+                  <Text style={{ color: COLORS.red, fontSize: 12, marginBottom: 10 }}>
+                    {errors.password}
+                  </Text>
+                )}
+              </View>
+              <View style={{ flexDirection: 'row', marginBottom: 20 }}>
                 <Text
                   style={{
-                    textAlign: 'center',
-                    fontSize: 12,
+                    fontSize: 13,
                     color: COLORS.primary,
-                    fontWeight: '500',
                   }}
                 >
-                  Register
+                  Forgot password?
                 </Text>
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        </ScrollView>
-      </View>
-    </View>
+                <TouchableOpacity>
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      color: COLORS.primary,
+                      fontWeight: '500',
+                      marginLeft: 3,
+                    }}
+                  >
+                    Reset
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <CustomBottom
+                title="Login"
+                disabled={isSubmitting}
+                onPress={handleSubmit}
+              />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 10,
+                }}
+              >
+                <Text style={{ textAlign: 'center', fontSize: 14, marginTop: 15 }}>
+                  Dont have an account?
+                </Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      fontSize: 14,
+                      color: COLORS.primary,
+                      fontWeight: '500',
+                      marginTop: 15,
+                    }}
+                  >
+                    Register
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </KeyboardAvoidingView>
+          </ScrollView>
+        </SafeAreaView>
+      )}
+    </Formik>
   );
-}
+};
 
 const style = StyleSheet.create({
   inputContainer: {
@@ -168,4 +203,4 @@ const style = StyleSheet.create({
     fontSize: 14,
   },
 });
-export default LoginScreen; 
+export default LoginScreen;

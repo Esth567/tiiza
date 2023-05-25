@@ -14,62 +14,36 @@ import {
 } from 'react-native';
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomBottom from '../component/CustomBottom';
-import { VerifyEmail } from '../utils/Auth';
+import CustomButton from '../component/CustomBotton';
+import { verifyEmail } from '../actions/authAction';
 import images from '../constant/images';
 import { OTPInput } from 'react-native-verify-otp-inputs';
-import { validateOtp } from '../actions/auth';
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
 
 
-const Verification = ({navigation}) => {
+const Verification = ({ navigation }) => {
+  const [counter, setCounter] = useState(59);
+  
+   const dispatch = useDispatch();
 
-  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
+    return () => clearInterval(timer);
+  }, [counter]);
 
-  const [isRegistraionSuccess, setIsRegistraionSuccess] = useState(false);
-  const [errortext, setErrortext] = useState('');
-
-
-   const dispatch = useDispatch(); 
-
-  const handleToken = () => {
-     try {
-      if (token) {
-        dispatch(validateOtp(token));
-        isRegistraionSuccess(true);
-        // if confirmed successfully navigate to "Login"
-        navigation.navigate('Login');
-        Alert.alert('Success', 'You can now login');
-      } else {
-        setErrortext();
-      }   
-     } catch (e) {
-       Alert.alert('Error', e.message || 'Authentication failed');
-     }
-  }
-
-   if (isRegistraionSuccess) {
-     return (
-       <View
-         style={{
-           flex: 1,
-           backgroundColor: '#307ecc',
-           justifyContent: 'center',
-         }}
-       >
-         <Image
-           source={images.success}
-           style={{
-             height: 150,
-             resizeMode: 'contain',
-             alignSelf: 'center',
-           }}
-         />
-         <Text style={style.successTextStyle}>Registration Successful</Text>
-         <CustomBottom title="Verify" onPress={() => navigation.navigate('LoginScreen')} />
-       </View>
-     );
-   }
+    const handleSubmit = (token: string) => {
+  
+    if (token) {
+      dispatch(verifyEmail(token))
+        .then(() => {
+          message.setMessage('Registration successful, please check your email for verification');
+          navigation.navigate('Login');
+        })
+        .catch(() => {
+          setSubmitting(false);
+        });
+    }
+  };
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: COLORS.white, paddingTop: 50 }}>
@@ -95,28 +69,26 @@ const Verification = ({navigation}) => {
           Please enter the pin sent to your email
         </Text>
         <OTPInput
-          onSubmit={(token: string) => {
-            handleToken(token);
-          }}
           pinCount={6}
           boxSelectedStyle={style.boxSelectedStyle}
           boxStyle={style.boxStyle}
           digitStyle={style.digitStyle}
           variant="underlined"
         />
-        <View>
-          <Text style={{textAlign: 'center', marginTop: 20}}>Didn't get pin</Text>   
-        <TouchableOpacity style={style.buttonStyle} activeOpacity={0.5}>
-          <Text style={style.buttonTextStyle}>Resend pin</Text>
-        </TouchableOpacity>
+        <CustomButton onPress={handleSubmit} title="Verify" />
+        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 20}}>
+          <Text style={{ color: COLORS.black, fontSize: 14}}>Didn't get pin?</Text>
+          <TouchableOpacity activeOpacity={0.5}>
+            <Text style={style.buttonTextStyle}>Resend pin</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
-}
+};
 
-const {width} = Dimensions.get('window')
-const inputWidth = Math.round(width / 9)
+const { width } = Dimensions.get('window');
+const inputWidth = Math.round(width / 9);
 
 const style = StyleSheet.create({
   inputContainer: {
@@ -158,9 +130,10 @@ const style = StyleSheet.create({
     width: inputWidth * 9,
   },
   buttonTextStyle: {
-    color: '#FFFFFF',
-    paddingVertical: 10,
-    fontSize: 16,
+    color: COLORS.black,
+    fontSize: 14,
+    marginLeft: 5,
+    fontWeight: 'bold'
   },
 });
 

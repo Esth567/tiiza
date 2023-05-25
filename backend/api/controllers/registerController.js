@@ -84,7 +84,7 @@ const registerController = asyncWrapper(async (req, res, next) => {
     password: hashPassword,
     email,
     phone,
-    fullName,
+    full_name,
     location,
   };
 

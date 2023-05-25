@@ -11,6 +11,8 @@ import Verification from './Verification';
 import FoundReport from './FoundReport';
 import FoundDetail from './FoundDetails';
 import SeeallScreen from './SeeallScreen';
+import PhoneNumber from './PhoneNumber';
+import SmsOtp from './SmsVerify';
 
 export {
   RegisterScreen,
@@ -26,4 +28,6 @@ export {
   FoundReport,
   FoundDetail,
   SeeallScreen,
+  PhoneNumber,
+  SmsOtp,
 };

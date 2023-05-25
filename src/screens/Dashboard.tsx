@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,51 +10,35 @@ import {
   FlatList,
   Modal,
   Pressable,
+  Dimensions,
   Alert,
   ListRenderItemInfo,
 } from 'react-native';
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomButton from '../component/CustomBottom';
+import CustomButton from '../component/CustomBotton';
 import LostReport from './LostReport';
 import images from '../constant/images';
 import CarouselComponent from '../component/carousel';
-import userService from '../services/user-service';
+import userServices from '../services/authServices';
 import SeeallScreen from './SeeallScreen';
 import FoundReport from './FoundReport';
 import SubscriptionScreen from './SubscriptionScreen';
+import Carousel from 'react-native-snap-carousel';
 
+const WIDTH = Dimensions.get('window').width + 80;
+const ITEM_WIDTH = Math.round(WIDTH * 0.75);
 
-const Dashboard = ({navigation}:any) => {
+const HEIGHT = Dimensions.get('window').height * 5;
 
-
+const Dashboard = ({ navigation }: any) => {
   const [modalVisible, setModalVisible] = useState(false);
-   const [content, setContent] = useState('');
 
-    useEffect(() => {
-      userService.getDashboard().then(
-        (response) => {
-          setContent(response.data);
-        },
-        (error) => {
-          const content =
-            (error.response && error.response.data && error.response.data.message) ||
-            error.message ||
-            error.toString();
-
-          setContent(content);
-        }
-      );
-    }, []);
-
-    interface IUser {
-    icon: string;
-    name: string;
-  }
+  const isCarousel = React.useRef(null);
 
   const menuItems = [
     {
-      name: 'Missing items',
+      name: 'All lost/found items',
       onPress: () => {
         navigation.navigate('seeAll');
       },
@@ -91,22 +75,19 @@ const Dashboard = ({navigation}:any) => {
     },
   ];
 
-  const Item = ({ data }: { data: IUser }) => (
-    <TouchableOpacity onPress={() => navigation.navigate(data.name)} style={{ alignItems: 'center', justifyContent: 'center', padding: 10}}>
-      <View>{data.icon}</View>
-      <Text style={{color: COLORS.white}}>{data.name}</Text>
-    </TouchableOpacity>
-  );
-
-
- const renderItem: ListRenderItem<IUser> = ({ item }) => <Item data={item} />;  
+  const advert = [
+    {
+      image:
+        'https://th.bing.com/th/id/OIP.Ze7wEUKDUsO07emkEW8kWgAAAA?w=316&h=180&c=7&r=0&o=5&pid=1.7',
+    },
+  ];
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white, paddingTop: 3 }}>
       <StatusBar backgroundColor={COLORS.white} barStyle="dark-content" />
       <ScrollView
         contentContainerStyle={{
-          paddingTop: 10,
+          paddingTop: 15,
           marginHorizontal: 15,
         }}
       >
@@ -150,39 +131,21 @@ const Dashboard = ({navigation}:any) => {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={style.card}></View>
-
-        <View style={style.subscriptionContainer}>
-          <Text
-            style={{
-              marginHorizontal: 20,
-              marginTop: 10,
-              fontSize: 15,
-              fontWeight: 'bold',
-              color: COLORS.primary,
-            }}
-          >
-            Get the latest gist about your area
-          </Text>
-          <View style={{ flexDirection: 'row' }}>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: 'bold',
-                marginHorizontal: 20,
-                color: COLORS.primary,
-                flex: 1,
-              }}
-            >
-              With Tiiza community
-            </Text>
-            <View style={{ marginRight: 20 }}>
-              <Image source={images.community2} style={{ height: 65, width: 78 }} />
+        <View style={{ marginBottom: 15 }}>
+          {advert.map(({ image, index }) => (
+            <View key={index}>
+              <Image source={{ uri: image }} style={style.image} />
             </View>
-          </View>
+          ))}
+        </View>
+        <View style={style.card2}>
+          <Text style={style.textStyle}>Lost and found items</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
           <CarouselComponent />
+        </View>
+        <View style={style.card}>
+          <Text style={style.textStyle}>In togetherness we achieve greateness</Text>
         </View>
         <Modal
           animationType="slide"
@@ -205,26 +168,25 @@ const Dashboard = ({navigation}:any) => {
       </ScrollView>
     </View>
   );
-}
+};
 
 const style = StyleSheet.create({
   header: {
     backgroundColor: COLORS.white,
     flexDirection: 'row',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   card: {
-    height: 120,
-    width: '100%',
-    elevation: 10,
+    height: 70,
+    width: ITEM_WIDTH,
     backgroundColor: COLORS.primary,
     borderRadius: 15,
-    paddingHorizontal: 15,
-    marginBottom: 20,
+    marginBottom: 50,
+    justifyContent: 'center',
   },
   lostContainer: {
     height: 120,
-    width: '49%',
+    width: ITEM_WIDTH,
     elavation: 20,
     borderRadius: 20,
     backgroundColor: COLORS.secondary,
@@ -239,64 +201,9 @@ const style = StyleSheet.create({
     marginBottom: 10,
     marginLeft: 10,
   },
-  subscriptionContainer: {
-    height: 100,
-    width: '100%',
-    elavation: 30,
-    borderWidth: 0.5,
-    borderColor: COLORS.secondary,
+  cardContainer2: {
+    width: ITEM_WIDTH,
     borderRadius: 20,
-    backgroundColor: COLORS.white,
-    marginBottom: 20,
-  },
-  seeAll: {
-    marginHorizontal: 10,
-    color: COLORS.black,
-    fontSize: 12,
-    height: 30,
-    // justifyContent: 'center',
-  },
-  reportIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 30,
-    backgroundColor: COLORS.white,
-    marginTop: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  reportIcon2: {
-    width: 30,
-    height: 30,
-    borderRadius: 30,
-    backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  adContainer: {
-    height: 250,
-    width: '47%',
-    elavation: 20,
-    borderRadius: 20,
-    backgroundColor: COLORS.secondary,
-  },
-  adContainer2: {
-    height: 250,
-    width: '47%',
-    elavation: 20,
-    borderRadius: 20,
-    backgroundColor: COLORS.secondary,
-    marginLeft: 15,
-  },
-  plusBtn: {
-    height: 30,
-    width: 30,
-    borderRadius: 50,
-    backgroundColor: COLORS.primary,
-    marginHorizontal: 10,
-    marginTop: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   modalView: {
     marginTop: 50,
@@ -341,9 +248,37 @@ const style = StyleSheet.create({
     marginTop: 5,
   },
   itemText: {
+    fontWeight: 'bold',
     fontSize: 16,
-    paddingVertical: 3,
-    paddingLeft: 20,
+    textAlign: 'center',
+    marginTop: 4,
+    color: COLORS.primary,
+  },
+  cardContainer: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    width: ITEM_WIDTH,
+    paddingBottom: 40,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+    elevation: 7,
+  },
+  image: {
+    width: ITEM_WIDTH,
+    height: 165,
+    borderRadius: 20,
+  },
+  card2: {
+    height: 35,
+    width: ITEM_WIDTH,
+    backgroundColor: COLORS.primary,
+    marginBottom: 7,
+    justifyContent: 'center',
   },
 });
 

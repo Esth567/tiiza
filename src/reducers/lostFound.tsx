@@ -1,34 +1,31 @@
-import {
-  CREATE_LOSTITEM_SUCCESS,
-  CREATE_LOSTITEM_FAIL,
-  CREATE_LOSTITEM_LOADING,
-} from '../actions/types';
+import { GETALL_FAILURE, GETALL_REQUEST, GETALL_SUCCESS } from '../actions/types';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const user = AsyncStorage.getItem('user');
 
-const initialState = user ? { isLoggedIn: true, user } : { isLoggedIn: false, user: null };
+const initialState = {};
 
 export default function (state = initialState, action) {
   const { type, payload } = action;
 
   switch (type) {
-    case CREATE_LOSTITEM_SUCCESS:
-      return {
-        ...state,
-        items: action.users,
-      };
-    case CREATE_LOSTITEM_FAIL:
-      return {
-        ...state,
-        error: action.error,
-      };
-    case CREATE_LOSTITEM_LOADING:
+    case GETALL_REQUEST:
       return {
         ...state,
         loading: true,
-        error: null,
       };
-  };
-    
-
+    case GETALL_SUCCESS:
+      return {
+        ...state,
+        items: payload.user,
+      };
+    case GETALL_FAILURE:
+      return {
+        ...state,
+        error: payload.error,
+      };
+    default:
+      return state;
+  }
+}

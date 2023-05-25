@@ -53,23 +53,26 @@ const data = [
       }, [activeIndex]);
       
      
-    const renderItem = ({ item, index }) => (
-      <View style={styles.card}>
-        <View>
-          <Image source={item.image} style={styles.cardImage} />
-          <View />
-          <View style={{ flexDirection: 'row', marginTop: 10 }}>
-            <Text style={styles.cardTitle}>{item.title}</Text>
-            <Text style={[styles.textContainer2, { color: index === 1 ? '#006000' : '#CA0C3A' }]}>
-              {item.status}
-            </Text>
+    const renderItem = ({ item, index }) => {
+      return (
+        <View style={styles.card}>
+          <View>
+            <Image source={item.image} style={styles.cardImage} />
+            <View />
+            <View style={{ flexDirection: 'row', marginTop: 10 }}>
+              <Text style={styles.cardTitle}>{item.title}</Text>
+              <Text style={[styles.textContainer2, { color: index === 1 ? '#006000' : '#CA0C3A' }]}>
+                {item.status}
+              </Text>
+            </View>
           </View>
+          <Text style={styles.cardDescription}>{item.description}</Text>
+          <Text style={styles.lastseen}>{item.lastseen}</Text>
+          <Text style={styles.location}>{item.location}</Text>
         </View>
-        <Text style={styles.cardDescription}>{item.description}</Text>
-        <Text style={styles.lastseen}>{item.lastseen}</Text>
-        <Text style={styles.location}>{item.location}</Text>
-      </View>
-    );
+      );
+    };
+
     return (
       <View style={styles.container}>
         <Carousel
@@ -95,7 +98,7 @@ const data = [
   };
   
   const sliderWidth = Dimensions.get('window').width;
-  const itemWidth = sliderWidth * 0.6;
+  const itemWidth = sliderWidth * 0.5;
   
   const styles = StyleSheet.create({
     container: {
@@ -133,14 +136,13 @@ const data = [
     },
     cardImage: {
       width: itemWidth,
-      height: 190,
+      height: 120,
       borderTopLeftRadius: 10,
       borderTopRightRadius: 10,
     },
     cardTitle: {
       fontSize: 15,
       fontWeight: 'bold',
-      paddingLeft: 15,
       flex: 1,
     },
     cardDescription: {

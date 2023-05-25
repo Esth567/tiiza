@@ -13,7 +13,7 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import { COLORS } from '../constant/theme';
 import { Button } from 'react-native';
-import CustomButton from '../component/CustomBottom';
+import CustomButton from '../component/CustomBotton';
 import BottomSheet from '../component/BottomSheet';
 import DatePicker from 'react-native-date-picker';
 
@@ -51,7 +51,6 @@ const FoundReport = ({ navigation }) => {
     { label: 'Watch', value: '14' },
   ];
 
-  
   const [item_name, setItem_name] = useState('');
   const [date_found, setDate_found] = useState('');
   const [discovery_location, setDiscovery_location] = useState('');

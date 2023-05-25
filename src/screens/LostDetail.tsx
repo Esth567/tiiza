@@ -1,16 +1,14 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomButton from '../component/CustomBottom';
+import CustomButton from '../component/CustomBotton';
 import BottomSheet from '../component/BottomSheet';
 import ImagePicker from 'react-native-image-crop-picker';
-import { lostItem } from '../actions/lostAndFount';
+import { lostItem } from '../actions/lostAndFound';
 import LostReport from './LostReport';
 
-
 const LostDetail = () => {
-
   const DATA = [
     { id: 1, name: 'Item Type' },
     { id: 1, name: 'Item Name' },
@@ -22,105 +20,103 @@ const LostDetail = () => {
   ];
 
   const [data, setData] = useState(DATA);
- 
 
-   const [img, setImg] = useState('');
-   const [visible, setVisible] = useState(false);
-   const [localFile, setLocalFile] = useState(null);
-   const [updatingImage, setUpdatingImage] = useState(false);
-   const [uploadSucceeded, setUploadSucceeded] = useState(false);
-   const [loading, setLoading] = useState(false);
-   const [formInput, setFormInput] = useState({
-         item_name: '',
-         item_worth: '',
-         lost_date: '',
-         lost_location: '',
-         description: '',
-         report_type: '',
-         item_color: '',
-         item_type: '',
-       });
- 
+  const [img, setImg] = useState('');
+  const [visible, setVisible] = useState(false);
+  const [localFile, setLocalFile] = useState(null);
+  const [updatingImage, setUpdatingImage] = useState(false);
+  const [uploadSucceeded, setUploadSucceeded] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formInput, setFormInput] = useState({
+    item_name: '',
+    item_worth: '',
+    lost_date: '',
+    lost_location: '',
+    description: '',
+    report_type: '',
+    item_color: '',
+    item_type: '',
+  });
 
   const [showBottomSheet, setShowBottomSheet] = React.useState(false);
 
-   const hide = () => {
-     setShowBottomSheet(false);
-   };
+  const hide = () => {
+    setShowBottomSheet(false);
+  };
 
-    const photoFromCamera = () => {
-      ImagePicker.openCamera({
-        compressImageMaxWidth: 300,
-        compressImageMaxHeight: 300,
-        cropping: true,
-      }).then((img) => {
-        console.log(img.path);
-        setImg(img.path);
-      });
-    };
+  const photoFromCamera = () => {
+    ImagePicker.openCamera({
+      compressImageMaxWidth: 300,
+      compressImageMaxHeight: 300,
+      cropping: true,
+    }).then((img) => {
+      console.log(img.path);
+      setImg(img.path);
+    });
+  };
 
-    const photoFromGalary = () => {
-      ImagePicker.openPicker({
-        width: 200,
-        height: 200,
-        cropping: true,
-        compressImageQuality: 0.7,
-      }).then((img) => {
-        console.log(img.path);
-        setImg(img.path);
-      });
-    };
+  const photoFromGalary = () => {
+    ImagePicker.openPicker({
+      width: 200,
+      height: 200,
+      cropping: true,
+      compressImageQuality: 0.7,
+    }).then((img) => {
+      console.log(img.path);
+      setImg(img.path);
+    });
+  };
 
-   const renderItem = ({item}) => {
-     return (
-       <View style={{marginHorizontal: 20, marginTop: 25}}>
-         <Text style={{fontSize: 15, fontWeight: '500'}}>{item.name}</Text>
-       </View>
-     );
-   };
-
-   headerComponent = () => {
+  const renderItem = ({ item }) => {
     return (
-       <Text style={{textAlign: 'center', marginTop: 15, fontSize: 17, fontWeight: 'bold' }}>Details</Text>
-    )
-   }
+      <View style={{ marginHorizontal: 20, marginTop: 25 }}>
+        <Text style={{ fontSize: 15, fontWeight: '500' }}>{item.name}</Text>
+      </View>
+    );
+  };
 
-    const handleChange = (evnt) => {
-      const newInput = (data) => ({ ...data, [evnt.target.name]: evnt.target.value });
-      setFormInput(newInput);
-    };
+  headerComponent = () => {
+    return (
+      <Text style={{ textAlign: 'center', marginTop: 15, fontSize: 17, fontWeight: 'bold' }}>
+        Details
+      </Text>
+    );
+  };
 
-    const handleSubmit = (evnt) => {
-      evnt.preventDefault();
-      const checkEmptyInput = !Object.values(formInput).every((res) => res === '');
-      if (checkEmptyInput) {
-        const newData = (data) => [...data, formInput];
-        setDetailsData(newData);
-        dispatch(
-          lostItem(
-            item_name,
-            item_worth,
-            lost_date,
-            lost_location,
-            description,
-            report_type,
-            item_color,
-            item_type
-          )
+  const handleChange = (evnt) => {
+    const newInput = (data) => ({ ...data, [evnt.target.name]: evnt.target.value });
+    setFormInput(newInput);
+  };
+
+  const handleSubmit = (evnt) => {
+    evnt.preventDefault();
+    const checkEmptyInput = !Object.values(formInput).every((res) => res === '');
+    if (checkEmptyInput) {
+      const newData = (data) => [...data, formInput];
+      setDetailsData(newData);
+      dispatch(
+        lostItem(
+          item_name,
+          item_worth,
+          lost_date,
+          lost_location,
+          description,
+          report_type,
+          item_color,
+          item_type
         )
-          .then((res) => {
-            console.log(res);
-            setFormInput(emptyInput);
-          })
-          .catch(() => {
-            setLoading(false);
-          });
-      } else {
-        setLoading(false);
-      }
-    };  
-
-
+      )
+        .then((res) => {
+          console.log(res);
+          setFormInput(emptyInput);
+        })
+        .catch(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -180,7 +176,12 @@ const LostDetail = () => {
           <Text>Attach image</Text>
         </TouchableOpacity>
         <View style={styles.inputContainer}>
-          <FlatList data={DATA} renderItem={renderItem} ListHeaderComponent={headerComponent} keyExtractor={DATA => DATA.id} />
+          <FlatList
+            data={DATA}
+            renderItem={renderItem}
+            ListHeaderComponent={headerComponent}
+            keyExtractor={(DATA) => DATA.id}
+          />
         </View>
         <CustomButton title="Save report" handleSubmit={handleSubmit} handleChange={handleChange} />
       </ScrollView>
