@@ -106,7 +106,7 @@ const requestOtpCtrl = asyncWrapper((req, res, next) => {
   const { email } = req.body;
   const options = {
     customerName: req.user.full_name,
-    emailTitle: 'TIIZA:Item confirmation',
+    emailTitle: 'Account Security Notification:OTP Authentication',
     email,
     req,
   };
