@@ -104,10 +104,15 @@ const smsOtpValidationCtrl = asyncWrapper(async (req, res, next) => {
 const requestOtpCtrl = asyncWrapper((req, res, next) => {
   const requestId = res.getHeader('X-request-Id');
   const { email } = req.body;
-
-  const { error } = new EmailValidator(email).validate();
+  const options = {
+    customerName: req.user.full_name,
+    emailTitle: 'TIIZA:Item confirmation',
+    email,
+    req,
+  };
+  const { error } = new EmailValidator({ email }).validate();
   if (error) return next(createCustomError(error.message, 400));
-  sendMailOTP(email, req)
+  sendMailOTP(options)
     .then((response) => {
       return res.status(200).json({
         success: true,
@@ -118,6 +123,7 @@ const requestOtpCtrl = asyncWrapper((req, res, next) => {
       });
     })
     .catch((error) => {
+      console.log(error);
       logger.error(`${error.message}`, {
         module: 'OTPController.js',
         userId: req.user ? req.user.user_id : null,
