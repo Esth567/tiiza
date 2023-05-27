@@ -3,6 +3,7 @@ require('dotenv').config();
 const speakeasy = require('speakeasy');
 const service = process.env;
 async function sendMailOTP(options) {
+  console.log(options, 'pppppppppppppppppp');
   // generate otp secrete
   var secret = speakeasy.generateSecret({ length: 20 });
 
