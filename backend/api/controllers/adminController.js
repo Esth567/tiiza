@@ -354,7 +354,7 @@ const alertCustomer = ({ message, customer_email, callback, req, res, next }) =>
     currentYear: new Date().getFullYear(),
     itemName: 'placeholder',
     customerName: req.user.full_name,
-    emailTitle: 'TIIZA:Item confirmation',
+    emailTitle: 'TIIZA:Item Registration Response',
     email: customer_email,
   };
 

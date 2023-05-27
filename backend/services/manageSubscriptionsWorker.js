@@ -1,4 +1,4 @@
-const {parentPort} = require('worker_threads');
+const { parentPort } = require('worker_threads');
 const cron = require('node-cron');
 
 const manageSubscriptions = require('../utils/manageSubscription');
@@ -10,15 +10,12 @@ const manageSubscriptions = require('../utils/manageSubscription');
 //   }
 // });
 
-const manageSubscriptionTask = cron.schedule(
-  '*/20 * * * * *',
-  async () => {
-    try {
-      await manageSubscriptions();
-    } catch (error) {
-      console.log(error.message);
-    }
-  },
-);
+const manageSubscriptionTask = cron.schedule('0 * * * * *', async () => {
+  try {
+    await manageSubscriptions();
+  } catch (error) {
+    console.log(error.message);
+  }
+});
 
-module.exports = {manageSubscriptionTask};
+module.exports = { manageSubscriptionTask };

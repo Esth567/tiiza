@@ -20,22 +20,17 @@ class RegisterValidator extends Validation {
         .string()
         .email({
           minDomainSegments: 2,
-          tlds: {allow: ['com', 'net', 'org', 'net']},
+          tlds: { allow: ['com', 'net', 'org', 'net'] },
         })
         .required()
         .messages({
           'string.empty': ` Email field cannot be empty `,
           'object.regex': 'Email Must Be A Valid Email',
-          'string.pattern.base':
-            'Email Must Be A Valid Email Address',
+          'string.pattern.base': 'Email Must Be A Valid Email Address',
         }),
       password: joi
         .string()
-        .pattern(
-          new RegExp(
-            '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
-          ),
-        )
+        .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$'))
         .min(8)
         .max(30)
         .required()
@@ -73,22 +68,17 @@ class LoginValidator extends Validation {
         .string()
         .email({
           minDomainSegments: 2,
-          tlds: {allow: ['com', 'net', 'org', 'net', 'it']},
+          tlds: { allow: ['com', 'net', 'org', 'net', 'it'] },
         })
         .required()
         .messages({
           'string.empty': ` Email field cannot be empty `,
           'object.regex': 'Email Must Be A Valid Email',
-          'string.pattern.base':
-            'Email Must Be A Valid Email Address',
+          'string.pattern.base': 'Email Must Be A Valid Email Address',
         }),
       password: joi
         .string()
-        .pattern(
-          new RegExp(
-            '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
-          ),
-        )
+        .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$'))
         .min(8)
         .max(30)
         .required()
@@ -140,14 +130,13 @@ class EmailValidator extends Validation {
         .string()
         .email({
           minDomainSegments: 2,
-          tlds: {allow: ['com', 'net', 'org', 'ng', 'it']},
+          tlds: { allow: ['com', 'net', 'org', 'ng', 'it'] },
         })
         .required()
         .messages({
           'string.empty': ` Email field cannot be empty `,
           'object.regex': 'Email Must Be A Valid Email',
-          'string.pattern.base':
-            'Email Must Be A Valid Email Address',
+          'string.pattern.base': 'Email Must Be A Valid Email Address',
         }),
     });
   }
@@ -167,11 +156,7 @@ class PasswordValidator extends Validation {
     return joi.object({
       password: joi
         .string()
-        .pattern(
-          new RegExp(
-            '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
-          ),
-        )
+        .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$'))
         .min(8)
         .max(30)
         .required()
@@ -223,7 +208,7 @@ class CardPaymentValidator extends Validation {
         .string()
         .email({
           minDomainSegments: 2,
-          tlds: {allow: ['com', 'net', 'org', 'it']},
+          tlds: { allow: ['com', 'net', 'org', 'it'] },
         })
         .required(),
 
@@ -294,7 +279,82 @@ class ItemUpdateValidator extends Validation {
     return validateSchema.validate(this.data);
   }
 }
+class LostItemRegistrationValidator extends Validation {
+  constructor(validationInfo) {
+    super(validationInfo);
+  }
+
+  schema() {
+    return joi.object({
+      item_name: joi.string().required(),
+      item_worth: joi.string().required(),
+      lost_date: joi.date().required(),
+      lost_location: joi.string().min(2).max(200).required(),
+      phone_number: joi
+        .string()
+        .pattern(/^(\+?\d{1,3}[- ]?)?\d{11}$/)
+        .messages({
+          'string.pattern.base': `phone number must have  11 digits.`,
+        }),
+      description: joi.string().min(5).max(300),
+      report_type: joi.string().required(),
+      item_color: joi.string().required(),
+      item_type: joi.string().max(10).min(3).required(),
+    });
+  }
+  validate() {
+    let validateSchema = this.schema();
+    return validateSchema.validate(this.data);
+  }
+}
+class FoundItemRegistrationValidator extends Validation {
+  constructor(validationInfo) {
+    super(validationInfo);
+  }
+
+  schema() {
+    return joi.object({
+      item_name: joi.string().required(),
+      item_worth: joi.string().required(),
+      date_found: joi.date().required(),
+      pickup_location: joi.string().min(2).max(200).required(),
+      phone_number: joi
+        .string()
+        .pattern(/^(\+?\d{1,3}[- ]?)?\d{11}$/)
+        .messages({
+          'string.pattern.base': `phone number must have  11 digits.`,
+        }),
+      description: joi.string().min(5).max(300),
+      item_color: joi.string().required(),
+      item_type: joi.string().max(10).min(3).required(),
+    });
+  }
+  validate() {
+    let validateSchema = this.schema();
+    return validateSchema.validate(this.data);
+  }
+}
+
+class SubscriptionValidator extends Validation {
+  constructor(validationInfo) {
+    super(validationInfo);
+  }
+
+  schema() {
+    return joi.object({
+      subscriptionName: joi.string().required(),
+      subscriptionAmount: joi.number().required(),
+    });
+  }
+  validate() {
+    let validateSchema = this.schema();
+    return validateSchema.validate(this.data);
+  }
+}
 module.exports = {
+  FoundItemRegistrationValidator,
+  LostItemRegistrationValidator,
+  SubscriptionValidator,
   CardPaymentValidator,
   ItemUpdateValidator,
   PasswordValidator,

@@ -27,7 +27,7 @@ const resetPasswordCtrl = asyncWrapper(async (req, res, next) => {
   const findUser = await UserModel.findOne({ where: { email } });
   if (!findUser) return next(createCustomError('Account not found', 404));
   const options = {
-    emailTitle: 'Account Security: Password Reset',
+    emailTitle: 'Account Security Notification: Password Reset',
     email,
     customerName: findUser.dataValues.full_name,
     resetUrl,
