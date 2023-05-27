@@ -13,79 +13,133 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import Loader from '../component/Loader';
 import Input from '../component/Input';
-import client from '../Api/client';
-import CustomButton from '../component/CustomBottom';
+import CustomButton from '../component/CustomBotton';
 import { COLORS } from '../constant/theme';
 import images from '../constant/images';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Verification from './Verification';
-import { useDispatch, useSelector } from "react-redux";
-import { register } from '../actions/auth';
+import { register } from '../actions/authAction';
+import { useDispatch, useSelector } from 'react-redux';
+import PhoneNumber from './PhoneNumber';
+import Loader from '../component/Loader';
 
-const RegisterScreen = ({props, navigation}) => {
+
+const RegisterScreen = ({ navigation }) => {
+
+    
+   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [location, setLocation] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [errortext, setErrortext] = useState('');
-  const [isRegistraionSuccess, setIsRegistraionSuccess] = useState(false);
-  
+   const [phone, setPhone] = useState('');
+   const [password, setPassword] = useState("");
+   const [confirmPassword, setConfirmPassword] = useState('');
+   const [successful, setSuccessful] = useState(false);
 
- const dispatch = useDispatch(); 
+     const [errors, setErrors] = React.useState({});
+     const [Loading, setLoading] = React.useState(false);
+      const [message, setMessage] = useState('');
 
- const checkBtn = useRef();
+   const dispatch = useDispatch();
 
-  const handleSubmitButton = () => {
-    setErrortext('');
-    if (!fullName) {
-      alert('Please fill Name');
-      return;
-    }
-    if (!email) {
-      alert('Please fill Email');
-      return;
-    }
-    if (!phone) {
-      alert('Please fill phone');
-      return;
-    }
-    if (!password) {
-      alert('Please fill Address');
-      return;
-    }
-    if (!confirmPassword) {
-      alert('Please confirm Password');
-      return;
-    }
-     if (!location) {
-       alert('Please fill location');
-       return;
-     }
-    //Show Loader
-    setLoading(true);
+   const validate = () => {
+         Keyboard.dismiss();
+         let valid = true;
+         if (!email) {
+           handleError('Please enter email', 'email');
+           valid = false;
+         } else if (!inputs.email.match(/\S+@\S+\.\S+/)) {
+           handleError('Please input valid email', 'email');
+           valid = false;
+         }
+         if (!fullName) {
+            handleError('Please input Full Name', 'fullName');
+            valid = false;
+         }
+         if (!phone) {
+           handleError('Please input Phone Number', 'phone');
+           valid = false;
+         }
+         if (!password) {
+           handleError('Please input password', 'password');
+           valid = false;
+         } else if (inputs.password.length < 8) {
+           handleError('Min password length of 8', 'password');
+           valid = false;
+         }
+         if (!confirmPassword) {
+           handleError('Please confirm password', 'confirmPassword');
+           valid = false;
+         } else if (!inputs['password'] != inputs['confirmPassword']) {
+           valid = false;
+           errors['confirmPassword'] = "Passwords don't match.";
+         }
+            if (!location) {
+              handleError('Please enter location', 'location');
+              valid = false;
+            }
+
+         if (valid) {
+           signUp();
+         }
+   }; 
+
+     const signUp = () => {
+       setLoading(true);
+       setTimeout(() => {
+         setLoading(false);
     if (fullName && email && phone && password && confirmPassword && location) {
       dispatch(register(fullName, email, phone, password, confirmPassword, location))
         .then(() => {
           console.log();
-          setIsRegistraionSuccess(true);
+          setSuccessful(true);
           navigation.replace('Verification');
         })
         .catch(() => {
-          setIsRegistraionSuccess(false);
+          setSuccessful(false);
         });
     }
+    }, 3000);
   };
+
+     
+  const handleOnChange = (text, input) => {
+    setInputs((prevState) => ({ ...prevState, [input]: text }));
+  };
+
+  const handleError = (errorMessage, input) => {
+    setErrors((prevState) => ({ ...prevState, [input]: errorMessage }));
+  };
+
 
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
-      <StatusBar backgroundColor={COLORS.white} barStyle="dark-content" />
-      <Loader loading={loading} />
+      <StatusBar backgroundColor={COLORS.primary} barStyle="white-content" />
+      <Loader visible={Loading} />
+      <View style={styles.header}>
+        <Text
+          style={{
+            color: COLORS.white,
+            marginTop: 80,
+            marginHorizontal: 15,
+            FONTwEIGHT: 'bold',
+            fontSize: 25,
+          }}
+        >
+          Register
+        </Text>
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: '500',
+            marginBottom: 50,
+            color: COLORS.white,
+            marginHorizontal: 15,
+          }}
+        >
+          Register to get started
+        </Text>
+      </View>
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
@@ -95,80 +149,79 @@ const RegisterScreen = ({props, navigation}) => {
           marginTop: 30,
         }}
       >
-        <View style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-          <Image source={images.lost12} />
-        </View>
-
         <KeyboardAvoidingView enabled>
           <View style={{ marginBottom: 15 }}>
-            <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 10 }}>
-              Register to get started
-            </Text>
             <Input
-              onChangeText={(fullName) => setFullName(fullName)}
-              iconName="user-o"
-              underlineColorAndroid="#f000"
-              placeholder="Enter full Name"
-              placeholderTextColor="#8b9cb5"
-              autoCapitalize="sentences"
-              returnKeyType="next"
-              blurOnSubmit={false}
-            />
-            <Input
-              onChangeText={(email) => setEmail(email)}
               underlineColorAndroid="#f000"
               placeholder="Enter Email"
               autoCapitalize="none"
               iconName="envelope-o"
               placeholderTextColor="#8b9cb5"
               keyboardType="email-address"
-              returnKeyType="next"
-              blurOnSubmit={false}
+              error={errors.email}
+              onFocus={() => {
+                handleError(null, 'email');
+              }}
+              onChangeText={(text) => handleOnChange(text, 'email')}
             />
             <Input
-              onChangeText={(phone) => setPhone(phone)}
-              iconName="mobile"
+              iconName="user-o"
               underlineColorAndroid="#f000"
-              placeholder="Enter phonenumber"
+              placeholder="Full Name"
               placeholderTextColor="#8b9cb5"
-              keyboardType="numeric"
-              returnKeyType="next"
-              blurOnSubmit={false}
+              autoCapitalize="sentences"
+              error={errors.fullName}
+              onFocus={() => {
+                handleError(null, 'fullName');
+              }}
+              onChangeText={(text) => handleOnChange(text, 'fullName')}
+            />
+            <PhoneNumber
+              error={errors.phone}
+              onFocus={() => {
+                handleError(null, 'phone');
+              }}
+              onChangeText={(text) => handleOnChange(text, 'phone')}
             />
             <Input
-              onChangeText={(password) => setPassword(password)}
               underlineColorAndroid="#f000"
               placeholder="Password"
               iconName="lock"
               password
               placeholderTextColor="#8b9cb5"
               autoCapitalize="sentences"
-              returnKeyType="next"
-              blurOnSubmit={false}
+              error={errors.password}
+              onFocus={() => {
+                handleError(null, 'password');
+              }}
+              onChangeText={(text) => handleOnChange(text, 'password')}
             />
             <Input
-              onChangeText={(confirmPassword) => setConfirmPassword(confirmPassword)}
               underlineColorAndroid="#f000"
               placeholder="Confirm password"
               iconName="lock"
               password
               placeholderTextColor="#8b9cb5"
               autoCapitalize="sentences"
-              returnKeyType="next"
-              blurOnSubmit={false}
+              error={errors.confirmPassword}
+              onFocus={() => {
+                handleError(null, 'confirmPassword');
+              }}
+              onChangeText={(text) => handleOnChange(text, 'confirmPassword')}
             />
             <Input
-              onChangeText={(location) => setLocation(location)}
               underlineColorAndroid="#f000"
               placeholder="State"
               placeholderTextColor="#8b9cb5"
               autoCapitalize="sentences"
-              returnKeyType="next"
-              blurOnSubmit={false}
+              error={errors.location}
+              onFocus={() => {
+                handleError(null, 'location');
+              }}
+              onChangeText={(text) => handleOnChange(text, 'location')}
             />
           </View>
-          {errortext != '' ? <Text style={styles.errorTextStyle}>{errortext}</Text> : null}
-          <CustomButton title="Register" onPress={handleSubmitButton} />
+          <CustomButton title="Register" onPress={validate} />
           <View
             style={{
               flexDirection: 'row',
@@ -177,9 +230,19 @@ const RegisterScreen = ({props, navigation}) => {
               marginBottom: 80,
             }}
           >
-            <Text style={{ fontSize: 12 }}>Already register?</Text>
+            <Text style={{ fontSize: 14, marginTop: 20 }}>Already register?</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={{ color: COLORS.primary, fontSizs: 12 }}>Login</Text>
+              <Text
+                style={{
+                  color: COLORS.primary,
+                  fontSizs: 14,
+                  marginTop: 20,
+                  fontWeight: 'bold',
+                  marginLeft: 5,
+                }}
+              >
+                Login
+              </Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -188,7 +251,7 @@ const RegisterScreen = ({props, navigation}) => {
   );
 };
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 export default RegisterScreen;
 
 const styles = StyleSheet.create({
@@ -237,5 +300,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     padding: 30,
+  },
+    header: {
+    backgroundColor: COLORS.primary,
+    marginBotom: 25,
+    borderBottomRightRadius: 100,
+    borderBottomLeftRadius: 50
   },
 });

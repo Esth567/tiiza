@@ -36,7 +36,7 @@ const Input = ({ label, iconName, error, password, onFocus = () => {}, ...props 
           />
         )}
       </View>
-      {error && <Text style={{ color: COLORS.red, ...FONTS.body4, marginTop: 5 }}>{error}</Text>}
+      {error && <Text style={{ color: COLORS.red, fontSize: 12, marginTop: 5 }}>{error}</Text>}
     </View>
   );
 };
@@ -44,12 +44,13 @@ const Input = ({ label, iconName, error, password, onFocus = () => {}, ...props 
 const style = StyleSheet.create({
   inputContainer: {
     height: 45,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderRadius: 18,
     paddingHorizontal: 5,
     flexDirection: 'row',
     alignItems: 'center',
     paddingLeft: 10,
+    borderColor: COLORS.gray,
   },
 });
 

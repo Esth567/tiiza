@@ -10,20 +10,41 @@ import {
   StatusBar,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomBottom from '../component/CustomBottom';
-import { VerifyEmail } from '../utils/Auth';
+import CustomButton from '../component/CustomBotton';
+import { verifyEmail } from '../actions/authAction';
 import images from '../constant/images';
-import OTPInputView from '@twotalltotems/react-native-otp-input'; 
+import { OTPInput } from 'react-native-verify-otp-inputs';
+import { useDispatch, useSelector } from 'react-redux';
 
 
+const Verification = ({ navigation }) => {
+  const [counter, setCounter] = useState(59);
+  
+   const dispatch = useDispatch();
 
-const Verification = () => {
+  useEffect(() => {
+    const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
+    return () => clearInterval(timer);
+  }, [counter]);
 
- 
- 
+    const handleSubmit = (token: string) => {
+  
+    if (token) {
+      dispatch(verifyEmail(token))
+        .then(() => {
+          message.setMessage('Registration successful, please check your email for verification');
+          navigation.navigate('Login');
+        })
+        .catch(() => {
+          setSubmitting(false);
+        });
+    }
+  };
+
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: COLORS.white, paddingTop: 50 }}>
       <StatusBar backgroundColor={COLORS.white} barStyle="dark-content" />
@@ -44,17 +65,30 @@ const Verification = () => {
             }}
           />
         </View>
-        <Text style={{ textAlign: 'center', marginBottom: 50 }}>
-          Please verify your email, Pin has been sent to your email
+        <Text style={{ textAlign: 'center', marginBottom: 20 }}>
+          Please enter the pin sent to your email
         </Text>
-        <CustomBottom title="Verify" />
+        <OTPInput
+          pinCount={6}
+          boxSelectedStyle={style.boxSelectedStyle}
+          boxStyle={style.boxStyle}
+          digitStyle={style.digitStyle}
+          variant="underlined"
+        />
+        <CustomButton onPress={handleSubmit} title="Verify" />
+        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 20}}>
+          <Text style={{ color: COLORS.black, fontSize: 14}}>Didn't get pin?</Text>
+          <TouchableOpacity activeOpacity={0.5}>
+            <Text style={style.buttonTextStyle}>Resend pin</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
-}
+};
 
-const {width} = Dimensions.get('window')
-const inputWidth = Math.round(width / 9)
+const { width } = Dimensions.get('window');
+const inputWidth = Math.round(width / 9);
 
 const style = StyleSheet.create({
   inputContainer: {
@@ -69,18 +103,37 @@ const style = StyleSheet.create({
     marginBottom: 30,
   },
   borderStyleHighLighted: {
-    borderColor: "#03DAC6",
+    borderColor: COLORS.gray,
   },
-
-  underlineStyleBase: {
-    width: 30,
+  boxSelectedStyle: {
+    backgroundColor: COLORS.primary,
+  },
+  boxStyle: {
+    borderRadius: 8,
+  },
+  digitStyle: {
+    color: 'gray',
+  },
+  successTextStyle: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 18,
+    padding: 30,
+  },
+  buttonStyle: {
+    backgroundColor: COLORS.primary,
+    color: '#FFFFFF',
     height: 45,
-    borderWidth: 0,
-    borderBottomWidth: 1,
+    alignItems: 'center',
+    borderRadius: 30,
+    marginTop: 10,
+    width: inputWidth * 9,
   },
-
-  underlineStyleHighLighted: {
-    borderColor: "#03DAC6",
+  buttonTextStyle: {
+    color: COLORS.black,
+    fontSize: 14,
+    marginLeft: 5,
+    fontWeight: 'bold'
   },
 });
 

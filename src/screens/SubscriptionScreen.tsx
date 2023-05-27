@@ -1,8 +1,8 @@
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomButton from '../component/CustomBottom';
+import CustomButton from '../component/CustomBotton';
 
 const SubscriptionScreen = () => {
   return (
@@ -296,7 +296,7 @@ const SubscriptionScreen = () => {
       </ScrollView>
     </View>
   );
-}
+};
 const style = StyleSheet.create({
   container: {
     height: 201,
@@ -319,7 +319,7 @@ const style = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: COLORS.secondary,
     width: '100%',
-   marginTop: 15,
+    marginTop: 15,
   },
   container2: {
     height: 240,

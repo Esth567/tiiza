@@ -1,26 +1,33 @@
 import RegisterScreen from './RegisterScreen';
 import LoginScreen from './LoginScreen';
 import Dashboard from './Dashboard';
-import Report from './Report';
-import FoundDetails from './FoundDetails';
-import CategoryScreen from './CategoryScreen';
-import DetailsScreen from './DetailsScreen';
+import LostReport from './LostReport';
+import LostDetail from './LostDetail';
 import ForgotPassword from './ForgotPassword';
 import SplashScreen from './SplashScreen';
 import HelpScreen from './HelpScreen';
 import ItemDetails from './ItemDetails';
 import Verification from './Verification';
+import FoundReport from './FoundReport';
+import FoundDetail from './FoundDetails';
+import SeeallScreen from './SeeallScreen';
+import PhoneNumber from './PhoneNumber';
+import SmsOtp from './SmsVerify';
 
 export {
   RegisterScreen,
   LoginScreen,
   Dashboard,
-  CategoryScreen,
-  Report,
-  DetailsScreen,
+  LostReport,
+  LostDetail,
   ForgotPassword,
   SplashScreen,
   HelpScreen,
   ItemDetails,
   Verification,
+  FoundReport,
+  FoundDetail,
+  SeeallScreen,
+  PhoneNumber,
+  SmsOtp,
 };

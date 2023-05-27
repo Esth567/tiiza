@@ -4,12 +4,17 @@ import {
   LOGIN_SUCCESS,
   LOGIN_FAIL,
   LOGOUT,
+  OTP_SUCCESS,
+  OTP_FAIL,
 } from '../actions/types';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const user = AsyncStorage.getItem('user');
 
-const initialState = user ? { isLoggedIn: true, user } : { isLoggedIn: false, user: null };
+const initialState = user
+  ? { isLoggedIn: true, user }
+  : { isLoggedIn: false, user: null };
 
 export default function (state = initialState, action) {
   const { type, payload } = action;

@@ -6,4 +6,9 @@ export const LOGOUT = 'LOGOUT';
 
 export const SET_MESSAGE = 'SET_MESSAGE';
 export const CLEAR_MESSAGE = 'CLEAR_MESSAGE';
+export const OTP_SUCCESS = 'OTP_SUCCESS';
+export const OTP_FAIL = 'OTP_SUCCESS';
 
+export const GETALL_REQUEST = 'GETALL_REQUEST';
+export const GETALL_SUCCESS = 'GETALL_SUCCESS';
+export const GETALL_FAILURE = 'GETALL_FAILURE';

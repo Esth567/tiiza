@@ -1,26 +1,16 @@
+import { GETALL_FAILURE, GETALL_REQUEST, GETALL_SUCCESS, SET_MESSAGE } from "./types";
+import { userServices } from "../services/userServices";
 
-import {
-  REGISTER_SUCCESS,
-  REGISTER_FAIL,
-  LOGIN_SUCCESS,
-  LOGIN_FAIL,
-  LOGOUT,
-  SET_MESSAGE,
-} from './types';
-
-
-import authServices from '../services/auth.services';
-
-export const register = (fullname, email, phone, password, confirmPassword, location) => (dispatch) => {
-  return authServices.register(fullname, email, phone, password, confirmPassword, location).then(
-    (response) => {
+export const fetchFoundItems = (email, user_id) => (dispatch) => {
+  return userServices.fetchFoundItems(email, user_id).then(
+    (data) => {
       dispatch({
-        type: REGISTER_SUCCESS,
+        type: GETALL_REQUEST,
       });
 
       dispatch({
-        type: SET_MESSAGE,
-        payload: response.data.message,
+        type: GETALL_SUCCESS,
+        payload: { res: data },
       });
 
       return Promise.resolve();
@@ -32,9 +22,8 @@ export const register = (fullname, email, phone, password, confirmPassword, loca
         error.toString();
 
       dispatch({
-        type: REGISTER_FAIL,
+        type: GETALL_FAILURE,
       });
-
       dispatch({
         type: SET_MESSAGE,
         payload: message,
@@ -45,11 +34,15 @@ export const register = (fullname, email, phone, password, confirmPassword, loca
   );
 };
 
-export const login = (email, password) => (dispatch) => {
-  return authServices.login(email, password).then(
+export const fetchLostItems = (email) => (dispatch) => {
+  return userServices.fetchLostItems(email).then(
     (data) => {
       dispatch({
-        type: LOGIN_SUCCESS,
+        type: GETALL_REQUEST,
+      });
+
+      dispatch({
+        type: GETALL_SUCCESS,
         payload: { user: data },
       });
 
@@ -62,9 +55,8 @@ export const login = (email, password) => (dispatch) => {
         error.toString();
 
       dispatch({
-        type: LOGIN_FAIL,
+        type: GETALL_FAILURE,
       });
-
       dispatch({
         type: SET_MESSAGE,
         payload: message,
@@ -75,10 +67,4 @@ export const login = (email, password) => (dispatch) => {
   );
 };
 
-export const logout = () => (dispatch) => {
-  authServices.logout();
 
-  dispatch({
-    type: LOGOUT,
-  });
-};

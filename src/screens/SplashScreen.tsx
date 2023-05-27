@@ -24,7 +24,7 @@ const SplashScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.white} barStyle="dark-content" />
-      <Image source={images.tiizLogo} style={{ width: '30%', resizeMode: 'contain' }} />
+      <Image source={images.logo} style={{ width: '30%', resizeMode: 'contain' }} />
       <ActivityIndicator
         animating={animating}
         color="#FFFFFF"
