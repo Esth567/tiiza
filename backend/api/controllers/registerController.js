@@ -71,7 +71,7 @@ const registerController = asyncWrapper(async (req, res, next) => {
     homeUrl: process.env.DOMAIN_NAME,
     currentYear: new Date().getFullYear(),
     itemName: 'Email Confirmation',
-    emailTitle: 'Account Security: OTP Authentication',
+    emailTitle: 'Account Security Notification: OTP Authentication',
     email,
     req,
   };

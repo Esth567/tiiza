@@ -1,29 +1,27 @@
 const express = require('express');
 require('dotenv').config();
 const app = express();
-const cookiePasser = require('cookie-parser');
 const routes = require('./api');
-const {connectDb} = require('./db/connect');
+const { connectDb } = require('./db/connect');
 const session = require('express-session');
 const passport = require('passport');
 const swaggerUI = require('swagger-ui-express');
 const YAML = require('yamljs');
 const swaggerJSDocs = YAML.load('./apiDocs.yaml');
-const SequelizeStore = require('connect-session-sequelize')(
-  session.Store,
-);
-const {sequelize} = require('./db/connect');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const { sequelize } = require('./db/connect');
 const requestIp = require('request-ip');
 const PORT = process.env.PORT || 4000;
 const errorHandler = require('./middleware/errorHandler');
 const cors = require('cors');
-const {createServer} = require('http');
-const {Server} = require('socket.io');
-const {logger} = require('./utils/winstonLogger');
-const {logRequest} = require('./middleware/logRequest');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const { logger } = require('./utils/winstonLogger');
+const { logRequest } = require('./middleware/logRequest');
 const path = require('path');
 const worker = require('./services/worker');
 const httpServer = createServer(app);
+
 const io = new Server(httpServer, {
   /* options */
 });
@@ -49,9 +47,8 @@ app.use(express.static('public'));
 console.log(path.join(__dirname, 'public'));
 app.use(logRequest);
 
-app.use(cookiePasser());
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(requestIp.mw());
 app.use(function (err, req, res, next) {
   const requestId = res.getHeader('X-request-Id');
@@ -99,7 +96,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
-  }),
+  })
 );
 app.use(passport.initialize());
 app.use(passport.session());
