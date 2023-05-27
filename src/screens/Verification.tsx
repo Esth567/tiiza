@@ -15,10 +15,8 @@ import {
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomButton from '../component/CustomBotton';
-import { verifyEmail } from '../actions/authAction';
 import images from '../constant/images';
 import { OTPInput } from 'react-native-verify-otp-inputs';
-import { useDispatch, useSelector } from 'react-redux';
 
 
 const Verification = ({ navigation }) => {

@@ -4,7 +4,7 @@ import { RegisterScreen, LoginScreen, Verification, PhoneNumber, SmsOtp } from '
 const AuthNavigator = () => {
   const AuthStack = createNativeStackNavigator();
   return (
-    <AuthStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Register">
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="Register" component={RegisterScreen} />
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="PhoneNumber" component={PhoneNumber} />

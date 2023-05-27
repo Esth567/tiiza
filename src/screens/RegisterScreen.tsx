@@ -1,107 +1,125 @@
-import React, { useState, useRef } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
-  StyleSheet,
-  TextInput,
   View,
   Text,
-  Image,
-  KeyboardAvoidingView,
-  Keyboard,
   TouchableOpacity,
+  Image,
+  FlatList,
+  Modal,
   ScrollView,
-  Dimensions,
-  SafeAreaView,
   StatusBar,
+  TextInput,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  ActivityIndicator,
+  Button,
+  Keyboard,
+  Alert,
 } from 'react-native';
-import Input from '../component/Input';
-import CustomButton from '../component/CustomBotton';
 import { COLORS } from '../constant/theme';
-import images from '../constant/images';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Verification from './Verification';
-import { register } from '../actions/authAction';
-import { useDispatch, useSelector } from 'react-redux';
-import PhoneNumber from './PhoneNumber';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Input from '../component/Input'
+import CustomBotton from '../component/CustomBotton';
 import Loader from '../component/Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons';
+import axios from 'axios';
 
+const SignUp = ({ navigation }) => {
+  const [inputs, setInputs] = React.useState({
+    email: '',
+    fullName: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    location: '',
+  });
 
-const RegisterScreen = ({ navigation }) => {
+  const [errors, setErrors] = React.useState({});
+  const [Loading, setLoading] = React.useState(false);
+  const [registerStatus, setRegisterStatus] = React.useState('');
+  const [message, setMessage] = useState('');
 
-    
-   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState('');
-   const [phone, setPhone] = useState('');
-   const [password, setPassword] = useState("");
-   const [confirmPassword, setConfirmPassword] = useState('');
-   const [successful, setSuccessful] = useState(false);
-
-     const [errors, setErrors] = React.useState({});
-     const [Loading, setLoading] = React.useState(false);
-      const [message, setMessage] = useState('');
-
-   const dispatch = useDispatch();
-
-   const validate = () => {
-         Keyboard.dismiss();
-         let valid = true;
-         if (!email) {
-           handleError('Please enter email', 'email');
-           valid = false;
-         } else if (!inputs.email.match(/\S+@\S+\.\S+/)) {
-           handleError('Please input valid email', 'email');
-           valid = false;
-         }
-         if (!fullName) {
-            handleError('Please input Full Name', 'fullName');
-            valid = false;
-         }
-         if (!phone) {
-           handleError('Please input Phone Number', 'phone');
-           valid = false;
-         }
-         if (!password) {
-           handleError('Please input password', 'password');
-           valid = false;
-         } else if (inputs.password.length < 8) {
-           handleError('Min password length of 8', 'password');
-           valid = false;
-         }
-         if (!confirmPassword) {
-           handleError('Please confirm password', 'confirmPassword');
-           valid = false;
-         } else if (!inputs['password'] != inputs['confirmPassword']) {
-           valid = false;
-           errors['confirmPassword'] = "Passwords don't match.";
-         }
-            if (!location) {
-              handleError('Please enter location', 'location');
-              valid = false;
-            }
-
-         if (valid) {
-           signUp();
-         }
-   }; 
-
-     const signUp = () => {
-       setLoading(true);
-       setTimeout(() => {
-         setLoading(false);
-    if (fullName && email && phone && password && confirmPassword && location) {
-      dispatch(register(fullName, email, phone, password, confirmPassword, location))
-        .then(() => {
-          console.log();
-          setSuccessful(true);
-          navigation.replace('Verification');
-        })
-        .catch(() => {
-          setSuccessful(false);
-        });
+  const validate = () => {
+    setMessage('');
+    Keyboard.dismiss();
+    let valid = true;
+     if (!inputs.email) {
+      handleError('Please enter email', 'email');
+      valid = false;
+    } else if (!inputs.email.match(/\S+@\S+\.\S+/)) {
+      handleError('Please input valid email', 'email');
+      valid = false;
     }
+    if (!inputs.fullName) {
+      handleError('Please input First Name', 'fullName');
+      valid = false;
+    }
+    if (!inputs.phone) {
+      handleError('Please input phone number', 'phone');
+      valid = false;
+    }
+    if (!inputs.password) {
+      handleError('Please input password', 'password');
+      valid = false;
+    } else if (inputs.password.length < 8) {
+      handleError('Min password length of 8', 'password');
+      valid = false;
+    }
+       if (!inputs.confirmPassword) {
+         handleError('Please confirm password', 'confirmPassword');
+         valid = false;
+       }
+          if (!inputs.location) {
+            handleError('Please enter your location', 'location');
+            valid = false;
+          }
+
+    if (valid) {
+      register();
+    }
+  };
+
+  const register = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+
+      fetch('http://192.168.43.95:5000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputs),
+      })
+        .then(async (res) => {
+          console.log(res);
+          try {
+            const jsonRes = await res.json();
+            if (res.status !== 200) {
+              setErrors(true);
+              setMessage(jsonRes.message);
+            } else {
+              setErrors(false);
+              setMessage(jsonRes.message);
+            }
+            navigation.navigate('Login');
+          } catch (err) {
+            console.log(err);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }, 3000);
   };
 
-     
+  const getMessage = () => {
+    const status = error ? `Error: ` : `Success: `;
+    return status + message;
+  };
+
   const handleOnChange = (text, input) => {
     setInputs((prevState) => ({ ...prevState, [input]: text }));
   };
@@ -110,201 +128,124 @@ const RegisterScreen = ({ navigation }) => {
     setErrors((prevState) => ({ ...prevState, [input]: errorMessage }));
   };
 
-
-
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
-      <StatusBar backgroundColor={COLORS.primary} barStyle="white-content" />
+    <View style={{ backgroundColor: COLORS.white, flex: 1, paddingTop: 3 }}>
+      <StatusBar backgroundColor={COLORS.white} barStyle="dark-content" />
       <Loader visible={Loading} />
-      <View style={styles.header}>
-        <Text
-          style={{
-            color: COLORS.white,
-            marginTop: 80,
-            marginHorizontal: 15,
-            FONTwEIGHT: 'bold',
-            fontSize: 25,
-          }}
-        >
-          Register
-        </Text>
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: '500',
-            marginBottom: 50,
-            color: COLORS.white,
-            marginHorizontal: 15,
-          }}
-        >
-          Register to get started
-        </Text>
-      </View>
       <ScrollView
-        keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
-          justifyContent: 'center',
-          alignContent: 'center',
-          marginHorizontal: 15,
-          marginTop: 30,
+          paddingTop: 30,
+          paddingHorizontal: 20,
         }}
       >
-        <KeyboardAvoidingView enabled>
-          <View style={{ marginBottom: 15 }}>
-            <Input
-              underlineColorAndroid="#f000"
-              placeholder="Enter Email"
-              autoCapitalize="none"
-              iconName="envelope-o"
-              placeholderTextColor="#8b9cb5"
-              keyboardType="email-address"
-              error={errors.email}
-              onFocus={() => {
-                handleError(null, 'email');
-              }}
-              onChangeText={(text) => handleOnChange(text, 'email')}
-            />
-            <Input
-              iconName="user-o"
-              underlineColorAndroid="#f000"
-              placeholder="Full Name"
-              placeholderTextColor="#8b9cb5"
-              autoCapitalize="sentences"
-              error={errors.fullName}
-              onFocus={() => {
-                handleError(null, 'fullName');
-              }}
-              onChangeText={(text) => handleOnChange(text, 'fullName')}
-            />
-            <PhoneNumber
-              error={errors.phone}
-              onFocus={() => {
-                handleError(null, 'phone');
-              }}
-              onChangeText={(text) => handleOnChange(text, 'phone')}
-            />
-            <Input
-              underlineColorAndroid="#f000"
-              placeholder="Password"
-              iconName="lock"
-              password
-              placeholderTextColor="#8b9cb5"
-              autoCapitalize="sentences"
-              error={errors.password}
-              onFocus={() => {
-                handleError(null, 'password');
-              }}
-              onChangeText={(text) => handleOnChange(text, 'password')}
-            />
-            <Input
-              underlineColorAndroid="#f000"
-              placeholder="Confirm password"
-              iconName="lock"
-              password
-              placeholderTextColor="#8b9cb5"
-              autoCapitalize="sentences"
-              error={errors.confirmPassword}
-              onFocus={() => {
-                handleError(null, 'confirmPassword');
-              }}
-              onChangeText={(text) => handleOnChange(text, 'confirmPassword')}
-            />
-            <Input
-              underlineColorAndroid="#f000"
-              placeholder="State"
-              placeholderTextColor="#8b9cb5"
-              autoCapitalize="sentences"
-              error={errors.location}
-              onFocus={() => {
-                handleError(null, 'location');
-              }}
-              onChangeText={(text) => handleOnChange(text, 'location')}
-            />
-          </View>
-          <CustomButton title="Register" onPress={validate} />
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 80,
+        <Text style={{ paddingTop: 20, color: COLORS.black, ...FONTS.h1, fontWeight: 'bold' }}>
+          Sign Up
+        </Text>
+        <Text style={{ paddingTop: 5, color: COLORS.black, ...FONTS.body4 }}>
+          Signup and get started
+        </Text>
+        <View style={{ marginVertical: 20, paddingTop: 10 }}>
+          <Input
+            placeholder="Enter email"
+            iconName="email"
+            autoCapitalize="none"
+            error={errors.email}
+            onFocus={() => {
+              handleError(null, 'email');
             }}
-          >
-            <Text style={{ fontSize: 14, marginTop: 20 }}>Already register?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text
-                style={{
-                  color: COLORS.primary,
-                  fontSizs: 14,
-                  marginTop: 20,
-                  fontWeight: 'bold',
-                  marginLeft: 5,
-                }}
-              >
-                Login
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
+            onChangeText={(text) => handleOnChange(text, 'email')}
+          />
+          <Input
+            placeholder="FullName"
+            iconName="person-outline"
+            error={errors.fullName}
+            onFocus={() => {
+              handleError(null, 'fullName');
+            }}
+            onChangeText={(text) => handleOnChange(text, 'fullName')}
+          />
+          <Input
+            keyboardType="numeric"
+            placeholder="PhoneNumber"
+            iconName="phone"
+            error={errors.phone}
+            onFocus={() => {
+              handleError(null, 'phone');
+            }}
+            onChangeText={(text) => handleOnChange(text, 'phone')}
+          />
+          <Input
+            placeholder="Password"
+            iconName="lock-outline"
+            password
+            error={errors.password}
+            onFocus={() => {
+              handleError(null, 'password');
+            }}
+            onChangeText={(text) => handleOnChange(text, 'password')}
+          />
+          <Input
+            placeholder="Confirm Password"
+            iconName="lock-outline"
+            password
+            error={errors.confirmPassword}
+            onFocus={() => {
+              handleError(null, 'confirmPassword');
+            }}
+            onChangeText={(text) => handleOnChange(text, 'confirmPassword')}
+          />
+          <Input
+            placeholder="State"
+            iconName="lock-outline"
+            password
+            error={errors.location}
+            onFocus={() => {
+              handleError(null, 'location');
+            }}
+            onChangeText={(text) => handleOnChange(text, 'location')}
+          />
+        </View>
+        <View style={{ flexDirection: 'row', paddingTop: 2 }}>
+          <TouchableOpacity
+            style={{
+              height: 18,
+              width: 19,
+              backgroundColor: COLORS.white,
+              borderRadius: SIZES.radius / 10,
+              borderWidth: 1,
+              marginTop: 0.2,
+              marginRight: 7,
+              borderColor: COLORS.primary,
+            }}
+          ></TouchableOpacity>
+          <Text style={{ color: COLORS.black, ...FONTS.body4, marginTop: 0.2 }}>
+            By signing you accept the
+          </Text>
+          <Text style={{ color: COLORS.red, ...FONTS.body4, paddingLeft: 3, marginTop: 0.2 }}>
+            Terms of service
+          </Text>
+          <Text style={{ color: COLORS.black, ...FONTS.body4, paddingLeft: 3, marginTop: 0.2 }}>
+            and
+          </Text>
+        </View>
+        <Text style={{ color: COLORS.red, ...FONTS.body4, paddingLeft: 27 }}>Private Policy</Text>
+        <CustomButton title="Sign Up" onPress={validate} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+          <Text style={{ color: COLORS.black, ...FONTS.body4, paddingLeft: 50 }}>
+            Already have an account?
+          </Text>
+          <TouchableOpacity>
+            <Text
+              onPress={() => navigation.navigate('Login')}
+              style={{ color: COLORS.primary, ...FONTS.body4 }}
+            >
+              Login
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
-const { width, height } = Dimensions.get('window');
-export default RegisterScreen;
-
-const styles = StyleSheet.create({
-  SectionStyle: {
-    flexDirection: 'row',
-    height: 40,
-    marginTop: 20,
-    marginLeft: 35,
-    marginRight: 35,
-    margin: 10,
-  },
-  buttonStyle: {
-    backgroundColor: '#7DE24E',
-    borderWidth: 0,
-    color: '#FFFFFF',
-    borderColor: '#7DE24E',
-    height: 40,
-    alignItems: 'center',
-    borderRadius: 30,
-    marginLeft: 35,
-    marginRight: 35,
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  buttonTextStyle: {
-    color: '#FFFFFF',
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  inputStyle: {
-    flex: 1,
-    color: 'white',
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderWidth: 1,
-    borderRadius: 30,
-    borderColor: '#dadae8',
-  },
-  errorTextStyle: {
-    color: 'red',
-    textAlign: 'center',
-    fontSize: 14,
-  },
-  successTextStyle: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 18,
-    padding: 30,
-  },
-    header: {
-    backgroundColor: COLORS.primary,
-    marginBotom: 25,
-    borderBottomRightRadius: 100,
-    borderBottomLeftRadius: 50
-  },
-});
+export default SignUp;

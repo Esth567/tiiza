@@ -20,10 +20,6 @@ import CustomBottom from '../component/CustomBotton';
 import { COLORS } from '../constant/theme';
 import images from '../constant/images';
 import axios from 'axios';
-import { login } from '../actions/authAction';
-import { useSelector, useDispatch } from 'react-redux';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {

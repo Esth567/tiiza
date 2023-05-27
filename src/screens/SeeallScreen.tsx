@@ -25,6 +25,8 @@ import { useDispatch } from 'react-redux';
 const WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(WIDTH * 0.45);
 
+const APP_URL = 'http://localhost:5000/api/v1/fetch/found-items';
+
 const SeeallScreen =({navigation} : any)=> {
   type ItemData = {
     id: string;
@@ -93,22 +95,20 @@ const SeeallScreen =({navigation} : any)=> {
 
   useEffect(() => {
     setIsLoading(true);
-    fetchData();
+    fetchData(APP_URL);
   }, []);
 
   const fetchData = async () => {
-    const APP_URL = 'http://192.168.43.95:5000/api/v1/fetch/lost-items';
-    fetch(APP_URL)
-    .then((response) => response.json())
-    .then((responseJson) => {
-      setData(responseJson);
-      console.log(responseJson);
-      setIsLoading(false);
-      setFullData(responseJson);
-    }).catch((error) => {
+    try {
+      const response = await fetch(url);
+      const json = await response.json();
+      setData(json.results);
+
+      console.log(json.results);
+    } catch (error) {
+      setError(error);
       console.log(error);
-       setIsLoading(false);
-    })
+    }
   };
   
     if (isLoading) {
@@ -129,13 +129,6 @@ const SeeallScreen =({navigation} : any)=> {
     );
   }
 
-  const ListEmptyComponent = () => {
-    return (
-      <View>
-        <Message info message= 'No item found' />
-      </View>
-    )
-  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -190,8 +183,7 @@ const SeeallScreen =({navigation} : any)=> {
           <FlatList
             data={data}
             renderItem={renderItem}
-            keyExtractor={(item) => string(item.item_id)}
-            ListEmptyComponent={ListEmptyComponent}
+            keyExtractor={(item) => (item.payload.item_id)}
           />
         </View>
       </ScrollView>

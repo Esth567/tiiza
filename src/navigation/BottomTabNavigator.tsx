@@ -1,7 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Image, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS } from '../constant/theme';
 import SubscriptionScreen from '../screens/SubscriptionScreen';

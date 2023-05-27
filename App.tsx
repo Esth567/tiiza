@@ -6,21 +6,36 @@
  */
 
 import React from 'react';
-import AppNav from './src/navigation/AppNav';
-import store from './src/store';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Provider as StoreProvider } from 'react-redux';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import BottomTabNavigator from './BottomTabNavigator';
+import AuthNavigator from './AuthNavigator';
+import { SplashScreen } from '../screens';
+
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    border: 'transparent',
+  },
+};
 
 
+const Stack = createNativeStackNavigator();
 
 const App = () => {
-  return (
-    <StoreProvider store={store}>
-      <SafeAreaProvider style={{ flex: 1 }}>
-        <AppNav />
-      </SafeAreaProvider>
-    </StoreProvider>
-  );
+ return (
+   <NavigationContainer theme={theme}>
+     <Stack.Navigator>
+       <Stack.Screen
+         name="BottomTabNavigator"
+         component={BottomTabNavigator}
+         // Hiding header for Bottom tab Navigation
+         options={{ headerShown: false }}
+       />
+     </Stack.Navigator>
+   </NavigationContainer>
+ );
 };
 
 export default App;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Button, Text } from 'react-native';
 import { OTPInput } from 'react-native-verify-otp-inputs';
-import { checkVerification } from '../actions/authAction';
+
 
 const SmsOtp = ({ route, navigation }) => {
   const { phoneNumber } = route.params;
@@ -20,7 +20,7 @@ const SmsOtp = ({ route, navigation }) => {
         codeInputFieldStyle={styles.underlineStyleBase}
         codeInputHighlightStyle={styles.underlineStyleHighLighted}
         onCodeFilled={(code) => {
-          checkVerification(phoneNumber, code).then((success) => {
+          (phoneNumber, code).then((success) => {
             if (!success) setInvalidCode(true);
             success && navigation.replace('Login');
           });
