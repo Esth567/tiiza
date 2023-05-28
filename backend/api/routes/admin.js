@@ -4,7 +4,7 @@ const VerifyUser = require('../../middleware/auth');
 const {
   adminFetchSubscriptionCtrl,
   adminFetchFoundItemsCtrl,
-  adminFetchCustomersCtrl,
+  adminFetchUsersCtrl,
   adminFetchLostItemsCtrl,
   adminCreateUserCtrl,
   adminUpdateItemCtrl,
@@ -18,7 +18,7 @@ router.get(
   '/admin/fetch/users',
   VerifyUser.ensureAuthenticated,
   VerifyUser.isAdmin,
-  adminFetchCustomersCtrl
+  adminFetchUsersCtrl
 );
 router.get(
   '/admin/fetch/lost-items',
