@@ -160,14 +160,16 @@ const adminUpdateItemCtrl = asyncWrapper(async (req, res, next) => {
 });
 // ======================||FETCH CUSTOMERS ||=============================
 
-const adminFetchCustomersCtrl = asyncWrapper(async (req, res, next) => {
-  const customers = await UserModel.findAll({
-    exclude: ['password', 'user_role', 'user_id'],
+const adminFetchUsersCtrl = asyncWrapper(async (req, res, next) => {
+  const users = await UserModel.findAll({
+    attributes: {
+      exclude: ['password', 'user_id'],
+    },
   });
 
-  if (customers.length == 0) return next(createCustomError('No customer found', 404));
+  if (users.length == 0) return next(createCustomError('No customer found', 404));
 
-  res.status(200).json({ success: true, payload: customers });
+  res.status(200).json({ success: true, payload: users });
 });
 // ======================||SUBSCRIPTIONS ||=============================
 const adminFetchSubscriptionCtrl = asyncWrapper(async (req, res, next) => {
@@ -334,7 +336,7 @@ const adminFetchActivities = asyncWrapper(async (req, res, next) => {
   return res.status(200).json({ success: true, payload: activities });
 });
 module.exports = {
-  adminFetchCustomersCtrl,
+  adminFetchUsersCtrl,
   adminFetchFoundItemsCtrl,
   adminFetchLostItemsCtrl,
   adminFetchSubscriptionCtrl,
