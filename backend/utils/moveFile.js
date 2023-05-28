@@ -3,7 +3,7 @@ const path = require('path');
 require('dotenv').config();
 
 const moveFile = (req, res) => {
-  const {filename} = req.session.fileData;
+  const { filename } = req.session.fileData;
 
   const tempFilePath = path.join(__dirname, '..', 'tmp', filename);
   const newFilePath = path.join(
@@ -13,7 +13,7 @@ const moveFile = (req, res) => {
     'lost_and_found',
     'lost',
     req.user.email,
-    filename,
+    filename
   );
 
   req.session.newFilePath = {
@@ -24,7 +24,7 @@ const moveFile = (req, res) => {
     .then(() => {
       return true;
     })
-    .catch(error => {
+    .catch((error) => {
       // console.error(error);
       return false;
     });
@@ -36,17 +36,19 @@ function renameFile(tempFilePath, newFilePath) {
     const folderPath = path.dirname(newFilePath);
 
     if (!fs.existsSync(folderPath)) {
-      fs.mkdirSync(folderPath, {recursive: true});
+      fs.mkdirSync(folderPath, { recursive: true });
     }
 
-    fs.rename(tempFilePath, newFilePath, err => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
+    setTimeout(() => {
+      fs.rename(tempFilePath, newFilePath, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    }, 500);
   });
 }
 
-module.exports = {moveFile};
+module.exports = { moveFile };

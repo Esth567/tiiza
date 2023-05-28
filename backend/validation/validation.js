@@ -289,7 +289,7 @@ class LostItemRegistrationValidator extends Validation {
       item_name: joi.string().required(),
       item_worth: joi.string().required(),
       lost_date: joi.date().required(),
-      lost_location: joi.string().min(2).max(200).required(),
+      lost_location: joi.string().min(3).max(200).required(),
       phone_number: joi
         .string()
         .pattern(/^(\+?\d{1,3}[- ]?)?\d{11}$/)
@@ -315,9 +315,9 @@ class FoundItemRegistrationValidator extends Validation {
   schema() {
     return joi.object({
       item_name: joi.string().required(),
-      item_worth: joi.string().required(),
+      discovery_location: joi.string().min(3).max(200).required(),
       date_found: joi.date().required(),
-      pickup_location: joi.string().min(2).max(200).required(),
+      pickup_location: joi.string().min(3).max(200).required(),
       phone_number: joi
         .string()
         .pattern(/^(\+?\d{1,3}[- ]?)?\d{11}$/)
@@ -351,6 +351,22 @@ class SubscriptionValidator extends Validation {
     return validateSchema.validate(this.data);
   }
 }
+
+class DateValidator {
+  constructor(input) {
+    this.input = input;
+  }
+
+  validate() {
+    const [year, month, day] = this.input.split('-');
+    const date = new Date(year, month - 1, day);
+    return (
+      date.getFullYear() === Number(year) &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === Number(day)
+    );
+  }
+}
 module.exports = {
   FoundItemRegistrationValidator,
   LostItemRegistrationValidator,
@@ -363,4 +379,5 @@ module.exports = {
   LoginValidator,
   EmailValidator,
   PhoneValidator,
+  DateValidator,
 };

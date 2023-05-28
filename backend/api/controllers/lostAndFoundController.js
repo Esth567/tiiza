@@ -14,15 +14,13 @@ const { logger } = require('../../utils/winstonLogger');
 const {
   LostItemRegistrationValidator,
   FoundItemRegistrationValidator,
+  DateValidator,
 } = require('../../validation/validation');
-const { errorMonitor } = require('stream');
 
 //==================================================== || REGISTER LOST ITEM || ===================================================================
 
 const lostItemCtrl = asyncWrapper(async (req, res, next) => {
   if (!req.file) return next(createCustomError('Missing Attachment', 400));
-  const { path } = req.file;
-
   let {
     item_name,
     item_worth,
@@ -42,10 +40,10 @@ const lostItemCtrl = asyncWrapper(async (req, res, next) => {
   if (isNaN(item_worth))
     return next(createCustomError('Please enter a  valid  amount for your item worth', 400));
   item_worth = parseFloat(item_worth);
-
   //check for invalid date
   const date = new Date(lost_date);
-  if (isNaN(date.getTime()))
+  const isDateValid = new DateValidator(lost_date).validate();
+  if (!isDateValid)
     return res.status(400).send({ success: false, payload: 'Please Enter a valid date' });
   if (!req.file)
     return res.status(400).send({ success: false, payload: 'Please select an image file' });
@@ -123,7 +121,7 @@ const fetchCustomerLostItemsCtrl = asyncWrapper(async (req, res) => {
   const customersItems = await LostItemModel.findAll({
     where: {
       customer_email: email,
-      is_approved: true,
+      // is_approved: true,
       // is_found: false,
     },
   });
@@ -134,7 +132,7 @@ const fetchCustomerLostItemsCtrl = asyncWrapper(async (req, res) => {
 
 //========================================================== || FOUND SECTION || ===================================================================
 
-const foundLostItemCtrl = asyncWrapper(async (req, res) => {
+const foundLostItemCtrl = asyncWrapper(async (req, res, next) => {
   const {
     item_name,
     discovery_location,
@@ -150,13 +148,10 @@ const foundLostItemCtrl = asyncWrapper(async (req, res) => {
   if (error) return next(createCustomError(error.message, 400));
   //check for invalid date
   const date = new Date(date_found);
-  if (isNaN(date.getTime()))
+  const isDateValid = new DateValidator(date_found).validate();
+  if (!isDateValid)
     return res.status(400).send({ success: false, payload: 'Please Enter a valid date' });
-  if (description.length < 6 || description.length > 200)
-    return res.status(400).send({
-      success: false,
-      payload: 'Please enter a valid description for your item',
-    });
+
   if (!req.file)
     return res.status(400).send({ success: false, payload: 'Please select an image file' });
   let { destination, path, filename } = req.file;
