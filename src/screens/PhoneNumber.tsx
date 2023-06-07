@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, Dimensions } from 'react-native';
 import { COLORS } from '../constant/theme';
-import PhoneInput from 'react-native-phone-number-input';
+import PhoneInput, { isValidNumber } from 'react-native-phone-number-input';
 
 const WIDTH = Dimensions.get('window').width + 80;
 const inputWidth = Math.round(WIDTH * 75);

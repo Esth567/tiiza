@@ -1,41 +1,72 @@
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Button, Text } from 'react-native';
 import { OTPInput } from 'react-native-verify-otp-inputs';
+import { COLORS } from '../constant/theme';
 
 
 const SmsOtp = ({ route, navigation }) => {
-  const { phoneNumber } = route.params;
+
   const [invalidCode, setInvalidCode] = useState(false);
+
+  const verifyOtp = async (token) => {
+    try {
+      const data = JSON.stringify({ token });
+
+      const response = await fetch('http://192.168.43.95:5000/api/v1/customer/validate-sms-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: data,
+      });
+
+      const json = await response.json();
+      return json.success;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
+
   return (
-    <SafeAreaView style={styles.wrapper}>
-      <Text style={styles.prompt}>Enter the code we sent you</Text>
-      <Text style={styles.message}>
-        {`Your phone (${phoneNumber}) will be used to protect your account each time you log in.`}
-      </Text>
-      <Button title="Edit Phone Number" onPress={() => navigation.replace('PhoneNumber')} />
-      <OTPInput
-        style={{ width: '80%', height: 200 }}
-        pinCount={6}
-        autoFocusOnLoad
-        codeInputFieldStyle={styles.underlineStyleBase}
-        codeInputHighlightStyle={styles.underlineStyleHighLighted}
-        onCodeFilled={(code) => {
-          (phoneNumber, code).then((success) => {
-            if (!success) setInvalidCode(true);
-            success && navigation.replace('Login');
-          });
-        }}
-      />
-      {invalidCode && <Text style={styles.error}>Incorrect code.</Text>}
+    <SafeAreaView style={style.wrapper}>
+      <Text style={style.prompt}>Enter the code we sent you</Text>
+        <OTPInput
+          onSubmit={(token: string) => {
+            verifyOtp(token).then((success) => {
+              if (!success) setInvalidCode(true);
+              success && navigation.replace('BottomTabNavigator');
+            });
+          }}
+          pinCount={6}
+          boxSelectedStyle={style.boxSelectedStyle}
+          boxStyle={style.boxStyle}
+          digitStyle={style.digitStyle}
+          variant="underlined"
+        />
+      {invalidCode && <Text style={style.error}>Incorrect code.</Text>}
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
+const style = StyleSheet.create({
   wrapper: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  borderStyleHighLighted: {
+    borderColor: COLORS.gray,
+  },
+  boxSelectedStyle: {
+    backgroundColor: COLORS.primary,
+  },
+  boxStyle: {
+    borderRadius: 8,
+  },
+  digitStyle: {
+    color: 'gray',
   },
 
   borderStyleBase: {
@@ -61,7 +92,7 @@ const styles = StyleSheet.create({
   },
 
   prompt: {
-    fontSize: 24,
+    fontSize: 20,
     paddingHorizontal: 30,
     paddingBottom: 20,
   },

@@ -15,11 +15,7 @@ import {
 import React, { useState, useEffect } from 'react'
 import CarouselComponent from '../component/carousel';
 import { COLORS } from '../constant/theme';
-import Card from '../component/Card';
-import MyCard from '../component/Card';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { fetchLostItems, fetchFoundItems } from '../actions/lostAndFound';
-import { useDispatch } from 'react-redux';
 
 
 const WIDTH = Dimensions.get('window').width;
@@ -27,7 +23,7 @@ const ITEM_WIDTH = Math.round(WIDTH * 0.45);
 
 const APP_URL = 'http://localhost:5000/api/v1/fetch/found-items';
 
-const SeeallScreen =({navigation} : any)=> {
+const LostItems =({navigation} : any)=> {
   type ItemData = {
     id: string;
     title: string;
@@ -63,8 +59,6 @@ const SeeallScreen =({navigation} : any)=> {
     },
   ];
 
-
-   const dispatch = useDispatch();
 
   const renderItem = ({item}) => (
     <TouchableOpacity onPress={onPress} style={styles.card}>
@@ -287,4 +281,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SeeallScreen;
+export default LostItems;

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomButton from '../component/CustomBotton';
+import CustomButton from '../component/CustomButton';
 
 const SubscriptionScreen = () => {
   return (

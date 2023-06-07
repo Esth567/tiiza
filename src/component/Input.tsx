@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
 import { COLORS } from '../constant/theme';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const Input = ({ label, iconName, error, password, onFocus = () => {}, ...props }) => {
   const [isFocused, setIsFocused] = React.useState(false);
@@ -14,7 +14,7 @@ const Input = ({ label, iconName, error, password, onFocus = () => {}, ...props 
           { borderColor: error ? COLORS.red : isFocused ? COLORS.primary : COLORS.gray },
         ]}
       >
-        <Icon name={iconName} style={{ fontSize: 15, color: COLORS.primary }} />
+        <FontAwesome name={iconName} style={{ fontSize: 15, color: COLORS.primary }} />
         <TextInput
           secureTextEntry={hidePassword}
           autoCorrect={false}
@@ -25,11 +25,11 @@ const Input = ({ label, iconName, error, password, onFocus = () => {}, ...props 
           onBlur={() => {
             setIsFocused(false);
           }}
-          style={{ color: COLORS.black, flex: 1, fontSize: 14 }}
+          style={{ color: COLORS.black, flex: 1, fontSize: 15 }}
           {...props}
         />
         {password && (
-          <Icon
+          <FontAwesome
             onPress={() => setHidePassword(!hidePassword)}
             style={{ fontSize: 21, color: COLORS.primary }}
             name={hidePassword ? 'eye' : 'eye-slash'}

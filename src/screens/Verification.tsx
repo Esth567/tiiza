@@ -14,34 +14,45 @@ import {
 } from 'react-native';
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomButton from '../component/CustomBotton';
+import CustomButton from '../component/CustomButton';
 import images from '../constant/images';
 import { OTPInput } from 'react-native-verify-otp-inputs';
 
-
 const Verification = ({ navigation }) => {
   const [counter, setCounter] = useState(59);
-  
-   const dispatch = useDispatch();
+   const [message, setMessage] = useState('');
+   const [isRegistraionSuccess, setIsRegistraionSuccess] = useState(false);
+   const [invalidCode, setInvalidCode] = useState(false);
+
+
 
   useEffect(() => {
     const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
     return () => clearInterval(timer);
   }, [counter]);
 
-    const handleSubmit = (token: string) => {
-  
-    if (token) {
-      dispatch(verifyEmail(token))
-        .then(() => {
-          message.setMessage('Registration successful, please check your email for verification');
-          navigation.navigate('Login');
-        })
-        .catch(() => {
-          setSubmitting(false);
-        });
+
+  const verifyEmail = async (token) => {
+    try {
+      const data = JSON.stringify({ token });
+
+      const response = await fetch('http://192.168.43.95:5000/api/v1/validate-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: data,
+      });
+
+      const json = await response.json();
+      return json.success;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
   };
+
+
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: COLORS.white, paddingTop: 50 }}>
@@ -67,19 +78,23 @@ const Verification = ({ navigation }) => {
           Please enter the pin sent to your email
         </Text>
         <OTPInput
+          onSubmit={(token: string) => {
+            verifyEmail(token).then((success) => {
+              if (!success) setInvalidCode(true);
+              success && navigation.replace('Login');
+            });
+          }}
           pinCount={6}
           boxSelectedStyle={style.boxSelectedStyle}
           boxStyle={style.boxStyle}
           digitStyle={style.digitStyle}
           variant="underlined"
         />
-        <CustomButton onPress={handleSubmit} title="Verify" />
-        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 20}}>
-          <Text style={{ color: COLORS.black, fontSize: 14}}>Didn't get pin?</Text>
-          <TouchableOpacity activeOpacity={0.5}>
-            <Text style={style.buttonTextStyle}>Resend pin</Text>
-          </TouchableOpacity>
+        {invalidCode && <Text style={{ color: COLORS.red }}>Incorrect code.</Text>}     
+        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20 }}>
+          <Text style={{ color: COLORS.black, fontSize: 14, marginBottom: 10 }}>Didn't get pin?</Text>
         </View>
+        <CustomButton title="Resend pin" />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -131,7 +146,7 @@ const style = StyleSheet.create({
     color: COLORS.black,
     fontSize: 14,
     marginLeft: 5,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 });
 

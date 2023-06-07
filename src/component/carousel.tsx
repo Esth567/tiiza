@@ -56,19 +56,19 @@ const data = [
     const renderItem = ({ item, index }) => {
       return (
         <View style={styles.card}>
-          <View>
+          <View style={{ flexDirection: 'row' }}>
             <Image source={item.image} style={styles.cardImage} />
-            <View />
-            <View style={{ flexDirection: 'row', marginTop: 10 }}>
+
+            <View style={{ marginTop: 10, marginLeft: 15 }}>
               <Text style={styles.cardTitle}>{item.title}</Text>
               <Text style={[styles.textContainer2, { color: index === 1 ? '#006000' : '#CA0C3A' }]}>
                 {item.status}
               </Text>
+              <Text style={styles.cardDescription}>{item.description}</Text>
+              <Text style={styles.lastseen}>{item.lastseen}</Text>
+              <Text style={styles.location}>{item.location}</Text>
             </View>
           </View>
-          <Text style={styles.cardDescription}>{item.description}</Text>
-          <Text style={styles.lastseen}>{item.lastseen}</Text>
-          <Text style={styles.location}>{item.location}</Text>
         </View>
       );
     };
@@ -98,7 +98,7 @@ const data = [
   };
   
   const sliderWidth = Dimensions.get('window').width;
-  const itemWidth = sliderWidth * 0.5;
+  const itemWidth = sliderWidth * 0.7;
   
   const styles = StyleSheet.create({
     container: {
@@ -116,12 +116,14 @@ const data = [
     },
     textContainer2: {
       fontSize: 14,
-      fontWeight: 'bold',   
+      fontWeight: 'bold',
       marginRight: 15,
       color: COLORS.primary,
+      marginBottom: 10,
     },
     card: {
       backgroundColor: 'white',
+      marginTop: 10,
       borderRadius: 10,
       width: itemWidth,
       marginBottom: 10,
@@ -135,33 +137,30 @@ const data = [
       elevation: 7,
     },
     cardImage: {
-      width: itemWidth,
-      height: 120,
+      width: itemWidth * 0.5,
+      height: 145,
       borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
+      borderBottomLeftRadius: 10,
     },
     cardTitle: {
       fontSize: 15,
       fontWeight: 'bold',
-      flex: 1,
+      marginBottom: 10,
     },
     cardDescription: {
       fontSize: 12,
       fontWeight: 400,
-      marginBottom: 8,
-      paddingLeft: 15,
+      marginBottom: 7,
     },
     lastseen: {
       fontSize: 12,
       fontWeight: 400,
-      paddingLeft: 15,
     },
     location: {
       fontSize: 12,
       fontWeight: 500,
       marginTop: 5,
-      paddingLeft: 15,
-      marginBottom: 15,
+      marginBottom: 13,
     },
     paginationContainer: {
       paddingVertical: 8,
@@ -184,7 +183,6 @@ const data = [
       fontStyle: 'normal',
       fontWeight: 500,
     },
- 
   });
   
 export default CarouselComponent;

@@ -21,6 +21,13 @@ const style = StyleSheet.create({
     zIndex: 10,
     backgroundColor: 'rgba(0.0.0.0.5)',
     justifyContent: 'center',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+    elevation: 7,
   },
   Loader: {
     height: 70,

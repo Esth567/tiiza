@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomButton from '../component/CustomBotton';
+import CustomButton from '../component/CustomButton';
 import BottomSheet from '../component/BottomSheet';
 import ImagePicker from 'react-native-image-crop-picker';
 import { foundItem } from '../actions/lostAndFound';

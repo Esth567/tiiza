@@ -6,8 +6,11 @@ import {
   ItemDetails,
   FoundReport,
   LostDetail,
+  LostItems,
+  Found,
+  Location,
 } from '../screens';
-import SeeallScreen from '../screens/SeeallScreen';
+
 
 const HomeNavigator = () => {
   const HomeStack = createNativeStackNavigator();
@@ -16,9 +19,11 @@ const HomeNavigator = () => {
       <HomeStack.Screen name="Dashboard" component={Dashboard} />
       <HomeStack.Screen name="Lostreport" component={LostReport} />
       <HomeStack.Screen name="LostDetail" component={LostDetail} />
-      <HomeStack.Screen name="seeAll" component={SeeallScreen} />
+      <HomeStack.Screen name="LostItems" component={LostItems} />
       <HomeStack.Screen name="ItemDetails" component={ItemDetails} />
       <HomeStack.Screen name="FoundReport" component={FoundReport} />
+      <HomeStack.Screen name="Found" component={Found} />
+      <HomeStack.Screen name="Location" component={Location} />
     </HomeStack.Navigator>
   );
 };

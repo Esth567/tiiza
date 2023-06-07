@@ -8,9 +8,8 @@
 import React from 'react';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import BottomTabNavigator from './BottomTabNavigator';
-import AuthNavigator from './AuthNavigator';
-import { SplashScreen } from '../screens';
+import { BottomTabNavigator, AuthNavigator} from './src/navigation';
+import { SplashScreen } from './src/screens';
 
 const theme = {
   ...DefaultTheme,
@@ -26,7 +25,19 @@ const Stack = createNativeStackNavigator();
 const App = () => {
  return (
    <NavigationContainer theme={theme}>
-     <Stack.Navigator>
+     <Stack.Navigator initialRouteName='SplashScreen'>
+       <Stack.Screen
+         name="SplashScreen"
+         component={SplashScreen}
+         // Hiding header for Bottom tab Navigation
+         options={{ headerShown: false }}
+       />
+       <Stack.Screen
+         name="AuthNavigator"
+         component={AuthNavigator}
+         // Hiding header for Bottom tab Navigation
+         options={{ headerShown: false }}
+       />
        <Stack.Screen
          name="BottomTabNavigator"
          component={BottomTabNavigator}

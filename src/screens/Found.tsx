@@ -26,14 +26,13 @@ const ITEM_WIDTH = Math.round(WIDTH * 0.45);
 const image_url =
   '"http://localhost:5000/uploads/lost_and_found/found/basseyesth@gmail.com';
 
-const ItemDetails = ({ navigation, route }) => {
+const Found = ({ navigation }) => {
  
   const [isLoading, setIsLoading] = useState(false);
+  const [payload, setPayload] = useState([]);
   const [error, setError] = useState(null);
   const [fullPayload, setFullPayload] = useState([]);
   const [search, setSearch] = useState('');
-
-  const { payload } = route.params;
 
   const handleSearch = (text) => {
     if (text) {
@@ -89,19 +88,25 @@ const ItemDetails = ({ navigation, route }) => {
     );
   }
 
-  const renderItem = () => (
-    <View style={styles.card}>
-      <View>
-        <Image source={{ uri: payload.image_url }} style={styles.cardImage} />
+  const renderItem = ({ item }) => (
+    <TouchableHighlight
+      underlayColor={COLORS.white}
+      activeOpacity={0.9}
+      onPress={() => navigation.navigate('ItemDetails', { payload: item.item_name })}
+    >
+      <View style={styles.card}>
+        <View>
+          <Image source={{ uri: item.image_url }} style={styles.cardImage} />
+        </View>
+        <View style={{ flexDirection: 'row', marginTop: 10 }}>
+          <Text style={styles.cardTitle}>{item.item_name}</Text>
+          <Text style={styles.textContainer2}>{item.item_color}</Text>
+        </View>
+        <Text style={styles.cardDescription}>{item.description}</Text>
+        <Text style={styles.lastseen}>{item.date_found}</Text>
+        <Text style={styles.location}>{item.discovery_location}</Text>
       </View>
-      <View style={{ flexDirection: 'row', marginTop: 10 }}>
-        <Text style={styles.cardTitle}>{payload}</Text>
-        <Text style={styles.textContainer2}>{payload.item_color}</Text>
-      </View>
-      <Text style={styles.cardDescription}>{payload.description}</Text>
-      <Text style={styles.lastseen}>{payload.date_found}</Text>
-      <Text style={styles.location}>{payload.discovery_location}</Text>
-    </View>
+    </TouchableHighlight>
   );
 
   return (
@@ -133,7 +138,7 @@ const ItemDetails = ({ navigation, route }) => {
                 flex: 1,
               }}
             >
-              Details
+              Items Found
             </Text>
             <TouchableOpacity
               style={{
@@ -145,12 +150,26 @@ const ItemDetails = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         </View>
+        <View style={styles.searchBox}>
+          <FontAwesome name="search" size={20} color={COLORS.gray} style={{ marginLeft: 10 }} />
+          <TextInput
+            placeholder="Search for all lost, found items"
+            clearButtonMode="always"
+            style={styles.textSearch}
+            autoCapitalize="none"
+            autoCorrect={false}
+            value={search}
+            underlineColorAndroid="transparent"
+            onChangeText={(text) => handleSearch(text)}
+          />
+        </View>
         <View style={{ marginHorizontal: 10 }}>
-        <FlatList
-          data={payload}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.item_id}
-        />
+          <FlatList
+            data={payload}
+            numColumns={2}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.item_id}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -160,7 +179,7 @@ const ItemDetails = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: COLORS.primary,
-    marginBottom: 25,
+    marginBotom: 25,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -255,4 +274,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ItemDetails;
+export default Found;

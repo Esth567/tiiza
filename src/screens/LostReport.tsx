@@ -13,7 +13,7 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import { COLORS } from '../constant/theme';
 import { Button } from 'react-native';
-import CustomButton from '../component/CustomBotton';
+import CustomButton from '../component/CustomButton';
 import BottomSheet from '../component/BottomSheet';
 import DatePicker from 'react-native-date-picker';
 
