@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   Platform,
   Pressable,
+  SafeAreaView,
+  StatusBar,
   TouchableWithoutFeedback,
 } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -16,11 +18,12 @@ import { Button } from 'react-native';
 import CustomButton from '../component/CustomButton';
 import BottomSheet from '../component/BottomSheet';
 import DatePicker from 'react-native-date-picker';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const CIRCLE_SIZE = 40;
 const CIRCLE_RING_SIZE = 2;
 
-const LostReport = ({ navigation }) => {
+const ReportLostItems = ({ navigation }) => {
   const Colors = [
     'red',
     'purple',
@@ -43,7 +46,7 @@ const LostReport = ({ navigation }) => {
     { label: 'Flashdrive', value: '6' },
     { label: 'Headset', value: '7' },
     { label: 'Key', value: '8' },
-    { label: 'Laptop', value: '9' },
+    { label: 'Laptop', value: '9' }, 
     { label: 'Monitor', value: '10' },
     { label: 'Phone', value: '11' },
     { label: 'Printer', value: '12' },
@@ -114,7 +117,8 @@ const LostReport = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor={COLORS.primary} barStyle="white-content" />
       <BottomSheet show={showBottomSheet} height={290} onOuterClick={hide}>
         <View style={styles.bottomSheetContent}>
           <TouchableOpacity onPress={hide} style={styles.bottomSheetCloseButton}>
@@ -147,160 +151,198 @@ const LostReport = ({ navigation }) => {
       </BottomSheet>
       <ScrollView
         contentContainerStyle={{
-          justifyContent: 'center',
-          alignContent: 'center',
-          marginHorizontal: 15,
-          marginTop: 20,
+          marginTop: -2,
         }}
       >
-        <Text style={{ marginBottom: 18, fontWeight: '600', fontSize: 15 }}>
-          Fill in the details about the item
-        </Text>
-        <View>
-          <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>Category</Text>
+        <View style={styles.header}>
+          <View
+            style={{
+              flexDirection: 'row',
+              marginHorizontal: 10,
+              marginBottom: 10,
+              marginTop: 20,
+            }}
+          >
+            <TouchableOpacity onPress={navigation.goBack}>
+              <FontAwesome name="angle-left" size={26} color={COLORS.white} />
+            </TouchableOpacity>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: '700',
+                color: COLORS.white,
+                marginLeft: 14,
+                flex: 1,
+              }}
+            >
+              Report Lost Items
+            </Text>
+            <TouchableOpacity
+              style={{
+                height: 40,
+                width: 40,
+              }}
+            >
+              <FontAwesome name="bell-o" size={15} color={COLORS.white} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={{marginHorizontal: 15}}>
+          <Text style={{ marginBottom: 18, fontWeight: '600', fontSize: 15 }}>
+            Fill in the details about the item
+          </Text>
+          <View>
+            <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>Category</Text>
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={category}
+              search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Select item type"
+              searchPlaceholder="Search..."
+              item_type={item_type}
+              onChange={(item) => {
+                setItem_type(item.item_type);
+              }}
+            />
+          </View>
+          <View>
+            <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>Item name</Text>
+            <TextInput
+              style={styles.inputContainer}
+              placeholder="Name of the item"
+              onChangeText={(item_name) => setItem_name(item_name)}
+            />
+          </View>
+          <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>Item worth</Text>
           <Dropdown
             style={styles.dropdown}
             placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
             iconStyle={styles.iconStyle}
-            data={category}
-            search
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder="Select item type"
-            searchPlaceholder="Search..."
-            item_type={item_type}
-            onChange={(item) => {
-              setItem_type(item.item_type);
-            }}
-          />
-        </View>
-        <View>
-          <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>Item name</Text>
-          <TextInput
-            style={styles.inputContainer}
-            placeholder="Name of the item"
-            onChangeText={(item_name) => setItem_name(item_name)}
-          />
-        </View>
-        <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>Item worth</Text>
-        <Dropdown
-          style={styles.dropdown}
-          placeholderStyle={styles.placeholderStyle}
-          iconStyle={styles.iconStyle}
-          data={worth}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder="Select item"
-          item_worth={item_worth}
-          onChange={(item) => {
-            setItem_worth(item.item_worth);
-          }}
-        />
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15, flex: 1 }}>
-            Report Type
-          </Text>
-          <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15, marginRight: 30 }}>
-            Color
-          </Text>
-        </View>
-        <View style={{ flexDirection: 'row' }}>
-          <Dropdown
-            style={styles.dropdown2}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={report}
+            data={worth}
             maxHeight={300}
             labelField="label"
             valueField="value"
             placeholder="Select item"
-            report_type={report_type}
+            item_worth={item_worth}
             onChange={(item) => {
-              setReport_type(item.report_type);
+              setItem_worth(item.item_worth);
             }}
           />
-          <TouchableOpacity
-            style={[styles.colorBox, { backgroundColor: Colors[item_color] }]}
-            onPress={() => {
-              setShowBottomSheet(true);
-            }}
-          ></TouchableOpacity>
-        </View>
-        <View>
-          <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>
-            Lost date and time
-          </Text>
-          <TouchableOpacity onPress={() => setOpen(true)}>
-            <TextInput
-              style={styles.input}
-              placeholder="DD-MM-YYYY"
-              value={lost_date}
-              onChangeText={setLost_date}
-              placeholderTextColor="#11182744"
-              editable={false}
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15, flex: 1 }}>
+              Report Type
+            </Text>
+            <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15, marginRight: 30 }}>
+              Color
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <Dropdown
+              style={styles.dropdown2}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={report}
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Select item"
+              report_type={report_type}
+              onChange={(item) => {
+                setReport_type(item.report_type);
+              }}
             />
-          </TouchableOpacity>
-          <DatePicker
-            modal
-            open={open}
-            format="DD-MM-YYYY"
-            minDate="01-01-2016"
-            maxDate="01-01-2019"
-            confirmBtnText="Confirm"
-            cancelBtnText="Cancel"
-            date={date}
-            mode="datetime"
-            onConfirm={(date) => {
-              setOpen(false);
-              setDate(date);
-            }}
-            onCancel={() => {
-              setOpen(false);
-            }}
-          />
-        </View>
-        <View>
-          <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>Lost location</Text>
-          <TextInput
-            style={styles.inputContainer}
-            placeholder="City/State"
-            onChangeText={(lost_location) => setLost_location(lost_location)}
-          />
-        </View>
-        <View>
-          <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>
-            Additional information
-          </Text>
-          <TextInput
-            style={styles.infoContainer}
-            placeholder="Type..."
-            onChangeText={(description) => setDescription(description)}
-          />
-        </View>
-        <View style={{ marginBottom: 70 }}>
-          <CustomButton
-            title="Continue"
-            onsubmit={onsubmit}
-            onPress={() => navigation.navigate('Details')}
-          />
+            <TouchableOpacity
+              style={[styles.colorBox, { backgroundColor: Colors[item_color] }]}
+              onPress={() => {
+                setShowBottomSheet(true);
+              }}
+            ></TouchableOpacity>
+          </View>
+          <View>
+            <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>
+              Lost date and time
+            </Text>
+            <TouchableOpacity onPress={() => setOpen(true)}>
+              <TextInput
+                style={styles.input}
+                placeholder="DD-MM-YYYY"
+                value={lost_date}
+                onChangeText={setLost_date}
+                placeholderTextColor="#11182744"
+                editable={false}
+              />
+            </TouchableOpacity>
+            <DatePicker
+              modal
+              open={open}
+              format="DD-MM-YYYY"
+              minDate="01-01-2016"
+              maxDate="01-01-2019"
+              confirmBtnText="Confirm"
+              cancelBtnText="Cancel"
+              date={date}
+              mode="datetime"
+              onConfirm={(date) => {
+                setOpen(false);
+                setDate(date);
+              }}
+              onCancel={() => {
+                setOpen(false);
+              }}
+            />
+          </View>
+          <View>
+            <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>Lost location</Text>
+            <TextInput
+              style={styles.inputContainer}
+              placeholder="City/State"
+              onChangeText={(lost_location) => setLost_location(lost_location)}
+            />
+          </View>
+          <View>
+            <Text style={{ marginBottom: 5, fontWeight: '600', fontSize: 15 }}>
+              Additional information
+            </Text>
+            <TextInput
+              style={styles.infoContainer}
+              placeholder="Type..."
+              onChangeText={(description) => setDescription(description)}
+            />
+          </View>
+          <View style={{ marginBottom: 70 }}>
+            <CustomButton
+              title="Continue"
+              onsubmit={onsubmit}
+              onPress={() => navigation.navigate('Details')}
+            />
+          </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
-export default LostReport;
+export default ReportLostItems;
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     flex: 1,
+  },
+  header: {
+    backgroundColor: COLORS.primary,
+    marginBottom: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   dropdown: {
     height: 50,

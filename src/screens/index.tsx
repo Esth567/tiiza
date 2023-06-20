@@ -1,37 +1,41 @@
 import RegisterScreen from './RegisterScreen';
 import LoginScreen from './LoginScreen';
 import Dashboard from './Dashboard';
-import LostReport from './LostReport';
+import ReportLostItems from './ReportLostItems';
 import LostDetail from './LostDetail';
 import ForgotPassword from './ForgotPassword';
 import SplashScreen from './SplashScreen';
 import HelpScreen from './HelpScreen';
-import ItemDetails from './ItemDetails';
+import Details from './Details';
 import Verification from './Verification';
 import FoundReport from './FoundReport';
 import FoundDetail from './FoundDetails';
 import LostItems from './LostItems';
 import PhoneNumber from './PhoneNumber';
 import SmsOtp from './SmsVerify';
-import Found from './Found';
+import ItemsFound from './ItemsFound';
 import Location from './Location';
+import Chat from './Chat';
+import Messaging from './Messaging';
 
 export {
   RegisterScreen,
   LoginScreen,
   LostItems,
-  Found,
+  ItemsFound,
   Dashboard,
-  LostReport,
+  ReportLostItems,
   LostDetail,
   ForgotPassword,
   SplashScreen,
   HelpScreen,
-  ItemDetails,
+  Details,
   Verification,
   FoundReport,
   FoundDetail,
   PhoneNumber,
   SmsOtp,
   Location,
+  Chat,
+  Messaging,
 };

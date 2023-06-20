@@ -22,7 +22,7 @@ const ChatComponent = ({ item }) => {
 
   return (
     <Pressable style={styles.chat} onPress={handleNavigation}>
-      <FontAwesome name="person-circle" size={45} color="black" style={{ marginRight: 15 }} />
+      <FontAwesome name="user-circle" size={33} color="black" style={{ marginRight: 15 }} />
 
       <View style={styles.rightContainer}>
         <View>

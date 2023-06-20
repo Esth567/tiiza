@@ -5,7 +5,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomButton from '../component/CustomButton';
 import BottomSheet from '../component/BottomSheet';
 import ImagePicker from 'react-native-image-crop-picker';
-import { foundItem } from '../actions/lostAndFound';
 import FoundReport from './FoundReport';
 
 const FoundDetail = () => {

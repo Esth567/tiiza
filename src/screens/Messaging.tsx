@@ -7,82 +7,102 @@ import socket from '../utils/socket';
 
 const Messaging = ({ route, navigation }) => {
 
- 	const [user, setUser] = useState("");
-	const { name, id } = route.params;
+    const [chatMessages, setChatMessages] = useState([
+      {
+        id: '1',
+        text: 'Hello guys, welcome!',
+        time: '07:50',
+        user: 'Tomer',
+      },
+      {
+        id: '2',
+        text: 'Hi Tomer, thank you! 😇',
+        time: '08:50',
+        user: 'David',
+      },
+    ]);
+    const [message, setMessage] = useState('');
+    const [user, setUser] = useState('');
 
-	const [chatMessages, setChatMessages] = useState([]);
-	const [message, setMessage] = useState("");
+    //👇🏻 Access the chatroom's name and id
+    const { name, id } = route.params;
 
-	const getUsername = async () => {
-		try {
-			const value = await AsyncStorage.getItem("username");
-			if (value !== null) {
-				setUser(value);
-			}
-		} catch (e) {
-			console.error("Error while loading username!");
-		}
-	};
+    //👇🏻 This function gets the username saved on AsyncStorage
+    const getUserId = async () => {
+      try {
+        const value = await AsyncStorage.getItem('user_id');
+        if (value !== null) {
+          setUser(value);
+        }
+      } catch (e) {
+        console.error('Error while loading username!');
+      }
+    };
 
-const handleNewMessage = () => {
-		const hour =
-			new Date().getHours() < 10
-				? `0${new Date().getHours()}`
-				: `${new Date().getHours()}`;
+    //👇🏻 Sets the header title to the name chatroom's name
+    useLayoutEffect(() => {
+      navigation.setOptions({ title: name });
+      getUserId();
+    }, []);
 
-		const mins =
-			new Date().getMinutes() < 10
-				? `0${new Date().getMinutes()}`
-				: `${new Date().getMinutes()}`;
+    /*👇🏻 
+        This function gets the time the user sends a message, then 
+        logs the username, message, and the timestamp to the console.
+     */
+    const handleNewMessage = () => {
+      const hour =
+        new Date().getHours() < 10 ? `0${new Date().getHours()}` : `${new Date().getHours()}`;
 
-		if (user) {
-			socket.emit("newMessage", {
-				message,
-				room_id: id,
-				user,
-				timestamp: { hour, mins },
-			});
-		}
-	};
+      const mins =
+        new Date().getMinutes() < 10 ? `0${new Date().getMinutes()}` : `${new Date().getMinutes()}`;
 
-	useLayoutEffect(() => {
-		navigation.setOptions({ title: name });
-		getUsername();
-		socket.emit("findRoom", id);
-		socket.on("foundRoom", (roomChats) => setChatMessages(roomChats));
-	}, []);
+      console.log({
+        message,
+        user,
+        timestamp: { hour, mins },
+      });
+    };
 
-	useEffect(() => {
-		socket.on("foundRoom", (roomChats) => setChatMessages(roomChats));
-	}, [socket]);
+    return (
+      <View style={styles.messagingscreen}>
+        <View style={[styles.messagingscreen, { paddingVertical: 15, paddingHorizontal: 10 }]}>
+          {chatMessages[0] ? (
+            <FlatList
+              data={chatMessages}
+              renderItem={({ item }) => <MessageComponent item={item} user={user} />}
+              keyExtractor={(item) => item.id.toString()}
+            />
+          ) : (
+            ''
+          )}
+        </View>
 
- return (
-   <View style={styles.messagingscreen}>
-     <View style={[styles.messagingscreen, { paddingVertical: 15, paddingHorizontal: 10 }]}>
-       {chatMessages[0] ? (
-         <FlatList
-           data={chatMessages}
-           renderItem={({ item }) => <MessageComponent item={item} user={user} />}
-           keyExtractor={(item) => item.id}
-         />
-       ) : (
-         ''
-       )}
-     </View>
-     <View style={styles.messaginginputContainer}>
-       <TextInput style={styles.messaginginput} onChangeText={(value) => setMessage(value)} />
-       <Pressable style={styles.messagingbuttonContainer} onPress={handleNewMessage}>
-         <View>
-           <Text style={{ color: '#f2f0f1', fontSize: 20 }}>SEND</Text>
-         </View>
-       </Pressable>
-     </View>
-   </View>
- );
+        <View style={styles.messaginginputContainer}>
+          <TextInput style={styles.messageinput} onChangeText={(value) => setMessage(value)} />
+          <Pressable style={styles.messagingbuttonContainer} onPress={handleNewMessage}>
+            <View>
+              <Text style={{ color: '#f2f0f1', fontSize: 16 }}>SEND</Text>
+            </View>
+          </Pressable>
+        </View>
+      </View>
+    );
 };
 
 const styles = StyleSheet.create({
-  inputContainer: {
+  messagingscreen: {
+    flex: 1,
+  },
+  messagingbuttonContainer: {
+    width: '20%',
+    backgroundColor: 'green',
+    borderRadius: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    height: 45,
+  },
+  messaginginputContainer: {
     width: '100%',
     minHeight: 100,
     backgroundColor: 'white',
@@ -92,19 +112,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   messageinput: {
-    borderWidth: 1,
+    borderWidth: 0.5,
     padding: 15,
     flex: 1,
     marginRight: 10,
-    borderRadius: 20,
-  },
-  messagebutton: {
-    width: '30%',
-    backgroundColor: 'green',
-    borderRadius: 3,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 50,
+    borderRadius: 10,
+    height: 50,
   },
 });
 

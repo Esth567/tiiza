@@ -2,13 +2,15 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   Dashboard,
-  LostReport,
-  ItemDetails,
+  ReportLostItems,
+  Details,
   FoundReport,
   LostDetail,
   LostItems,
-  Found,
+  ItemsFound,
   Location,
+  Chat,
+  Messaging,
 } from '../screens';
 
 
@@ -17,13 +19,15 @@ const HomeNavigator = () => {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Dashboard">
       <HomeStack.Screen name="Dashboard" component={Dashboard} />
-      <HomeStack.Screen name="Lostreport" component={LostReport} />
+      <HomeStack.Screen name="Report Lost Items" component={ReportLostItems} />
       <HomeStack.Screen name="LostDetail" component={LostDetail} />
       <HomeStack.Screen name="LostItems" component={LostItems} />
-      <HomeStack.Screen name="ItemDetails" component={ItemDetails} />
+      <HomeStack.Screen name="Details" component={Details} />
       <HomeStack.Screen name="FoundReport" component={FoundReport} />
-      <HomeStack.Screen name="Found" component={Found} />
+      <HomeStack.Screen name="Items Found" component={ItemsFound} />
       <HomeStack.Screen name="Location" component={Location} />
+      <HomeStack.Screen name="Chat" component={Chat} />
+      <HomeStack.Screen name="Messaging" component={Messaging} />
     </HomeStack.Navigator>
   );
 };

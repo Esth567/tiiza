@@ -17,7 +17,7 @@ import {
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomButton from '../component/CustomButton';
-import LostReport from './LostReport';
+import LostReport from './ReportLostItems';
 import images from '../constant/images';
 import CarouselComponent from '../component/carousel';
 import userServices from '../services/authServices';
@@ -33,55 +33,52 @@ const ITEM_WIDTH = Math.round(WIDTH * 0.73);
 const HEIGHT = Dimensions.get('window').height * 5;
 
 const Dashboard = ({ navigation }: any) => {
-    const [selectedId, setSelectedId] = useState<string>();
-
+  const [selectedId, setSelectedId] = useState<string>();
 
   type ItemData = {
     id: string;
-    title: string;
+    name: string;
   };
 
   const DATA: ItemData[] = [
     {
       id: '1',
-      title: 'Lost Items',
+      name: 'Lost Items',
       icon: <FontAwesome name="list-alt" size={18} color={COLORS.primary} />,
     },
     {
       id: '2',
-      title: 'Found',
+      name: 'Items Found',
       icon: <FontAwesome name="handshake-o" size={18} color={COLORS.primary} />,
-       onPress: () => {
-        navigation.navigate(Found);
+      onPress: () => {
+        navigation.navigate(ItemsFound);
       },
     },
     {
       id: '3',
-      title: 'My galary',
+      name: 'Report Found Items',
       icon: <FontAwesome name="archive" size={18} color={COLORS.primary} />,
-    },
-    {
-      id: '4',
-      title: 'Report Found',
-      icon: <FontAwesome name="bug" size={18} color={COLORS.primary} />,
       onPress: () => {
-        navigation.navigate(FoundDetail);
+        navigation.navigate('ReportLostItems');
       },
     },
     {
-      id: '5',
-      title: 'Report Lost',
-      icon: <FontAwesome name="flag-checkered" size={18} color={COLORS.primary} />,
+      id: '4',
+      name: 'Report Lost Items',
+      icon: <FontAwesome name="bug" size={18} color={COLORS.primary} />,
+      onPress: () => {
+        navigation.navigate('ReportLostItems');
+      },
     },
     {
       id: '6',
-      title: 'Location',
-      icon: <FontAwesome name="location-arrow" size={20} color={COLORS.primary} />,
-    },
-    {
-      id: '6',
-      title: 'Stealing alarm',
+      name: 'Stealing alarm',
       icon: <FontAwesome name="exclamation-triangle" size={18} color={COLORS.primary} />,
+    },
+    {
+      id: '5',
+      name: 'Location',
+      icon: <FontAwesome name="location-arrow" size={20} color={COLORS.primary} />,
     },
   ];
 
@@ -93,8 +90,8 @@ const Dashboard = ({ navigation }: any) => {
   };
 
   const Item = ({ item, onPress }: ItemProps) => (
-    <TouchableOpacity  onPress={() => navigation.navigate(item.title)}>
-      <View style={{ marginTop: 5, alignItems: 'center', justifyContent: 'center' }}>
+    <TouchableOpacity onPress={() => navigation.navigate(item.name)}>
+      <View style={{ marginTop: 10, alignItems: 'center', justifyContent: 'center' }}>
         {item.icon}
       </View>
       <Text
@@ -102,17 +99,16 @@ const Dashboard = ({ navigation }: any) => {
           textAlign: 'center',
           flexWrap: 'wrap',
           fontSize: 12,
-          paddingTop: 10,
+          paddingTop: 8,
           marginBottom: 10,
           color: COLORS.primary,
         }}
       >
-        {item.title}
+        {item.name}
       </Text>
     </TouchableOpacity>
   );
 
-  
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white, paddingTop: 3 }}>
       <StatusBar backgroundColor={COLORS.white} barStyle="dark-content" />
@@ -147,7 +143,7 @@ const Dashboard = ({ navigation }: any) => {
                 alignItems: 'center',
               }}
             >
-              <FontAwesome name="bell-o" size={18} color={COLORS.black} />
+              <FontAwesome name="bell-o" size={15} color={COLORS.black} />
               <View
                 style={{
                   position: 'absolute',
@@ -169,10 +165,10 @@ const Dashboard = ({ navigation }: any) => {
           <View style={style.containerCard}>
             <FlatList
               data={DATA}
-              numColumns={4}
+              numColumns={3}
               columnWrapperStyle={{ justifyContent: 'space-between' }}
               renderItem={Item}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.id.toString()}
               extraData={selectedId}
               style={{ marginTop: 15 }}
               showsVerticalScrollIndicator={false}
@@ -214,7 +210,7 @@ const style = StyleSheet.create({
     backgroundColor: COLORS.primary,
     marginBottom: 7,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   item: {
     padding: 20,

@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS } from '../constant/theme';
 import SubscriptionScreen from '../screens/SubscriptionScreen';
 import HomeNavigator from './HomeNavigator';
-import { CreateReport, HelpScreen, LostReport } from '../screens';
+import {  HelpScreen, ReportLostItems } from '../screens';
 
 
 const Tab = createBottomTabNavigator();
@@ -25,7 +25,7 @@ const BottomTabNavigator = () => {
       }}
     >
       <Tab.Screen
-        name="Home"
+        name="HomeNavigator"
         component={HomeNavigator}
         options={{
           tabBarIcon: ({ color }) => <Icon name="home" color={color} size={28} />,
@@ -33,7 +33,7 @@ const BottomTabNavigator = () => {
       />
       <Tab.Screen
         name="LostReport"
-        component={LostReport}
+        component={ReportLostItems}
         options={{
           tabBarIcon: ({ color }) => <Icon name="person-circle" color={color} size={20} />,
         }}

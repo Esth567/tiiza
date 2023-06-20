@@ -81,8 +81,8 @@ const LoginScreen = ({ navigation }) => {
       })
         .then((response) => response.json())
         .then((responseJson) => {
-            console.log(responseJson);
-            navigation.navigate('BottomTabNavigator');    
+            console.log(responseJson); 
+             navigation.navigate('BottomTabNavigator');    
         })
         .catch((error) => {
           console.log('Error');

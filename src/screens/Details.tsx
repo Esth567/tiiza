@@ -17,53 +17,34 @@ import React, { useState, useEffect } from 'react';
 import { COLORS } from '../constant/theme';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import filter from 'lodash.filter';
-
+import CustomButton from '../component/CustomButton';
 
 
 const WIDTH = Dimensions.get('window').width;
-const ITEM_WIDTH = Math.round(WIDTH * 0.45);
+const ITEM_WIDTH = Math.round(WIDTH * 0.93);
 
-const image_url =
-  '"http://localhost:5000/uploads/lost_and_found/found/basseyesth@gmail.com';
 
-const ItemDetails = ({ navigation, route }) => {
+const Details = ({ navigation, route }) => {
  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [fullPayload, setFullPayload] = useState([]);
-  const [search, setSearch] = useState('');
+  
 
   const { payload } = route.params;
 
-  const handleSearch = (text) => {
-    if (text) {
-      const newData = fullPayload.filter(function (item) {
-        const itemData = item.item_name ? item.item_name.toUpperCase() : ''.toUpperCase();
-        const textData = text.toUpperCase();
-        return itemData.indexOf(textData) > -1;
-      });
-      setPayload(newData);
-      setSearch(text);
-    } else {
-      setPayload(fullPayload);
-      setSearch(text);
-    }
-  };
 
   useEffect(() => {
     setIsLoading(true);
     fetchData();
   }, []);
 
-  const fetchData = (item) => {
+  const fetchData = () => {
     fetch('http://192.168.43.95:5000/api/v1/customer/fetch/found-items')
       .then((res) => {
         return res.json();
       })
       .then((res) => {
         console.log(res);
-        setFullPayload(res.payload);
-        setPayload(res.payload);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -89,20 +70,6 @@ const ItemDetails = ({ navigation, route }) => {
     );
   }
 
-  const renderItem = () => (
-    <View style={styles.card}>
-      <View>
-        <Image source={{ uri: payload.image_url }} style={styles.cardImage} />
-      </View>
-      <View style={{ flexDirection: 'row', marginTop: 10 }}>
-        <Text style={styles.cardTitle}>{payload}</Text>
-        <Text style={styles.textContainer2}>{payload.item_color}</Text>
-      </View>
-      <Text style={styles.cardDescription}>{payload.description}</Text>
-      <Text style={styles.lastseen}>{payload.date_found}</Text>
-      <Text style={styles.location}>{payload.discovery_location}</Text>
-    </View>
-  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -145,12 +112,41 @@ const ItemDetails = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{ marginHorizontal: 10 }}>
-        <FlatList
-          data={payload}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.item_id}
-        />
+        <View>
+          <View style={{ marginHorizontal: 15 }}>
+            <Image source={{ uri: payload.image_url }} style={styles.cardImage} />
+          </View>
+          <View style={styles.card}>
+          <View
+            style={{
+              flexDirection: 'row',
+              marginTop: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={styles.cardTitle}>{payload.item_name}</Text>
+            <Text style={styles.textContainer2}>{payload.item_color}</Text>
+          </View>
+          <Text style={styles.cardDescription}>{payload.description}</Text>
+          <Text style={styles.lastseen}>{payload.date_found}</Text>
+          <Text style={styles.location}>{payload.discovery_location}</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              marginHorizontal: 15,
+              alignItems: 'center',
+              marginTop: 10,
+            }}
+          >
+            <FontAwesome name="phone" size={20} color={COLORS.primary} />
+            <Text style={styles.phone}>{payload.phone_number}</Text>
+            <Text style={{ marginRight: 10, fontSize: 14, fontWeight: 'bold' }}>Chat</Text>
+             <TouchableOpacity onPress={() => navigation.navigate('Chat')}>
+            <FontAwesome name="whatsapp" size={20} color={COLORS.primary} />
+            </TouchableOpacity>
+          </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -164,46 +160,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  search: {
-    height: 45,
-    width: '100%',
-    backgroundColor: '#5211',
-    padding: 5,
-    marginTop: 20,
-    borderRadius: 10,
-  },
-  textSearch: {
-    color: '#000000',
-    marginTop: 8,
-    fontSize: 15,
-    marginHorizontal: 10,
-  },
-  categ: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: 10,
-  },
-  searchBox: {
-    flexDirection: 'row',
-    height: 45,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginHorizontal: 15,
-    backgroundColor: COLORS.white,
-    marginBottom: 30,
-    marginVertical: -20,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.29,
-    shadowRadius: 4.65,
-    elevation: 7,
-  },
   card: {
+    marginTop: 50,
     backgroundColor: 'white',
-    marginHorizontal: 5,
+    marginHorizontal: 15,
     borderRadius: 10,
+    height: 220,
     width: ITEM_WIDTH,
     marginBottom: 10,
     shadowColor: '#000',
@@ -216,43 +178,49 @@ const styles = StyleSheet.create({
     elevation: 7,
   },
   cardImage: {
-    width: 80,
-    height: 80,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    resizeMode: 'cover',
+    width: 100,
+    height: 100,
+    marginTop: 20   
   },
   cardTitle: {
     fontSize: 15,
     fontWeight: 'bold',
-    paddingLeft: 10,
+    paddingLeft: 15,
     flex: 1,
+    marginTop: 15
   },
   textContainer2: {
     fontSize: 14,
     fontWeight: 'bold',
     marginRight: 15,
+    marginTop: 15,
     color: COLORS.primary,
   },
   cardDescription: {
     fontSize: 13,
     fontWeight: '500',
-    paddingLeft: 10,
-    marginTop: 10,
+    paddingLeft: 15,
+    marginTop: 15,
   },
   lastseen: {
     fontSize: 13,
-    marginTop: 5,
+    marginTop: 15,
     fontWeight: '500',
-    paddingLeft: 10,
+    paddingLeft: 15,
   },
   location: {
     fontSize: 14,
     fontWeight: '600',
-    marginTop: 5,
-    paddingLeft: 10,
+    marginTop: 15,
+    paddingLeft: 15,
     marginBottom: 15,
+  },
+  phone: {
+    marginLeft: 2,
+    marginBottom: 10,
+    flex: 1,
+    fontWeight: 'bold',
   },
 });
 
-export default ItemDetails;
+export default Details;

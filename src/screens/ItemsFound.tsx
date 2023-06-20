@@ -26,7 +26,7 @@ const ITEM_WIDTH = Math.round(WIDTH * 0.45);
 const image_url =
   '"http://localhost:5000/uploads/lost_and_found/found/basseyesth@gmail.com';
 
-const Found = ({ navigation }) => {
+const ItemsFound = ({ navigation }) => {
  
   const [isLoading, setIsLoading] = useState(false);
   const [payload, setPayload] = useState([]);
@@ -89,21 +89,18 @@ const Found = ({ navigation }) => {
   }
 
   const renderItem = ({ item }) => (
-    <TouchableHighlight
-      underlayColor={COLORS.white}
-      activeOpacity={0.9}
-      onPress={() => navigation.navigate('ItemDetails', { payload: item.item_name })}
-    >
+    <TouchableHighlight underlayColor={COLORS.white} activeOpacity={0.9} onPress={() => navigation.navigate('Details', { payload: item})} >
       <View style={styles.card}>
-        <View>
-          <Image source={{ uri: item.image_url }} style={styles.cardImage} />
-        </View>
+       <Image source={{ uri: item.image_url }} style={styles.cardImage} />
         <View style={{ flexDirection: 'row', marginTop: 10 }}>
-          <Text style={styles.cardTitle}>{item.item_name}</Text>
+          <Text
+            style={styles.cardTitle}
+          >
+            {item.item_name}
+          </Text>
           <Text style={styles.textContainer2}>{item.item_color}</Text>
         </View>
         <Text style={styles.cardDescription}>{item.description}</Text>
-        <Text style={styles.lastseen}>{item.date_found}</Text>
         <Text style={styles.location}>{item.discovery_location}</Text>
       </View>
     </TouchableHighlight>
@@ -168,7 +165,7 @@ const Found = ({ navigation }) => {
             data={payload}
             numColumns={2}
             renderItem={renderItem}
-            keyExtractor={(item) => item.item_id}
+            keyExtractor={(item) => item.item_id.toString()}
           />
         </View>
       </ScrollView>
@@ -274,4 +271,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Found;
+export default ItemsFound;
